@@ -33,11 +33,7 @@ from services.export import generate_csuite_briefing_html, generate_pbit_templat
 from services.data_dictionary import get_governed_data_dictionary
 from services.test_runner import execute_automated_system_tests
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Safe Startup Event: Initializes DB Schema/View without destroying existing records
-    init_db()
-    session = SessionLocal()
+def ensure_database_populated(session):
     try:
         mgr_user = session.query(User).filter_by(email="manager@travelintelligence.com").first()
         ticket_count = session.query(FactTravelTicket).count()
@@ -48,7 +44,15 @@ async def lifespan(app: FastAPI):
             if os.path.exists(raw_csv):
                 run_end_to_end_pipeline(raw_csv, "INITIAL_PROD_BOOTSTRAP_BATCH", "Production Auto-Bootstrap Ingestion")
     except Exception as e:
-        print(f"[BOOTSTRAP NOTICE] {e}")
+        print(f"[AUTO-POPULATE NOTICE] {e}")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Safe Startup Event: Initializes DB Schema/View without destroying existing records
+    init_db()
+    session = SessionLocal()
+    try:
+        ensure_database_populated(session)
     finally:
         session.close()
     yield
@@ -322,6 +326,7 @@ def get_dashboard_stats(
     current_user: User = Depends(get_current_user)
 ):
     session = SessionLocal()
+    ensure_database_populated(session)
     query = session.query(FactTravelTicket)
     
     # Employee Role Scoping: Employees see their own records only
@@ -478,6 +483,7 @@ def run_system_tests(current_user: User = Depends(require_role(["manager", "admi
 @app.get("/api/employees")
 def get_all_employees(current_user: User = Depends(require_role(["manager", "admin"]))):
     session = SessionLocal()
+    ensure_database_populated(session)
     employees = session.query(EmployeeMaster).filter_by(is_current=1).all()
     
     emp_list = []
@@ -850,6 +856,7 @@ def manager_approval_action(req: ManagerApprovalAction, current_user: User = Dep
 @app.get("/api/pipeline/audit")
 def get_pipeline_audit_history(current_user: User = Depends(require_role(["manager", "admin"]))):
     session = SessionLocal()
+    ensure_database_populated(session)
     audits = session.query(PipelineBatchAudit).order_by(PipelineBatchAudit.started_at.desc()).limit(20).all()
     
     result = [
@@ -951,6 +958,9 @@ def apply_analyst_override(req: OverrideRequest, current_user: User = Depends(re
 
 @app.get("/api/forecasting")
 def forecasting_data(current_user: User = Depends(get_current_user)):
+    session = SessionLocal()
+    ensure_database_populated(session)
+    session.close()
     return get_spend_forecasting()
 
 @app.get("/api/reports/briefing-html", response_class=HTMLResponse)
