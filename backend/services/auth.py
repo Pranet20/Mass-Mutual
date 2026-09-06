@@ -8,12 +8,7 @@ from fastapi import HTTPException, Header, Depends, Query, status
 from database.models import SessionLocal, User, EmployeeMaster
 
 # Load JWT Secret securely from environment
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
-if not SECRET_KEY:
-    if os.environ.get("ENV") == "production":
-        raise RuntimeError("CRITICAL SECURITY CONFIGURATION ERROR: JWT_SECRET_KEY environment variable must be set in production mode.")
-    SECRET_KEY = "travel_analytics_enterprise_jwt_secret_2026"
-
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or os.environ.get("SECRET_KEY", "travel_analytics_enterprise_jwt_secret_2026_mass_mutual_prod")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = int(os.environ.get("ACCESS_TOKEN_EXPIRE_HOURS", "12"))
 
