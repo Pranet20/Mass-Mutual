@@ -1,0 +1,11 @@
+country_code,country_name,iso_alpha2,iso_alpha3,region,is_domestic_base
+IN,India,IN,IND,APAC,1
+US,United States,US,USA,AMER,0
+GB,United Kingdom,GB,GBR,EMEA,0
+SG,Singapore,SG,SGP,APAC,0
+DE,Germany,DE,DEU,EMEA,0
+AE,United Arab Emirates,AE,ARE,EMEA,0
+JP,Japan,JP,JPN,APAC,0
+AU,Australia,AU,AUS,APAC,0
+CA,Canada,CA,CAN,AMER,0
+CH,Switzerland,CH,CHE,EMEA,0

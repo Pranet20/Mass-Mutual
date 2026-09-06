@@ -1,0 +1,107 @@
+/* =========================================================================
+   Corporate Travel Analytics — Production DAX Measure Library
+   Governed Source: vw_travel
+   Base Currency: INR
+   ========================================================================= */
+
+// 1. Total Gross Booking Spend (All Bookings)
+Total Spend INR = 
+SUM(vw_travel[amount_inr])
+
+// 2. Total Net Realized Travel Spend (Only Completed / Travelled Tickets)
+Total Completed Spend INR = 
+CALCULATE(
+    SUM(vw_travel[amount_inr]),
+    vw_travel[travelled_flag] = "Y"
+)
+
+// 3. Total Tickets Count
+Total Tickets = 
+COUNTROWS(vw_travel)
+
+// 4. Completed Travel Tickets Count
+Completed Travel Tickets = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[travelled_flag] = "Y"
+)
+
+// 5. Cancelled or Refunded Tickets Count
+Cancelled or Refunded Tickets = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[travelled_flag] = "N"
+)
+
+// 6. Cross-Border Travel Spend (INR)
+Cross-Border Spend INR = 
+CALCULATE(
+    SUM(vw_travel[amount_inr]),
+    vw_travel[trip_classification] = "Cross-Border",
+    vw_travel[travelled_flag] = "Y"
+)
+
+// 7. Cross-Border Spend Percentage of Completed Spend
+Cross-Border Spend % = 
+DIVIDE(
+    [Cross-Border Spend INR],
+    [Total Completed Spend INR],
+    0
+)
+
+// 8. Policy Flagged Tickets Count (Exceptions / Violations)
+Flagged Tickets Count = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[policy_compliance_status] <> "COMPLIANT"
+)
+
+// 9. Policy Violation Rate Percentage
+Policy Violation Rate % = 
+DIVIDE(
+    [Flagged Tickets Count],
+    [Total Tickets],
+    0
+)
+
+// 10. Manual Overrides Count (Analyst Exceptions Applied)
+Manual Overrides Count = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[override_applied] = 1
+)
+
+// 11. Average Ticket Cost (INR)
+Average Ticket Cost INR = 
+DIVIDE(
+    [Total Completed Spend INR],
+    [Completed Travel Tickets],
+    0
+)
+
+// 12. Total Approved Quarterly Budget (₹1,50,000 INR baseline per corporate employee)
+Total Quarterly Allowance INR = 
+DISTINCTCOUNT(vw_travel[employee_id]) * 150000.0
+
+// 13. Budget Utilization Percentage
+Budget Utilization % = 
+DIVIDE(
+    [Total Completed Spend INR],
+    [Total Quarterly Allowance INR],
+    0
+)
+
+// 14. Quarter-over-Quarter Spend Growth % (For Import Mode with Date Table)
+QoQ Spend Growth % = 
+VAR CurrentQtrSpend = [Total Completed Spend INR]
+VAR PriorQtrSpend = 
+    CALCULATE(
+        [Total Completed Spend INR],
+        DATEADD(vw_travel[travel_date], -1, QUARTER)
+    )
+RETURN
+    DIVIDE(
+        CurrentQtrSpend - PriorQtrSpend,
+        PriorQtrSpend,
+        0
+    )

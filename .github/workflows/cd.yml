@@ -1,0 +1,96 @@
+name: Enterprise CD Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      deployment_env:
+        description: 'Target Deployment Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  # 1. Require successful CI verification before deployment
+  verify-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Backend Pytest Suite
+        run: pytest -q
+
+  # 2. Build & Package Containerized Artifacts
+  build-and-package:
+    needs: verify-ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: env.CONTAINER_REGISTRY_USER != ''
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CONTAINER_REGISTRY_USER: ${{ github.actor }}
+
+      - name: Extract Metadata (Tags & Labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=sha,format=short
+
+      - name: Build and Test Docker Container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # 3. Deployment Stage Boundary
+  deploy:
+    needs: build-and-package
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.deployment_env || 'staging' }}
+    steps:
+      - name: Checkout Deployment Manifests
+        uses: actions/checkout@v4
+
+      - name: Deploy to Target Environment
+        run: |
+          echo "============================================================"
+          echo "Deploying Corporate Travel Intelligence Platform"
+          echo "Target Environment: ${{ github.event.inputs.deployment_env || 'staging' }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Deployment Boundary Reached — Verification Succeeded"
+          echo "============================================================"
+          # In live cloud environments (AWS ECS / Azure WebApps / GCP CloudRun / Kubernetes),
+          # configure secret variables: DEPLOY_HOST, DEPLOY_SSH_KEY, or KUBECONFIG.

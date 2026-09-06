@@ -1,0 +1,102 @@
+employee_id,employee_name,email,business_unit,department,designation,location,manager_id,effective_start_date,effective_end_date,quarterly_allowance_inr,is_current
+EMP-1001,Rajesh Sharma,rajesh.sharma@travelintelligence.com,Global Technology,Software Engineering,Senior Principal Engineer,Bengaluru,MGR-5002,2024-01-01,9999-12-31,250000.0,1
+EMP-1002,Priya Nair,priya.nair@travelintelligence.com,Operations & Risk,Internal Audit,Risk Analyst,Mumbai,MGR-5003,2024-01-01,2025-12-31,120000.0,0
+EMP-1002,Priya Nair,priya.nair@travelintelligence.com,Finance & Actuarial,Financial Planning,Lead Financial Analyst,Mumbai,MGR-5003,2026-01-01,9999-12-31,180000.0,1
+EMP-1003,Ananya Verma,ananya.verma@travelintelligence.com,Global Technology,Data & AI,Lead Data Engineer,Hyderabad,MGR-5004,2024-01-01,9999-12-31,200000.0,1
+EMP-1004,Vikram Malhotra,vikram.malhotra@travelintelligence.com,Operations & Risk,Risk Management,Director of Operations,Gurugram,MGR-5005,2024-01-01,9999-12-31,220000.0,1
+EMP-1005,Siddharth Rao,siddharth.rao@travelintelligence.com,Global Technology,Cloud Architecture,Staff Cloud Architect,Bengaluru,MGR-5001,2024-01-01,9999-12-31,240000.0,1
+EMP-1006,Kavita Deshmukh,kavita.deshmukh@travelintelligence.com,Human Resources,Talent Acquisition,Global HR Business Partner,Pune,MGR-5002,2024-01-01,9999-12-31,140000.0,1
+EMP-1007,Rohan Mehta,rohan.mehta@travelintelligence.com,Finance & Actuarial,Corporate Treasury,VP Treasury,Mumbai,MGR-5003,2024-01-01,9999-12-31,260000.0,1
+EMP-1008,Neha Gupta,neha.gupta@travelintelligence.com,Global Technology,Cybersecurity,Lead Security Engineer,Hyderabad,MGR-5004,2024-01-01,9999-12-31,210000.0,1
+EMP-1009,Arjun Kapoor,arjun.kapoor@travelintelligence.com,Operations & Risk,Compliance,Compliance Manager,Chennai,MGR-5005,2024-01-01,9999-12-31,160000.0,1
+EMP-1010,Deepa Joshi,deepa.joshi@travelintelligence.com,Executive Leadership,Strategy,VP Corporate Strategy,Bengaluru,MGR-5001,2024-01-01,9999-12-31,300000.0,1
+EMP-1011,Amitabh Sen,amitabh.sen@travelintelligence.com,Sales & Marketing,Enterprise Sales,Regional Sales Director,Delhi,MGR-5002,2024-01-01,9999-12-31,220000.0,1
+EMP-1012,Sunita Reddy,sunita.reddy@travelintelligence.com,Finance & Actuarial,Actuarial Science,Senior Actuary,Mumbai,MGR-5003,2024-01-01,9999-12-31,190000.0,1
+EMP-1013,Manish Pandey,manish.pandey@travelintelligence.com,Global Technology,DevOps & SRE,Principal SRE Engineer,Bengaluru,MGR-5004,2024-01-01,9999-12-31,230000.0,1
+EMP-1014,Tarun Saxena,tarun.saxena@travelintelligence.com,Legal & Compliance,Corporate Law,Senior Counsel,Gurugram,MGR-5005,2024-01-01,9999-12-31,200000.0,1
+EMP-1015,Pooja Bhatia,pooja.bhatia@travelintelligence.com,Human Resources,People Ops,HR Operations Lead,Pune,MGR-5001,2024-01-01,9999-12-31,130000.0,1
+EMP-1016,Gaurav Iyer,gaurav.iyer@travelintelligence.com,Sales & Marketing,Field Marketing,Marketing Director,Bengaluru,MGR-5002,2024-01-01,9999-12-31,210000.0,1
+EMP-1017,Divya Pillai,divya.pillai@travelintelligence.com,Global Technology,Product Management,Lead Product Manager,Hyderabad,MGR-5003,2024-01-01,9999-12-31,220000.0,1
+EMP-1018,Karan Chaudhury,karan.chaudhury@travelintelligence.com,Operations & Risk,Internal Audit,Audit Manager,Mumbai,MGR-5004,2024-01-01,9999-12-31,170000.0,1
+EMP-1019,Shruti Aggarwal,shruti.aggarwal@travelintelligence.com,Finance & Actuarial,Tax & Audit,Tax Manager,Delhi,MGR-5005,2024-01-01,9999-12-31,180000.0,1
+EMP-1020,Nitin Kulkarni,nitin.kulkarni@travelintelligence.com,Global Technology,QA Automation,Test Automation Manager,Pune,MGR-5001,2024-01-01,9999-12-31,160000.0,1
+EMP-1021,Swati Chawla,swati.chawla@travelintelligence.com,Sales & Marketing,Customer Success,Head of CS,Bengaluru,MGR-5002,2024-01-01,9999-12-31,190000.0,1
+EMP-1022,Abhishek Banerjee,abhishek.banerjee@travelintelligence.com,Global Technology,Mobile Engineering,Staff Android Engineer,Hyderabad,MGR-5003,2024-01-01,9999-12-31,190000.0,1
+EMP-1023,Meera Nambiar,meera.nambiar@travelintelligence.com,Human Resources,Learning & Dev,L&D Manager,Chennai,MGR-5004,2024-01-01,9999-12-31,140000.0,1
+EMP-1024,Varun Dhawan,varun.dhawan@travelintelligence.com,Sales & Marketing,Business Dev,BD Director,Mumbai,MGR-5005,2024-01-01,9999-12-31,210000.0,1
+EMP-1025,Ishita Roy,ishita.roy@travelintelligence.com,Legal & Compliance,IP & Patents,Legal Specialist,Gurugram,MGR-5001,2024-01-01,9999-12-31,150000.0,1
+EMP-1026,Alok Nath,alok.nath@travelintelligence.com,Operations & Risk,Facilities,Facilities Director,Bengaluru,MGR-5002,2024-01-01,9999-12-31,160000.0,1
+EMP-1027,Ritu Sharma,ritu.sharma@travelintelligence.com,Global Technology,UI/UX Design,Lead UX Designer,Pune,MGR-5003,2024-01-01,9999-12-31,170000.0,1
+EMP-1028,Sameer Joshi,sameer.joshi@travelintelligence.com,Finance & Actuarial,Accounting,Senior Accountant,Mumbai,MGR-5004,2024-01-01,9999-12-31,150000.0,1
+EMP-1029,Nisha Agarwal,nisha.agarwal@travelintelligence.com,Global Technology,Database Ops,Lead DBA,Hyderabad,MGR-5005,2024-01-01,9999-12-31,180000.0,1
+EMP-1030,Vikramaditya Bose,vikramaditya.bose@travelintelligence.com,Global Technology,Platform Engineering,VP Global Platforms,Bengaluru,MGR-5001,2024-01-01,9999-12-31,280000.0,1
+EMP-1031,Sneha Kulkarni,sneha.kulkarni@travelintelligence.com,Sales & Marketing,Digital Growth,Growth Marketing Lead,Delhi,MGR-5002,2024-01-01,9999-12-31,160000.0,1
+EMP-1032,Aditya Singhania,aditya.singhania@travelintelligence.com,Finance & Actuarial,Risk Modeling,Lead Quantitative Modeler,Mumbai,MGR-5003,2024-01-01,9999-12-31,210000.0,1
+EMP-1033,Harish Chandra,harish.chandra@travelintelligence.com,Global Technology,Platform Ops,Infrastructure Lead,Bengaluru,MGR-5004,2024-01-01,9999-12-31,190000.0,1
+EMP-1034,Bhavna Shah,bhavna.shah@travelintelligence.com,Finance & Actuarial,Budgeting,Financial Controller,Gurugram,MGR-5005,2024-01-01,9999-12-31,220000.0,1
+EMP-1035,Shalini Roy,shalini.roy@travelintelligence.com,Sales & Marketing,Communications,PR & Brand Director,Mumbai,MGR-5001,2024-01-01,9999-12-31,200000.0,1
+EMP-1036,Dinesh Varma,dinesh.varma@travelintelligence.com,Operations & Risk,Vendor Mgmt,Procurement Lead,Chennai,MGR-5002,2024-01-01,9999-12-31,160000.0,1
+EMP-1037,Smriti Madhavan,smriti.madhavan@travelintelligence.com,Human Resources,Culture & DEI,DEI Programs Director,Bengaluru,MGR-5003,2024-01-01,9999-12-31,150000.0,1
+EMP-1038,Gautam Singhal,gautam.singhal@travelintelligence.com,Global Technology,AI Research,Principal Research Scientist,Hyderabad,MGR-5004,2024-01-01,9999-12-31,270000.0,1
+EMP-1039,Prashant Hegde,prashant.hegde@travelintelligence.com,Operations & Risk,Security,Information Security Officer,Pune,MGR-5005,2024-01-01,9999-12-31,190000.0,1
+EMP-1040,Nikhil Chandrasekhar,nikhil.chandrasekhar@travelintelligence.com,Sales & Marketing,Brand Strategy,Creative Director,Mumbai,MGR-5001,2024-01-01,9999-12-31,200000.0,1
+EMP-1041,Indira Krishnan,indira.krishnan@travelintelligence.com,Legal & Compliance,Ethics,Chief Ethics Officer,Delhi,MGR-5002,2024-01-01,9999-12-31,230000.0,1
+EMP-1042,Kartik Sundaram,kartik.sundaram@travelintelligence.com,Sales & Marketing,Product Marketing,Product Marketing Lead,Bengaluru,MGR-5003,2024-01-01,9999-12-31,170000.0,1
+EMP-1043,Tanvi Mukherjee,tanvi.mukherjee@travelintelligence.com,Human Resources,Talent Sourcing,Lead Technical Recruiter,Hyderabad,MGR-5004,2024-01-01,9999-12-31,130000.0,1
+EMP-1044,Suresh Narayanan,suresh.narayanan@travelintelligence.com,Finance & Actuarial,Payroll,Global Payroll Manager,Mumbai,MGR-5005,2024-01-01,9999-12-31,160000.0,1
+EMP-1045,Karan Singla,karan.singla@travelintelligence.com,Executive Leadership,Board,Chief Operating Officer,Mumbai,MGR-5001,2024-01-01,9999-12-31,320000.0,1
+EMP-1046,Meenakshi Natarajan,meenakshi.natarajan@travelintelligence.com,Global Technology,Transformation,Chief Technology Officer,Bengaluru,MGR-5002,2024-01-01,9999-12-31,350000.0,1
+EMP-1047,Ganesh Venkatraman,ganesh.venkatraman@travelintelligence.com,Operations & Risk,Logistics,Supply Chain Director,Chennai,MGR-5003,2024-01-01,9999-12-31,200000.0,1
+EMP-1048,Rameshwar Prasad,rameshwar.prasad@travelintelligence.com,Legal & Compliance,Regulatory,Regulatory Affairs Lead,Gurugram,MGR-5004,2024-01-01,9999-12-31,180000.0,1
+EMP-1049,Anuradha Sen,anuradha.sen@travelintelligence.com,Global Technology,Systems Architecture,Principal Systems Architect,Bengaluru,MGR-5005,2024-01-01,9999-12-31,240000.0,1
+EMP-1050,Bhaskar Nambiar,bhaskar.nambiar@travelintelligence.com,Finance & Actuarial,Investment Strategy,Portfolio Manager,Mumbai,MGR-5001,2024-01-01,9999-12-31,250000.0,1
+EMP-1051,Chitra Raghavan,chitra.raghavan@travelintelligence.com,Human Resources,Employee Relations,Senior HRBP,Chennai,MGR-5002,2024-01-01,9999-12-31,145000.0,1
+EMP-1052,Debashis Ghosh,debashis.ghosh@travelintelligence.com,Global Technology,Data Engineering,Senior Data Engineer,Hyderabad,MGR-5003,2024-01-01,9999-12-31,195000.0,1
+EMP-1053,Esha Deol,esha.deol@travelintelligence.com,Sales & Marketing,Client Engagement,Account Director,Delhi,MGR-5004,2024-01-01,9999-12-31,185000.0,1
+EMP-1054,Feroz Khan,feroz.khan@travelintelligence.com,Operations & Risk,Operational Risk,Risk Lead,Mumbai,MGR-5005,2024-01-01,9999-12-31,175000.0,1
+EMP-1055,Gitanjali Soni,gitanjali.soni@travelintelligence.com,Legal & Compliance,Commercial Contracts,Senior Legal Specialist,Gurugram,MGR-5001,2024-01-01,9999-12-31,190000.0,1
+EMP-1056,Hemant Khandelwal,hemant.khandelwal@travelintelligence.com,Global Technology,Site Reliability,Senior SRE Lead,Bengaluru,MGR-5002,2024-01-01,9999-12-31,215000.0,1
+EMP-1057,Ila Arun,ila.arun@travelintelligence.com,Human Resources,Total Rewards,Compensation Analyst,Pune,MGR-5003,2024-01-01,9999-12-31,135000.0,1
+EMP-1058,Jayant Gokhale,jayant.gokhale@travelintelligence.com,Finance & Actuarial,Financial Reporting,Senior Finance Manager,Mumbai,MGR-5004,2024-01-01,9999-12-31,205000.0,1
+EMP-1059,Kalyani Nair,kalyani.nair@travelintelligence.com,Global Technology,Frontend Systems,Staff UI Engineer,Hyderabad,MGR-5005,2024-01-01,9999-12-31,185000.0,1
+EMP-1060,Lalit Mohan,lalit.mohan@travelintelligence.com,Operations & Risk,Business Continuity,BCP Program Manager,Bengaluru,MGR-5001,2024-01-01,9999-12-31,165000.0,1
+EMP-1061,Madhuri Dixit,madhuri.dixit@travelintelligence.com,Sales & Marketing,Demand Generation,Marketing Operations Lead,Delhi,MGR-5002,2024-01-01,9999-12-31,175000.0,1
+EMP-1062,Naveen Patnaik,naveen.patnaik@travelintelligence.com,Legal & Compliance,Corporate Governance,Governance Counsel,Gurugram,MGR-5003,2024-01-01,9999-12-31,210000.0,1
+EMP-1063,Pallavi Shinde,pallavi.shinde@travelintelligence.com,Global Technology,Cloud Infrastructure,Cloud Platform Engineer,Pune,MGR-5004,2024-01-01,9999-12-31,190000.0,1
+EMP-1064,Raghavendra Rao,raghavendra.rao@travelintelligence.com,Finance & Actuarial,Actuarial Valuation,Senior Actuarial Associate,Mumbai,MGR-5005,2024-01-01,9999-12-31,180000.0,1
+EMP-1065,Sandhya Menon,sandhya.menon@travelintelligence.com,Human Resources,Organizational Dev,OD Lead Consultant,Bengaluru,MGR-5001,2024-01-01,9999-12-31,155000.0,1
+EMP-1066,Tushar Deshpande,tushar.deshpande@travelintelligence.com,Global Technology,API Platform,Senior Backend Architect,Hyderabad,MGR-5002,2024-01-01,9999-12-31,225000.0,1
+EMP-1067,Urvashi Raut,urvashi.raut@travelintelligence.com,Sales & Marketing,Strategic Partnerships,Partnerships Manager,Mumbai,MGR-5003,2024-01-01,9999-12-31,170000.0,1
+EMP-1068,Vijayendra Kulkarni,vijayendra.kulkarni@travelintelligence.com,Operations & Risk,Fraud Prevention,Senior Fraud Analyst,Chennai,MGR-5004,2024-01-01,9999-12-31,160000.0,1
+EMP-1069,Yamini Reddy,yamini.reddy@travelintelligence.com,Global Technology,Information Security,SecOps Manager,Bengaluru,MGR-5005,2024-01-01,9999-12-31,235000.0,1
+EMP-1070,Zakir Hussain,zakir.hussain@travelintelligence.com,Finance & Actuarial,Capital Planning,Capital Analyst,Mumbai,MGR-5001,2024-01-01,9999-12-31,195000.0,1
+EMP-1071,Aparna Sen,aparna.sen@travelintelligence.com,Human Resources,Talent Management,Head of Talent Development,Delhi,MGR-5002,2024-01-01,9999-12-31,190000.0,1
+EMP-1072,Brijesh Tiwari,brijesh.tiwari@travelintelligence.com,Global Technology,Enterprise Solutions,Solutions Architect,Hyderabad,MGR-5003,2024-01-01,9999-12-31,220000.0,1
+EMP-1073,Chandana Roy,chandana.roy@travelintelligence.com,Operations & Risk,Vendor Assessment,Procurement Specialist,Pune,MGR-5004,2024-01-01,9999-12-31,145000.0,1
+EMP-1074,Dipankar Bhattacharya,dipankar.bhattacharya@travelintelligence.com,Legal & Compliance,Litigation,Litigation Specialist,Gurugram,MGR-5005,2024-01-01,9999-12-31,180000.0,1
+EMP-1075,Farida Jalal,farida.jalal@travelintelligence.com,Sales & Marketing,Channel Sales,Channel Director,Bengaluru,MGR-5001,2024-01-01,9999-12-31,205000.0,1
+EMP-1076,Govind Padmasoorya,govind.padmasoorya@travelintelligence.com,Global Technology,MLOps,Senior Machine Learning Engineer,Bengaluru,MGR-5002,2024-01-01,9999-12-31,240000.0,1
+EMP-1077,Harini Sundar,harini.sundar@travelintelligence.com,Finance & Actuarial,Risk Analytics,Senior Risk Quant,Mumbai,MGR-5003,2024-01-01,9999-12-31,210000.0,1
+EMP-1078,Inderpreet Singh,inderpreet.singh@travelintelligence.com,Human Resources,HR Operations,HR Shared Services Lead,Delhi,MGR-5004,2024-01-01,9999-12-31,150000.0,1
+EMP-1079,Jayashree Thota,jayashree.thota@travelintelligence.com,Global Technology,Data Governance,Lead Data Governance Officer,Hyderabad,MGR-5005,2024-01-01,9999-12-31,200000.0,1
+EMP-1080,Kishore Kumar,kishore.kumar@travelintelligence.com,Operations & Risk,Workplace Safety,EHS Lead,Chennai,MGR-5001,2024-01-01,9999-12-31,140000.0,1
+EMP-1081,Leela Samson,leela.samson@travelintelligence.com,Legal & Compliance,Data Privacy,Privacy Officer,Gurugram,MGR-5002,2024-01-01,9999-12-31,215000.0,1
+EMP-1082,Manmohan Waris,manmohan.waris@travelintelligence.com,Finance & Actuarial,Financial Systems,FinTech Systems Lead,Mumbai,MGR-5003,2024-01-01,9999-12-31,220000.0,1
+EMP-1083,Nandita Das,nandita.das@travelintelligence.com,Human Resources,Leadership Development,Executive Coach Lead,Bengaluru,MGR-5004,2024-01-01,9999-12-31,175000.0,1
+EMP-1084,Omkar Pradhan,omkar.pradhan@travelintelligence.com,Global Technology,Core Banking,Principal Core Engineer,Pune,MGR-5005,2024-01-01,9999-12-31,230000.0,1
+EMP-1085,Parvati Patil,parvati.patil@travelintelligence.com,Sales & Marketing,Key Accounts,Strategic Account Director,Delhi,MGR-5001,2024-01-01,9999-12-31,210000.0,1
+EMP-1086,Qasim Ali,qasim.ali@travelintelligence.com,Operations & Risk,Disaster Recovery,DR Lead,Hyderabad,MGR-5002,2024-01-01,9999-12-31,165000.0,1
+EMP-1087,Radhamani Pillai,radhamani.pillai@travelintelligence.com,Finance & Actuarial,Corporate Audit,Lead Internal Auditor,Mumbai,MGR-5003,2024-01-01,9999-12-31,185000.0,1
+EMP-1088,Satish Kaushik,satish.kaushik@travelintelligence.com,Global Technology,Distributed Systems,Principal Systems Engineer,Bengaluru,MGR-5004,2024-01-01,9999-12-31,255000.0,1
+EMP-1089,Tejaswini Pandit,tejaswini.pandit@travelintelligence.com,Sales & Marketing,Regional Growth,Growth Manager (West),Mumbai,MGR-5005,2024-01-01,9999-12-31,165000.0,1
+EMP-1090,Udayan Mukherjee,udayan.mukherjee@travelintelligence.com,Finance & Actuarial,Global Actuarial,Chief Actuary,Mumbai,MGR-5001,2024-01-01,9999-12-31,340000.0,1
+EMP-1091,Vandana Shiva,vandana.shiva@travelintelligence.com,Executive Leadership,Sustainability,Chief Sustainability Officer,Delhi,MGR-5002,2024-01-01,9999-12-31,310000.0,1
+EMP-1092,Wahida Rehman,wahida.rehman@travelintelligence.com,Human Resources,Employee Experience,EX Program Director,Bengaluru,MGR-5003,2024-01-01,9999-12-31,180000.0,1
+EMP-1093,Xavier Dsouza,xavier.dsouza@travelintelligence.com,Global Technology,Network Infrastructure,Principal Network Architect,Pune,MGR-5004,2024-01-01,9999-12-31,225000.0,1
+EMP-1094,Yogeshwar Dutt,yogeshwar.dutt@travelintelligence.com,Operations & Risk,Physical Security,Security Operations Manager,Gurugram,MGR-5005,2024-01-01,9999-12-31,155000.0,1
+EMP-1095,Zoya Akhtar,zoya.akhtar@travelintelligence.com,Sales & Marketing,Brand Creative,Creative Strategy Lead,Mumbai,MGR-5001,2024-01-01,9999-12-31,195000.0,1
+EMP-1096,Ritika Varma,ritika.varma@travelintelligence.com,Global Technology,Software Consulting,Consulting Intern (Unallocated),Pune,MGR-5002,2024-01-01,9999-12-31,,1
+EMP-1097,Aarav Namboodiri,aarav.namboodiri@travelintelligence.com,Operations & Risk,Logistics Support,Contractor Specialist (Unallocated),Bengaluru,MGR-5003,2024-01-01,9999-12-31,,1
+EMP-1098,Devika Menon,devika.menon@travelintelligence.com,Finance & Actuarial,Quantitative Research,Research Intern (Unallocated),Mumbai,MGR-5004,2024-01-01,9999-12-31,,1
+EMP-1099,Kunal Sengupta,kunal.sengupta@travelintelligence.com,Sales & Marketing,Market Research,External Strategy Contractor (Unallocated),Delhi,MGR-5005,2024-01-01,9999-12-31,,1
+EMP-1100,Pooja Krishnamurthy,pooja.krishnamurthy@travelintelligence.com,Human Resources,Talent Sourcing,Campus Ambassador (Unallocated),Hyderabad,MGR-5001,2024-01-01,9999-12-31,,1

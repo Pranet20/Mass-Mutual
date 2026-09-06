@@ -1,0 +1,121 @@
+ticket_id,trip_id,employee_id,issue_date,travel_date,return_date,origin_city,origin_country,dest_city,dest_country,ticket_status,amount,currency,booking_channel,cabin_class
+TCK-9101,TRP-1101,EMP-1054,2026-07-02,2026-07-06,2026-07-11,Hyderabad,India,Delhi,India,ISSUED,16200,INR,Corporate Portal,Economy
+TCK-9102,TRP-1102,EMP-1055,2026-07-03,2026-07-07,2026-07-12,Bengaluru,India,Bengaluru,India,ISSUED,12800,INR,Sabre GDS,Economy
+TCK-9103,TRP-1103,EMP-1056,2026-07-04,2026-07-08,2026-07-13,Mumbai,India,Dubai,United Arab Emirates,CANCELLED,1950,AED,Corporate Portal,Economy
+TCK-9104,TRP-1104,EMP-1057,2026-07-05,2026-07-09,2026-07-14,Hyderabad,India,Delhi,India,ISSUED,16200,INR,Corporate Portal,Premium Economy
+TCK-9105,TRP-1105,EMP-1058,2026-07-06,2026-07-10,2026-07-15,Bengaluru,India,Frankfurt,Germany,REFUNDED,980,EUR,Uber for Business,Economy
+TCK-9106,TRP-1106,EMP-1059,2026-07-07,2026-07-11,2026-07-16,Mumbai,India,Mumbai,India,CANCELLED,14500,INR,Corporate Portal,Business
+TCK-9107,TRP-1107,EMP-1060,2026-07-08,2026-07-12,2026-07-17,Hyderabad,India,Bengaluru,India,REFUNDED,12800,INR,Amadeus GDS,Business
+TCK-9108,TRP-1108,EMP-1061,2026-07-09,2026-07-13,2026-07-18,Bengaluru,India,Mumbai,India,REFUNDED,14500,INR,Corporate Portal,Economy
+TCK-9109,TRP-1109,EMP-1062,2026-07-10,2026-07-14,2026-07-19,Mumbai,India,Dubai,United Arab Emirates,REFUNDED,1950,AED,Amadeus GDS,Economy
+TCK-9110,TRP-1110,EMP-1063,2026-07-11,2026-07-15,2026-07-20,Hyderabad,India,Dubai,United Arab Emirates,ISSUED,1950,AED,Amadeus GDS,Business
+TCK-9111,TRP-1111,EMP-1064,2026-07-12,2026-07-16,2026-07-21,Bengaluru,India,Dubai,United Arab Emirates,ISSUED,1950,AED,Uber for Business,Business
+TCK-9112,TRP-1112,EMP-1065,2026-07-13,2026-07-17,2026-07-22,Mumbai,India,Singapore,Singapore,REFUNDED,850,SGD,Corporate Portal,Premium Economy
+TCK-9113,TRP-1113,EMP-1066,2026-07-14,2026-07-18,2026-07-23,Hyderabad,India,Dubai,United Arab Emirates,CANCELLED,1950,AED,Uber for Business,Premium Economy
+TCK-9114,TRP-1114,EMP-1067,2026-07-15,2026-07-19,2026-07-24,Bengaluru,India,Bengaluru,India,CANCELLED,12800,INR,Sabre GDS,Economy
+TCK-9115,TRP-1115,EMP-1068,2026-07-16,2026-07-20,2026-07-25,Mumbai,India,New York,United States,ISSUED,1750,USD,Corporate Portal,Premium Economy
+TCK-9116,TRP-1116,EMP-1069,2026-07-17,2026-07-21,2026-07-26,Hyderabad,India,Bengaluru,India,ISSUED,12800,INR,Amadeus GDS,Premium Economy
+TCK-9117,TRP-1117,EMP-1070,2026-07-18,2026-07-22,2026-07-27,Bengaluru,India,Frankfurt,Germany,ISSUED,980,EUR,Corporate Portal,Premium Economy
+TCK-9118,TRP-1118,EMP-1071,2026-07-19,2026-07-23,2026-07-28,Mumbai,India,Frankfurt,Germany,ISSUED,980,EUR,Uber for Business,Business
+TCK-9119,TRP-1119,EMP-1072,2026-07-20,2026-07-24,2026-07-29,Hyderabad,India,New York,United States,REFUNDED,1750,USD,Amadeus GDS,Economy
+TCK-9120,TRP-1120,EMP-1073,2026-07-01,2026-07-05,2026-07-10,Bengaluru,India,Singapore,Singapore,CANCELLED,850,SGD,Corporate Portal,Premium Economy
+TCK-9121,TRP-1121,EMP-1074,2026-07-02,2026-07-06,2026-07-11,Mumbai,India,Boston,United States,CANCELLED,1550,USD,Corporate Portal,Premium Economy
+TCK-9122,TRP-1122,EMP-1075,2026-07-03,2026-07-07,2026-07-12,Hyderabad,India,Frankfurt,Germany,ISSUED,980,EUR,Amadeus GDS,Economy
+TCK-9123,TRP-1123,EMP-1076,2026-07-04,2026-07-08,2026-07-13,Bengaluru,India,Frankfurt,Germany,ISSUED,980,EUR,Corporate Portal,Business
+TCK-9124,TRP-1124,EMP-1077,2026-07-05,2026-07-09,2026-07-14,Mumbai,India,Dubai,United Arab Emirates,ISSUED,1950,AED,Sabre GDS,Economy
+TCK-9125,TRP-1125,EMP-1078,2026-07-06,2026-07-10,2026-07-15,Hyderabad,India,Hyderabad,India,ISSUED,13900,INR,Sabre GDS,Business
+TCK-9126,TRP-1126,EMP-1079,2026-07-07,2026-07-11,2026-07-16,Bengaluru,India,Frankfurt,Germany,ISSUED,980,EUR,Sabre GDS,Business
+TCK-9127,TRP-1127,EMP-1080,2026-07-08,2026-07-12,2026-07-17,Mumbai,India,Mumbai,India,REFUNDED,14500,INR,Corporate Portal,Economy
+TCK-9128,TRP-1128,EMP-1081,2026-07-09,2026-07-13,2026-07-18,Hyderabad,India,Delhi,India,ISSUED,16200,INR,Amadeus GDS,Business
+TCK-9129,TRP-1129,EMP-1082,2026-07-10,2026-07-14,2026-07-19,Bengaluru,India,Frankfurt,Germany,REFUNDED,980,EUR,Amadeus GDS,Economy
+TCK-9130,TRP-1130,EMP-1083,2026-07-11,2026-07-15,2026-07-20,Mumbai,India,Boston,United States,ISSUED,1550,USD,Uber for Business,Business
+TCK-9131,TRP-1131,EMP-1084,2026-07-12,2026-07-16,2026-07-21,Hyderabad,India,Boston,United States,ISSUED,1550,USD,Uber for Business,Business
+TCK-9132,TRP-1132,EMP-1085,2026-07-13,2026-07-17,2026-07-22,Bengaluru,India,Mumbai,India,REFUNDED,14500,INR,Corporate Portal,Business
+TCK-9133,TRP-1133,EMP-1086,2026-07-14,2026-07-18,2026-07-23,Mumbai,India,Singapore,Singapore,ISSUED,850,SGD,Corporate Portal,Premium Economy
+TCK-9134,TRP-1134,EMP-1087,2026-07-15,2026-07-19,2026-07-24,Hyderabad,India,Mumbai,India,ISSUED,14500,INR,Amadeus GDS,Economy
+TCK-9135,TRP-1135,EMP-1088,2026-07-16,2026-07-20,2026-07-25,Bengaluru,India,Mumbai,India,ISSUED,14500,INR,Amadeus GDS,Business
+TCK-9136,TRP-1136,EMP-1089,2026-07-17,2026-07-21,2026-07-26,Mumbai,India,London,United Kingdom,ISSUED,1150,GBP,Uber for Business,Business
+TCK-9137,TRP-1137,EMP-1090,2026-07-18,2026-07-22,2026-07-27,Hyderabad,India,Frankfurt,Germany,CANCELLED,980,EUR,Sabre GDS,Premium Economy
+TCK-9138,TRP-1138,EMP-1091,2026-07-19,2026-07-23,2026-07-28,Bengaluru,India,Boston,United States,ISSUED,1550,USD,Uber for Business,Business
+TCK-9139,TRP-1139,EMP-1092,2026-07-20,2026-07-24,2026-07-29,Mumbai,India,Hyderabad,India,ISSUED,13900,INR,Uber for Business,Business
+TCK-9140,TRP-1140,EMP-1093,2026-07-01,2026-07-05,2026-07-10,Hyderabad,India,Mumbai,India,ISSUED,14500,INR,Corporate Portal,Premium Economy
+TCK-9141,TRP-1141,EMP-1094,2026-07-02,2026-07-06,2026-07-11,Bengaluru,India,Boston,United States,ISSUED,1550,USD,Amadeus GDS,Economy
+TCK-9142,TRP-1142,EMP-1095,2026-07-03,2026-07-07,2026-07-12,Mumbai,India,Delhi,India,ISSUED,16200,INR,Corporate Portal,Business
+TCK-9143,TRP-1143,EMP-1096,2026-07-04,2026-07-08,2026-07-13,Hyderabad,India,Delhi,India,ISSUED,16200,INR,Sabre GDS,Business
+TCK-9144,TRP-1144,EMP-1097,2026-07-05,2026-07-09,2026-07-14,Bengaluru,India,Singapore,Singapore,ISSUED,850,SGD,Uber for Business,Business
+TCK-9145,TRP-1145,EMP-1098,2026-07-06,2026-07-10,2026-07-15,Mumbai,India,London,United Kingdom,ISSUED,1150,GBP,Corporate Portal,Business
+TCK-9146,TRP-1146,EMP-1099,2026-07-07,2026-07-11,2026-07-16,Hyderabad,India,Hyderabad,India,REFUNDED,13900,INR,Corporate Portal,Business
+TCK-9147,TRP-1147,EMP-1100,2026-07-08,2026-07-12,2026-07-17,Bengaluru,India,Frankfurt,Germany,ISSUED,980,EUR,Amadeus GDS,Premium Economy
+TCK-9148,TRP-1148,EMP-1101,2026-07-09,2026-07-13,2026-07-18,Mumbai,India,Hyderabad,India,ISSUED,13900,INR,Uber for Business,Economy
+TCK-9149,TRP-1149,EMP-1102,2026-07-10,2026-07-14,2026-07-19,Hyderabad,India,Bengaluru,India,CANCELLED,12800,INR,Amadeus GDS,Business
+TCK-9150,TRP-1150,EMP-1103,2026-07-11,2026-07-15,2026-07-20,Bengaluru,India,Mumbai,India,REFUNDED,14500,INR,Corporate Portal,Business
+TCK-9151,TRP-1151,EMP-1104,2026-07-12,2026-07-16,2026-07-21,Mumbai,India,Dubai,United Arab Emirates,CANCELLED,1950,AED,Sabre GDS,Business
+TCK-9152,TRP-1152,EMP-1001,2026-07-13,2026-07-17,2026-07-22,Hyderabad,India,Bengaluru,India,ISSUED,12800,INR,Sabre GDS,Business
+TCK-9153,TRP-1153,EMP-1002,2026-07-14,2026-07-18,2026-07-23,Bengaluru,India,Singapore,Singapore,ISSUED,850,SGD,Sabre GDS,Premium Economy
+TCK-9154,TRP-1154,EMP-1003,2026-07-15,2026-07-19,2026-07-24,Mumbai,India,Delhi,India,ISSUED,16200,INR,Uber for Business,Premium Economy
+TCK-9155,TRP-1155,EMP-1004,2026-07-16,2026-07-20,2026-07-25,Hyderabad,India,Bengaluru,India,ISSUED,12800,INR,Corporate Portal,Economy
+TCK-9156,TRP-1156,EMP-1005,2026-07-17,2026-07-21,2026-07-26,Bengaluru,India,Mumbai,India,ISSUED,14500,INR,Amadeus GDS,Premium Economy
+TCK-9157,TRP-1157,EMP-1006,2026-07-18,2026-07-22,2026-07-27,Mumbai,India,Frankfurt,Germany,ISSUED,980,EUR,Uber for Business,Business
+TCK-9158,TRP-1158,EMP-1007,2026-07-19,2026-07-23,2026-07-28,Hyderabad,India,Singapore,Singapore,REFUNDED,850,SGD,Amadeus GDS,Business
+TCK-9159,TRP-1159,EMP-1008,2026-07-20,2026-07-24,2026-07-29,Bengaluru,India,Bengaluru,India,ISSUED,12800,INR,Sabre GDS,Economy
+TCK-9160,TRP-1160,EMP-1009,2026-07-01,2026-07-05,2026-07-10,Mumbai,India,New York,United States,CANCELLED,1750,USD,Sabre GDS,Premium Economy
+TCK-9161,TRP-1161,EMP-1010,2026-07-02,2026-07-06,2026-07-11,Hyderabad,India,London,United Kingdom,ISSUED,1150,GBP,Corporate Portal,Premium Economy
+TCK-9162,TRP-1162,EMP-1011,2026-07-03,2026-07-07,2026-07-12,Bengaluru,India,Singapore,Singapore,CANCELLED,850,SGD,Uber for Business,Business
+TCK-9163,TRP-1163,EMP-1012,2026-07-04,2026-07-08,2026-07-13,Mumbai,India,Delhi,India,ISSUED,16200,INR,Amadeus GDS,Business
+TCK-9164,TRP-1164,EMP-1013,2026-07-05,2026-07-09,2026-07-14,Hyderabad,India,Hyderabad,India,ISSUED,13900,INR,Amadeus GDS,Economy
+TCK-9165,TRP-1165,EMP-1014,2026-07-06,2026-07-10,2026-07-15,Bengaluru,India,London,United Kingdom,ISSUED,1150,GBP,Corporate Portal,Economy
+TCK-9166,TRP-1166,EMP-1015,2026-07-07,2026-07-11,2026-07-16,Mumbai,India,Hyderabad,India,REFUNDED,13900,INR,Sabre GDS,Economy
+TCK-9167,TRP-1167,EMP-1016,2026-07-08,2026-07-12,2026-07-17,Hyderabad,India,Delhi,India,CANCELLED,16200,INR,Sabre GDS,Economy
+TCK-9168,TRP-1168,EMP-1017,2026-07-09,2026-07-13,2026-07-18,Bengaluru,India,Bengaluru,India,ISSUED,12800,INR,Corporate Portal,Business
+TCK-9169,TRP-1169,EMP-1018,2026-07-10,2026-07-14,2026-07-19,Mumbai,India,London,United Kingdom,REFUNDED,1150,GBP,Uber for Business,Business
+TCK-9170,TRP-1170,EMP-1019,2026-07-11,2026-07-15,2026-07-20,Hyderabad,India,Boston,United States,REFUNDED,1550,USD,Uber for Business,Premium Economy
+TCK-9171,TRP-1171,EMP-1020,2026-07-12,2026-07-16,2026-07-21,Bengaluru,India,Delhi,India,ISSUED,16200,INR,Uber for Business,Economy
+TCK-9172,TRP-1172,EMP-1021,2026-07-13,2026-07-17,2026-07-22,Mumbai,India,Dubai,United Arab Emirates,REFUNDED,1950,AED,Sabre GDS,Premium Economy
+TCK-9173,TRP-1173,EMP-1022,2026-07-14,2026-07-18,2026-07-23,Hyderabad,India,Mumbai,India,REFUNDED,14500,INR,Corporate Portal,Business
+TCK-9174,TRP-1174,EMP-1023,2026-07-15,2026-07-19,2026-07-24,Bengaluru,India,Hyderabad,India,REFUNDED,13900,INR,Corporate Portal,Economy
+TCK-9175,TRP-1175,EMP-1024,2026-07-16,2026-07-20,2026-07-25,Mumbai,India,Singapore,Singapore,REFUNDED,850,SGD,Corporate Portal,Premium Economy
+TCK-9176,TRP-1176,EMP-1025,2026-07-17,2026-07-21,2026-07-26,Hyderabad,India,Dubai,United Arab Emirates,ISSUED,1950,AED,Amadeus GDS,Premium Economy
+TCK-9177,TRP-1177,EMP-1026,2026-07-18,2026-07-22,2026-07-27,Bengaluru,India,Boston,United States,CANCELLED,1550,USD,Sabre GDS,Business
+TCK-9178,TRP-1178,EMP-1027,2026-07-19,2026-07-23,2026-07-28,Mumbai,India,New York,United States,ISSUED,1750,USD,Sabre GDS,Economy
+TCK-9179,TRP-1179,EMP-1028,2026-07-20,2026-07-24,2026-07-29,Hyderabad,India,New York,United States,ISSUED,1750,USD,Corporate Portal,Premium Economy
+TCK-9180,TRP-1180,EMP-1029,2026-07-01,2026-07-05,2026-07-10,Bengaluru,India,Bengaluru,India,ISSUED,12800,INR,Amadeus GDS,Business
+TCK-9181,TRP-1181,EMP-1030,2026-07-02,2026-07-06,2026-07-11,Mumbai,India,Mumbai,India,ISSUED,14500,INR,Sabre GDS,Premium Economy
+TCK-9182,TRP-1182,EMP-1031,2026-07-03,2026-07-07,2026-07-12,Hyderabad,India,Boston,United States,CANCELLED,1550,USD,Sabre GDS,Business
+TCK-9183,TRP-1183,EMP-1032,2026-07-04,2026-07-08,2026-07-13,Bengaluru,India,New York,United States,ISSUED,1750,USD,Uber for Business,Business
+TCK-9184,TRP-1184,EMP-1033,2026-07-05,2026-07-09,2026-07-14,Mumbai,India,Singapore,Singapore,ISSUED,850,SGD,Corporate Portal,Premium Economy
+TCK-9185,TRP-1185,EMP-1034,2026-07-06,2026-07-10,2026-07-15,Hyderabad,India,Delhi,India,ISSUED,16200,INR,Uber for Business,Business
+TCK-9186,TRP-1186,EMP-1035,2026-07-07,2026-07-11,2026-07-16,Bengaluru,India,New York,United States,ISSUED,1750,USD,Amadeus GDS,Premium Economy
+TCK-9187,TRP-1187,EMP-1036,2026-07-08,2026-07-12,2026-07-17,Mumbai,India,Bengaluru,India,ISSUED,12800,INR,Amadeus GDS,Premium Economy
+TCK-9188,TRP-1188,EMP-1037,2026-07-09,2026-07-13,2026-07-18,Hyderabad,India,Hyderabad,India,ISSUED,13900,INR,Uber for Business,Business
+TCK-9189,TRP-1189,EMP-1038,2026-07-10,2026-07-14,2026-07-19,Bengaluru,India,Delhi,India,ISSUED,16200,INR,Uber for Business,Business
+TCK-9190,TRP-1190,EMP-1039,2026-07-11,2026-07-15,2026-07-20,Mumbai,India,Frankfurt,Germany,ISSUED,980,EUR,Corporate Portal,Economy
+TCK-9191,TRP-1191,EMP-1040,2026-07-12,2026-07-16,2026-07-21,Hyderabad,India,Boston,United States,ISSUED,1550,USD,Amadeus GDS,Economy
+TCK-9192,TRP-1192,EMP-1041,2026-07-13,2026-07-17,2026-07-22,Bengaluru,India,Bengaluru,India,ISSUED,12800,INR,Sabre GDS,Premium Economy
+TCK-9193,TRP-1193,EMP-1042,2026-07-14,2026-07-18,2026-07-23,Mumbai,India,Mumbai,India,ISSUED,14500,INR,Sabre GDS,Premium Economy
+TCK-9194,TRP-1194,EMP-1043,2026-07-15,2026-07-19,2026-07-24,Hyderabad,India,Mumbai,India,ISSUED,14500,INR,Sabre GDS,Business
+TCK-9195,TRP-1195,EMP-1044,2026-07-16,2026-07-20,2026-07-25,Bengaluru,India,Mumbai,India,ISSUED,14500,INR,Corporate Portal,Business
+TCK-9196,TRP-1196,EMP-1045,2026-07-17,2026-07-21,2026-07-26,Mumbai,India,Boston,United States,ISSUED,1550,USD,Corporate Portal,Premium Economy
+TCK-9197,TRP-1197,EMP-1046,2026-07-18,2026-07-22,2026-07-27,Hyderabad,India,Singapore,Singapore,ISSUED,850,SGD,Amadeus GDS,Business
+TCK-9198,TRP-1198,EMP-1047,2026-07-19,2026-07-23,2026-07-28,Bengaluru,India,Mumbai,India,ISSUED,14500,INR,Uber for Business,Business
+TCK-9199,TRP-1199,EMP-1048,2026-07-20,2026-07-24,2026-07-29,Mumbai,India,London,United Kingdom,ISSUED,1150,GBP,Sabre GDS,Economy
+TCK-9200,TRP-1200,EMP-1049,2026-07-01,2026-07-05,2026-07-10,Hyderabad,India,London,United Kingdom,ISSUED,1150,GBP,Sabre GDS,Premium Economy
+TCK-9201,TRP-1201,EMP-1050,2026-07-02,2026-07-06,2026-07-11,Bengaluru,India,Singapore,Singapore,ISSUED,850,SGD,Amadeus GDS,Economy
+TCK-9202,TRP-1202,EMP-1051,2026-07-03,2026-07-07,2026-07-12,Mumbai,India,Frankfurt,Germany,REFUNDED,980,EUR,Uber for Business,Premium Economy
+TCK-9203,TRP-1203,EMP-1052,2026-07-04,2026-07-08,2026-07-13,Hyderabad,India,Delhi,India,ISSUED,16200,INR,Uber for Business,Premium Economy
+TCK-9204,TRP-1204,EMP-1053,2026-07-05,2026-07-09,2026-07-14,Bengaluru,India,Frankfurt,Germany,ISSUED,980,EUR,Corporate Portal,Premium Economy
+TCK-9205,TRP-1205,EMP-1054,2026-07-06,2026-07-10,2026-07-15,Mumbai,India,Bengaluru,India,CANCELLED,12800,INR,Amadeus GDS,Economy
+TCK-9206,TRP-1206,EMP-1055,2026-07-07,2026-07-11,2026-07-16,Hyderabad,India,Singapore,Singapore,ISSUED,850,SGD,Uber for Business,Economy
+TCK-9207,TRP-1207,EMP-1056,2026-07-08,2026-07-12,2026-07-17,Bengaluru,India,Dubai,United Arab Emirates,ISSUED,1950,AED,Uber for Business,Premium Economy
+TCK-9208,TRP-1208,EMP-1057,2026-07-09,2026-07-13,2026-07-18,Mumbai,India,Hyderabad,India,ISSUED,13900,INR,Sabre GDS,Premium Economy
+TCK-9209,TRP-1209,EMP-1058,2026-07-10,2026-07-14,2026-07-19,Hyderabad,India,Frankfurt,Germany,ISSUED,980,EUR,Uber for Business,Premium Economy
+TCK-9210,TRP-1210,EMP-1059,2026-07-11,2026-07-15,2026-07-20,Bengaluru,India,Dubai,United Arab Emirates,ISSUED,1950,AED,Amadeus GDS,Economy
+TCK-9211,TRP-1211,EMP-1060,2026-07-12,2026-07-16,2026-07-21,Mumbai,India,Singapore,Singapore,ISSUED,850,SGD,Amadeus GDS,Economy
+TCK-9212,TRP-1212,EMP-1061,2026-07-13,2026-07-17,2026-07-22,Hyderabad,India,Boston,United States,ISSUED,1550,USD,Sabre GDS,Economy
+TCK-9213,TRP-1213,EMP-1062,2026-07-14,2026-07-18,2026-07-23,Bengaluru,India,Hyderabad,India,ISSUED,13900,INR,Uber for Business,Premium Economy
+TCK-9214,TRP-1214,EMP-1063,2026-07-15,2026-07-19,2026-07-24,Mumbai,India,Bengaluru,India,ISSUED,12800,INR,Corporate Portal,Business
+TCK-9215,TRP-1215,EMP-1064,2026-07-16,2026-07-20,2026-07-25,Hyderabad,India,Hyderabad,India,ISSUED,13900,INR,Amadeus GDS,Economy
+TCK-9216,TRP-1216,EMP-1065,2026-07-17,2026-07-21,2026-07-26,Bengaluru,India,Delhi,India,ISSUED,16200,INR,Corporate Portal,Premium Economy
+TCK-9217,TRP-1217,EMP-1066,2026-07-18,2026-07-22,2026-07-27,Mumbai,India,New York,United States,ISSUED,1750,USD,Corporate Portal,Premium Economy
+TCK-9218,TRP-1218,EMP-1067,2026-07-19,2026-07-23,2026-07-28,Hyderabad,India,Mumbai,India,CANCELLED,14500,INR,Sabre GDS,Business
+TCK-9219,TRP-1219,EMP-1068,2026-07-20,2026-07-24,2026-07-29,Bengaluru,India,Dubai,United Arab Emirates,CANCELLED,1950,AED,Uber for Business,Economy
+TCK-9220,TRP-1220,EMP-1069,2026-07-01,2026-07-05,2026-07-10,Mumbai,India,New York,United States,ISSUED,1750,USD,Corporate Portal,Economy
