@@ -37,6 +37,19 @@ from services.test_runner import execute_automated_system_tests
 async def lifespan(app: FastAPI):
     # Safe Startup Event: Initializes DB Schema/View without destroying existing records
     init_db()
+    session = SessionLocal()
+    try:
+        mgr_user = session.query(User).filter_by(email="manager@travelintelligence.com").first()
+        if not mgr_user:
+            from seed_data import generate_all_data
+            generate_all_data()
+            raw_csv = os.path.join(os.path.dirname(__file__), "data", "travel_raw_tickets.csv")
+            if os.path.exists(raw_csv):
+                run_end_to_end_pipeline(raw_csv, "INITIAL_BOOTSTRAP_BATCH", "Production Auto-Bootstrap Ingestion")
+    except Exception as e:
+        print(f"[BOOTSTRAP NOTICE] {e}")
+    finally:
+        session.close()
     yield
 
 app = FastAPI(
