@@ -38,20 +38,27 @@ export const EmployeePortal = () => {
 
   const empId = user?.employee_id || 'EMP-1002';
   const empName = user?.name || data?.employee_name || 'Priya Nair';
+  const [fetchError, setFetchError] = useState(null);
 
   const fetchPersonalData = () => {
     setLoading(true);
-    axios.get(`/api/employees/${empId}`)
+    setFetchError(null);
+    const targetId = user?.employee_id || 'EMP-1002';
+    axios.get(`/api/employees/${targetId}`)
       .then(res => {
         setData(res.data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Failed to fetch employee data:', err);
+        setFetchError(err.response?.data?.detail || 'Unable to connect to server');
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
     fetchPersonalData();
-  }, [user]);
+  }, [user?.employee_id]);
 
   const handleCreateTicket = (e) => {
     e.preventDefault();
@@ -238,15 +245,22 @@ export const EmployeePortal = () => {
 
         {/* Center Main Tab View */}
         <main className="flex-1 p-6 space-y-6 overflow-y-auto">
+          {fetchError && (
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between">
+              <span>{fetchError}</span>
+              <button onClick={fetchPersonalData} className="px-3 py-1 bg-rose-600 text-white rounded font-bold hover:bg-rose-700">Retry</button>
+            </div>
+          )}
+
           {/* TAB 1: Employee Dashboard */}
-          {activeTab === 'emp-dashboard' && data && (
+          {activeTab === 'emp-dashboard' && (
             <div className="space-y-6">
               {/* Top Personal KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Quarterly Allowance</p>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">₹{data.quarterly_allowance_inr.toLocaleString('en-IN')}</h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">₹{(data?.quarterly_allowance_inr ?? 180000).toLocaleString('en-IN')}</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Fixed Corporate Limit</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xl font-mono shadow-sm">
@@ -257,8 +271,8 @@ export const EmployeePortal = () => {
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Spent (YTD)</p>
-                    <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹{data.used_allowance_inr.toLocaleString('en-IN')}</h3>
-                    <p className="text-xs text-emerald-600 font-semibold mt-0.5">{data.allowance_burn_pct}% Budget Utilized</p>
+                    <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹{(data?.used_allowance_inr ?? 0).toLocaleString('en-IN')}</h3>
+                    <p className="text-xs text-emerald-600 font-semibold mt-0.5">{data?.allowance_burn_pct ?? 0}% Budget Utilized</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                     <Wallet className="w-6 h-6" />
@@ -268,7 +282,7 @@ export const EmployeePortal = () => {
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Remaining Balance</p>
-                    <h3 className="text-2xl font-black text-amber-500 dark:text-amber-400 mt-1">₹{data.remaining_allowance_inr.toLocaleString('en-IN')}</h3>
+                    <h3 className="text-2xl font-black text-amber-500 dark:text-amber-400 mt-1">₹{(data?.remaining_allowance_inr ?? 180000).toLocaleString('en-IN')}</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Available for New Claims</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold">
@@ -279,8 +293,8 @@ export const EmployeePortal = () => {
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Bookings</p>
-                    <h3 className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">{data.numbers.total_bookings} Trips</h3>
-                    <p className="text-xs text-purple-600 font-semibold mt-0.5">{data.numbers.flown_trips} Flown Trips</p>
+                    <h3 className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">{data?.numbers?.total_bookings ?? 0} Trips</h3>
+                    <p className="text-xs text-purple-600 font-semibold mt-0.5">{data?.numbers?.flown_trips ?? 0} Flown Trips</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
                     <Ticket className="w-6 h-6" />
@@ -295,7 +309,7 @@ export const EmployeePortal = () => {
                   <span>Personal Travel Profile Summary</span>
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                  {data.narrative_summary}
+                  {data?.narrative_summary || `${empName} (${empId}) is assigned to ${data?.business_unit || 'Global Technology'} with active quarterly travel allowances.`}
                 </p>
               </div>
             </div>
@@ -441,46 +455,52 @@ export const EmployeePortal = () => {
           )}
 
           {/* TAB 3: History */}
-          {activeTab === 'emp-tickets' && data && (
+          {activeTab === 'emp-tickets' && (
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
               <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <History className="w-5 h-5 text-blue-600" />
                 <span>Personal Travel Booking History & Approval Status</span>
               </h4>
 
-              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 font-semibold uppercase">
-                    <tr>
-                      <th className="p-3">Ticket ID</th>
-                      <th className="p-3">Travel Date</th>
-                      <th className="p-3">Route (Origin → Destination)</th>
-                      <th className="p-3 text-center">Approval Status</th>
-                      <th className="p-3">Classification</th>
-                      <th className="p-3 text-right">Amount (INR)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700 font-medium">
-                    {data.tickets.map((t) => (
-                      <tr key={t.ticket_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                        <td className="p-3 font-mono font-bold text-blue-600 dark:text-blue-400">{t.ticket_id}</td>
-                        <td className="p-3 font-mono text-slate-600 dark:text-slate-300">{t.travel_date}</td>
-                        <td className="p-3 text-slate-900 dark:text-white font-semibold">{t.origin} → {t.destination}</td>
-                        <td className="p-3 text-center">
-                          <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${
-                            t.approval_status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                            (t.approval_status === 'REJECTED' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-amber-100 text-amber-800 border border-amber-200')
-                          }`}>
-                            {t.approval_status}
-                          </span>
-                        </td>
-                        <td className="p-3 text-slate-600 dark:text-slate-300">{t.classification}</td>
-                        <td className="p-3 text-right font-mono font-bold text-slate-900 dark:text-white">₹{t.amount_inr.toLocaleString('en-IN')}</td>
+              {(!data?.tickets || data.tickets.length === 0) ? (
+                <div className="p-8 text-center bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs">
+                  No travel bookings recorded yet for this account. Use <strong>Submit Claim</strong> to request a new travel ticket.
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 font-semibold uppercase">
+                      <tr>
+                        <th className="p-3">Ticket ID</th>
+                        <th className="p-3">Travel Date</th>
+                        <th className="p-3">Route (Origin → Destination)</th>
+                        <th className="p-3 text-center">Approval Status</th>
+                        <th className="p-3">Classification</th>
+                        <th className="p-3 text-right">Amount (INR)</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700 font-medium">
+                      {data.tickets.map((t) => (
+                        <tr key={t.ticket_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                          <td className="p-3 font-mono font-bold text-blue-600 dark:text-blue-400">{t.ticket_id}</td>
+                          <td className="p-3 font-mono text-slate-600 dark:text-slate-300">{t.travel_date}</td>
+                          <td className="p-3 text-slate-900 dark:text-white font-semibold">{t.origin} → {t.destination}</td>
+                          <td className="p-3 text-center">
+                            <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${
+                              t.approval_status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                              (t.approval_status === 'REJECTED' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-amber-100 text-amber-800 border border-amber-200')
+                            }`}>
+                              {t.approval_status}
+                            </span>
+                          </td>
+                          <td className="p-3 text-slate-600 dark:text-slate-300">{t.classification}</td>
+                          <td className="p-3 text-right font-mono font-bold text-slate-900 dark:text-white">₹{(t.amount_inr ?? 0).toLocaleString('en-IN')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
