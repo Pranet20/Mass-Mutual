@@ -40,12 +40,13 @@ async def lifespan(app: FastAPI):
     session = SessionLocal()
     try:
         mgr_user = session.query(User).filter_by(email="manager@travelintelligence.com").first()
-        if not mgr_user:
+        ticket_count = session.query(FactTravelTicket).count()
+        if not mgr_user or ticket_count == 0:
             from seed_data import generate_all_data
             generate_all_data()
             raw_csv = os.path.join(os.path.dirname(__file__), "data", "travel_raw_tickets.csv")
             if os.path.exists(raw_csv):
-                run_end_to_end_pipeline(raw_csv, "INITIAL_BOOTSTRAP_BATCH", "Production Auto-Bootstrap Ingestion")
+                run_end_to_end_pipeline(raw_csv, "INITIAL_PROD_BOOTSTRAP_BATCH", "Production Auto-Bootstrap Ingestion")
     except Exception as e:
         print(f"[BOOTSTRAP NOTICE] {e}")
     finally:

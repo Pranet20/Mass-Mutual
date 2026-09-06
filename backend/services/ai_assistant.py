@@ -23,8 +23,12 @@ def call_gemini_api(prompt: str, context_str: str) -> str:
     if not api_key:
         return None
 
-    # Google Gemini 2.5 Flash Endpoint
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    models = [
+        "gemini-1.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-pro",
+        "gemini-2.5-flash"
+    ]
     headers = {"Content-Type": "application/json"}
     
     system_instruction = (
@@ -32,7 +36,7 @@ def call_gemini_api(prompt: str, context_str: str) -> str:
         "You have full visibility into the live corporate travel warehouse database. "
         "Answer any user question comprehensively, accurately, professionally, concisely, and helpfully. "
         "You can answer questions about corporate travel spend, department budgets, flight bookings, policy compliance, "
-        "approvals, employee allowances, or general queries about how the application works. "
+        "approvals, employee allowances, platform services/features, or general travel optimizations. "
         "STRICT FORMATTING RULE: Do NOT include any asterisk characters (*) anywhere in your text response. Avoid bolding or italicizing with asterisks. Write in clean, modern prose. "
         "SUPPORT RULE: For filing complaints or help desk requests, inform the user they can use the in-app support desk form or email complaints@travelintelligence.com. "
         f"\nLive Corporate Travel Warehouse Context:\n{context_str}"
@@ -48,33 +52,23 @@ def call_gemini_api(prompt: str, context_str: str) -> str:
         ]
     }
     
-    try:
-        req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=12) as response:
-            res_data = json.loads(response.read().decode("utf-8"))
-            if "candidates" in res_data and len(res_data["candidates"]) > 0:
-                candidate = res_data["candidates"][0]
-                content = candidate.get("content", {})
-                parts = content.get("parts", [])
-                if parts and "text" in parts[0]:
-                    text = parts[0]["text"]
-                    clean_text = text.replace('*', '').strip()
-                    return clean_text
-    except Exception as e:
-        print(f"[Gemini API Notice] primary endpoint error: {e}")
-        # Fallback to gemini-2.0-flash
+    for model_name in models:
         try:
-            url_alt = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-            req_alt = urllib.request.Request(url_alt, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
-            with urllib.request.urlopen(req_alt, timeout=12) as response:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+            req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=10) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 if "candidates" in res_data and len(res_data["candidates"]) > 0:
-                    text = res_data["candidates"][0]["content"]["parts"][0]["text"]
-                    clean_text = text.replace('*', '').strip()
-                    return clean_text
-        except Exception as e2:
-            print(f"[Gemini API Notice] fallback endpoint error: {e2}")
-            return None
+                    candidate = res_data["candidates"][0]
+                    content = candidate.get("content", {})
+                    parts = content.get("parts", [])
+                    if parts and "text" in parts[0]:
+                        text = parts[0]["text"]
+                        clean_text = text.replace('*', '').strip()
+                        return clean_text
+        except Exception as e:
+            print(f"[Gemini API Notice] {model_name} attempt: {e}")
+            continue
 
     return None
 
@@ -199,6 +193,10 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
     if query_lower in ["hi", "hello", "hey", "greetings"]:
         response["answer"] = f"Hello! I am your Corporate Travel AI Assistant connected to the live warehouse. We are currently tracking {total_tickets} tickets across {emp_count} active employees with ₹{total_spend:,.2f} INR in verified flown spend. How can I assist you with budgets, policies, spend optimizations, or approvals today?"
         response["data_summary"] = {"Total Records": total_tickets, "Total Spend": f"₹{total_spend:,.2f}", "Active Employees": emp_count}
+
+    elif "service" in query_lower or "feature" in query_lower or "capabilities" in query_lower or "what do you do" in query_lower:
+        response["answer"] = "The Corporate Travel Intelligence Platform provides 6 core enterprise services: 1. Executive Command Center with dynamic spend analytics, route filters, and BI visualizations. 2. Governed multi-tier ETL Ingestion Pipeline with quarantine isolation, FX normalization, and deduplication. 3. 100-Employee Corporate Directory with real-time quarterly allowance limit management. 4. Manager Approval Desk & Policy Exemption Overrides. 5. Predictive Time-Series Spend Forecasting with QoQ projections. 6. AI Assistant with conversational data warehouse queries and automated compliance complaint filing."
+        response["data_summary"] = {"Core Services": "Executive BI, Governed Pipeline, Employee Directory, Approvals, Forecasting, AI Assistant"}
 
     elif "optimize" in query_lower or "saving" in query_lower or "reduction" in query_lower:
         response["answer"] = "Corporate Spend Optimization Strategies: 1. Strict Enforcement of Economy Class for domestic flights under 6 hours saves up to 34% annually. 2. Implementing the Manager Approval Desk prevents unapproved bookings before tickets are issued. 3. Setting quarterly budget allowance caps (₹1,50,000 INR default) limits excessive divisional expenditures. 4. Capping hotel reimbursements at ₹8,500 INR domestic prevents accommodation cost overruns."
