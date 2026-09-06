@@ -5,9 +5,8 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from tests.test_system import TestTravelAnalyticsSystem
-
 def execute_automated_system_tests() -> dict:
+    from tests.test_system import TestTravelAnalyticsSystem
     suite = unittest.TestLoader().loadTestsFromTestCase(TestTravelAnalyticsSystem)
     stream = io.StringIO()
     runner = unittest.TextTestRunner(stream=stream, verbosity=2)

@@ -15,6 +15,9 @@ class TestTravelAnalyticsSystem(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         init_db()
+        from seed_data import generate_all_data
+        generate_all_data()
+
 
     def test_iso_date_standardization(self):
         self.assertEqual(standardize_iso_date("15/08/2026"), "2026-08-15")
