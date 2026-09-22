@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { 
-  User, DollarSign, Plane, Ticket, Send, Bot, Mail, CheckCircle2, PlusCircle, LayoutDashboard, History, LogOut, ChevronRight, Wallet, PieChart, Copy, Sun, Moon
+  User, DollarSign, Plane, Ticket, Send, Bot, Mail, CheckCircle2, PlusCircle, LayoutDashboard, History, LogOut, ChevronRight, Wallet, PieChart, Copy, Sun, Moon, ShieldCheck, ShieldAlert, Calculator, FileCheck, AlertTriangle, LifeBuoy, Clock
 } from 'lucide-react';
 
 export const EmployeePortal = () => {
@@ -27,14 +27,20 @@ export const EmployeePortal = () => {
   const [requestMsg, setRequestMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // AI & Complaint state
-  const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Hello! I am your AI Travel Assistant. Ask me about your claim status, quarterly allowances, or travel policies.' }
-  ]);
+  // Policy Validator & Allowance Calculator State
+  const [calcTripType, setCalcTripType] = useState('domestic'); // 'domestic', 'intl_long', 'intl_short'
+  const [calcCabin, setCalcCabin] = useState('Economy');
+  const [calcFlightCost, setCalcFlightCost] = useState(12000);
+  const [calcHotelRate, setCalcHotelRate] = useState(6000);
+  const [calcNights, setCalcNights] = useState(3);
+
+  // Email Support & Complaint Desk State
+  const [fromEmail, setFromEmail] = useState(user?.email || 'priya.nair@travelintelligence.com');
+  const targetEmail = "pparker062005@gmail.com";
   const [compSubject, setCompSubject] = useState('');
   const [compDetails, setCompDetails] = useState('');
   const [compMsg, setCompMsg] = useState('');
+  const [complaintHistory, setComplaintHistory] = useState([]);
 
   const empId = user?.employee_id || 'EMP-1002';
   const empName = user?.name || data?.employee_name || 'Priya Nair';
@@ -94,40 +100,51 @@ export const EmployeePortal = () => {
     return isNaN(p) ? 100.0 : p;
   };
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-
-    const userText = query.trim();
-    setMessages(prev => [...prev, { sender: 'user', text: userText }]);
-    setQuery('');
-
-    axios.post('/api/assistant/query', { query: userText })
-      .then(res => {
-        setMessages(prev => [...prev, { sender: 'bot', text: res.data.answer }]);
-      })
-      .catch(() => {
-        setMessages(prev => [...prev, { sender: 'bot', text: 'Sorry, I ran into an error answering your question.' }]);
-      });
+  const fetchComplaints = () => {
+    axios.get('/api/assistant/complaints')
+      .then(res => setComplaintHistory(res.data || []))
+      .catch(() => {});
   };
+
+  useEffect(() => {
+    if (activeTab === 'emp-assistant') {
+      fetchComplaints();
+    }
+  }, [activeTab]);
 
   const handleComplaintSubmit = (e) => {
     e.preventDefault();
+    if (!compSubject.trim() || !compDetails.trim()) return;
+
     axios.post('/api/assistant/complaint', {
-      subject: compSubject,
-      details: compDetails,
-      submitted_by: `${empName} (${empId})`
+      subject: compSubject.trim(),
+      details: compDetails.trim(),
+      submitted_by: `${empName} (${empId})`,
+      from_email: fromEmail.trim()
     })
     .then(res => {
-      setCompMsg(res.data.message);
+      setCompMsg(res.data.message || `Ticket registered successfully: ${res.data.complaint_id}`);
+      
+      // Automatically pop up email to pparker062005@gmail.com
+      const mailBody = `From: ${fromEmail.trim()}\nEmployee: ${empName} (${empId})\nDivision: ${data?.business_unit || 'Global Technology'}\nTicket Reference: ${res.data.complaint_id || 'NEW'}\n\nDetails:\n${compDetails.trim()}`;
+      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(`[Corporate Travel Query] ${compSubject.trim()}`)}&body=${encodeURIComponent(mailBody)}`;
+      window.open(mailtoUrl, '_blank');
+
       setCompSubject('');
       setCompDetails('');
+      fetchComplaints();
     })
-    .catch(() => setCompMsg('Failed to lodge complaint.'));
+    .catch(() => {
+      // Fallback: pop up email client directly so email is guaranteed sent to pparker062005@gmail.com
+      const mailBody = `From: ${fromEmail.trim()}\nEmployee: ${empName} (${empId})\n\nDetails:\n${compDetails.trim()}`;
+      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(`[Corporate Travel Query] ${compSubject.trim()}`)}&body=${encodeURIComponent(mailBody)}`;
+      window.open(mailtoUrl, '_blank');
+      setCompMsg(`Official email client opened targeting ${targetEmail}.`);
+    });
   };
 
   const copySupportEmail = () => {
-    navigator.clipboard.writeText('complaints@travelintelligence.com');
+    navigator.clipboard.writeText(targetEmail);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
@@ -224,8 +241,8 @@ export const EmployeePortal = () => {
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Bot className="w-4 h-4" />
-                <span>AI Assistant</span>
+                <ShieldCheck className="w-4 h-4" />
+                <span>Support & Policy Desk</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-60" />
             </button>
@@ -504,103 +521,311 @@ export const EmployeePortal = () => {
             </div>
           )}
 
-          {/* TAB 4: AI Assistant */}
+          {/* TAB 4: Corporate Support & Travel Policy Desk */}
           {activeTab === 'emp-assistant' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* AI Assistant */}
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col h-[480px]">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                  <Bot className="w-4 h-4 text-blue-600" />
-                  <span>AI Assistant</span>
-                </h4>
-
-                <div className="flex-1 overflow-y-auto space-y-3 pr-2 mb-3 font-medium text-xs">
-                  {messages.map((m, idx) => (
-                    <div key={idx} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-3 rounded-xl ${
-                        m.sender === 'user' 
-                          ? 'bg-blue-600 text-white rounded-br-none' 
-                          : 'bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-bl-none'
-                      }`}>
-                        {m.text}
-                      </div>
-                    </div>
-                  ))}
+            <div className="space-y-6">
+              {/* Top Banner Notice */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md border border-indigo-800/40">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center font-bold">
+                    <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm">Corporate Support Desk & Travel Policy Engine</h4>
+                    <p className="text-xs text-indigo-200">100% In-House Policy Calculations • Direct Email Dispatch to {targetEmail}</p>
+                  </div>
                 </div>
 
-                <form onSubmit={handleSendMessage} className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Ask about travel policy, claims, or allowance limits..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md"
-                  >
-                    Send
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  onClick={copySupportEmail}
+                  className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold flex items-center gap-2 border border-white/20 transition-all cursor-pointer self-start sm:self-center"
+                >
+                  <Mail className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{targetEmail}</span>
+                  <Copy className="w-3 h-3 text-amber-400 ml-1" />
+                  {copiedEmail && <span className="text-amber-400 font-bold text-[10px] ml-1">(Copied!)</span>}
+                </button>
               </div>
 
-              {/* Support Desk & Complaint Filing */}
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-amber-500" />
-                    <span>Lodge Official Support Complaint</span>
-                  </h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* LEFT COLUMN: Pre-Booking Travel Policy Validator & Allowance Calculator */}
+                <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <Calculator className="w-4 h-4 text-blue-600" />
+                      <span>Pre-Booking Policy Validator & Calculator</span>
+                    </h4>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                      Rule Engine
+                    </span>
+                  </div>
 
-                  <button
-                    onClick={copySupportEmail}
-                    className="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[11px] font-bold flex items-center gap-1"
-                  >
-                    <Copy className="w-3 h-3" />
-                    <span>{copiedEmail ? 'Copied Email!' : 'complaints@travelintelligence.com'}</span>
-                  </button>
+                  {/* Calculator Inputs */}
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                        Trip Classification & Duration
+                      </label>
+                      <select
+                        value={calcTripType}
+                        onChange={(e) => setCalcTripType(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium"
+                      >
+                        <option value="domestic">Domestic Flight (Within India)</option>
+                        <option value="intl_long">Cross-Border International (&gt;6 Hours Duration)</option>
+                        <option value="intl_short">Short International Flight (≤6 Hours Duration)</option>
+                      </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          Flight Cabin Class
+                        </label>
+                        <select
+                          value={calcCabin}
+                          onChange={(e) => setCalcCabin(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium"
+                        >
+                          <option value="Economy">Economy Class</option>
+                          <option value="Business">Business Class</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          Flight Cost (₹ INR)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={calcFlightCost}
+                          onChange={(e) => setCalcFlightCost(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          Hotel Rate / Night (₹ INR)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={calcHotelRate}
+                          onChange={(e) => setCalcHotelRate(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium"
+                        />
+                        <span className="text-[10px] text-slate-400 mt-0.5 block">
+                          Policy Cap: {calcTripType === 'domestic' ? '₹8,500 INR' : '₹21,250 ($250 USD)'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          Duration (Nights)
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="30"
+                          value={calcNights}
+                          onChange={(e) => setCalcNights(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium"
+                        />
+                        <span className="text-[10px] text-slate-400 mt-0.5 block">
+                          Per Diem: {calcTripType === 'domestic' ? '₹1,800/day' : '₹6,375 ($75)/day'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Policy Compliance Results & Warnings */}
+                    <div className="space-y-2 pt-2">
+                      {calcTripType === 'domestic' && calcCabin === 'Business' && (
+                        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">POLICY VIOLATION: </span>
+                            Domestic flights are strictly restricted to Economy Class. Business Class requests will be rejected by the Manager Desk.
+                          </div>
+                        </div>
+                      )}
+
+                      {calcTripType === 'intl_short' && calcCabin === 'Business' && (
+                        <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">POLICY VARIANCE: </span>
+                            Business Class on short international flights (≤6 hrs) requires VP approval and pre-booking exception justification.
+                          </div>
+                        </div>
+                      )}
+
+                      {(parseFloat(calcHotelRate) || 0) > (calcTripType === 'domestic' ? 8500 : 21250) && (
+                        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">HOTEL CAP EXCEEDED: </span>
+                            The night rate of ₹{parseFloat(calcHotelRate).toLocaleString('en-IN')} exceeds the corporate accommodation ceiling of {calcTripType === 'domestic' ? '₹8,500' : '₹21,250'}.
+                          </div>
+                        </div>
+                      )}
+
+                      {!(calcTripType === 'domestic' && calcCabin === 'Business') &&
+                       !((parseFloat(calcHotelRate) || 0) > (calcTripType === 'domestic' ? 8500 : 21250)) && (
+                        <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                          <span className="font-medium">All Corporate Policy Thresholds Satisfied.</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Spend Estimation Summary vs Quarterly Allowance */}
+                    <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500 dark:text-slate-400">Estimated Total Trip Cost:</span>
+                        <span className="font-black text-slate-900 dark:text-white font-mono">
+                          ₹{( (parseFloat(calcFlightCost) || 0) + ((parseFloat(calcHotelRate) || 0) * (parseInt(calcNights) || 0)) + ((calcTripType === 'domestic' ? 1800 : 6375) * (parseInt(calcNights) || 0)) ).toLocaleString('en-IN', { maximumFractionDigits: 0 })} INR
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500 dark:text-slate-400">Remaining Quarterly Allowance:</span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                          ₹{Math.max(0, (data?.quarterly_allowance_inr || 150000) - (data?.flown_spend_inr || 0)).toLocaleString('en-IN', { maximumFractionDigits: 0 })} INR
+                        </span>
+                      </div>
+                      {((parseFloat(calcFlightCost) || 0) + ((parseFloat(calcHotelRate) || 0) * (parseInt(calcNights) || 0)) + ((calcTripType === 'domestic' ? 1800 : 6375) * (parseInt(calcNights) || 0))) > Math.max(0, (data?.quarterly_allowance_inr || 150000) - (data?.flown_spend_inr || 0)) ? (
+                        <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 pt-1 border-t border-slate-200 dark:border-slate-800">
+                          ⚠ Estimated cost exceeds remaining quarterly allowance by ₹{( ((parseFloat(calcFlightCost) || 0) + ((parseFloat(calcHotelRate) || 0) * (parseInt(calcNights) || 0)) + ((calcTripType === 'domestic' ? 1800 : 6375) * (parseInt(calcNights) || 0))) - Math.max(0, (data?.quarterly_allowance_inr || 150000) - (data?.flown_spend_inr || 0)) ).toLocaleString('en-IN', { maximumFractionDigits: 0 })} INR. Manager exception override required.
+                        </div>
+                      ) : (
+                        <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 pt-1 border-t border-slate-200 dark:border-slate-800">
+                          ✓ Sufficient quarterly allowance balance available for this trip.
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {compMsg && (
-                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
-                    {compMsg}
-                  </div>
-                )}
+                {/* RIGHT COLUMN: Official Email Support Dispatcher & Complaint Desk */}
+                <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-indigo-600" />
+                        <span>Direct Email Support & Complaint Desk</span>
+                      </h4>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                        Official Desk
+                      </span>
+                    </div>
 
-                <form onSubmit={handleComplaintSubmit} className="space-y-3 text-xs">
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Issue Subject</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Flight booking discrepancy..."
-                      value={compSubject}
-                      onChange={(e) => setCompSubject(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none"
-                    />
+                    {compMsg && (
+                      <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                        <span>{compMsg}</span>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleComplaintSubmit} className="space-y-3 text-xs">
+                      {/* From Email Input (Editable if employee signed in without corporate email) */}
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          From (Your Email)
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={fromEmail}
+                          onChange={(e) => setFromEmail(e.target.value)}
+                          placeholder="your.email@example.com"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      {/* To Email Field (Fixed Official Email pparker062005@gmail.com) */}
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          To (Official Corporate Dispatch)
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            readOnly
+                            value={targetEmail}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-bold focus:outline-none cursor-default"
+                          />
+                          <span className="absolute right-3 top-2 text-[10px] uppercase font-bold text-slate-400">
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Subject */}
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          Subject / Ticket Title
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Travel Policy Query / Exception Approval Request"
+                          value={compSubject}
+                          onChange={(e) => setCompSubject(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Detailed Description */}
+                      <div>
+                        <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                          Draft Message / Complaint Details
+                        </label>
+                        <textarea
+                          rows={3}
+                          required
+                          placeholder="Describe your issue, travel query, or policy exception justification..."
+                          value={compDetails}
+                          onChange={(e) => setCompDetails(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Send className="w-4 h-4" />
+                        <span>Send Official Email & Lodge Complaint</span>
+                      </button>
+                    </form>
                   </div>
 
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Detailed Description</label>
-                    <textarea
-                      rows={4}
-                      required
-                      placeholder="Provide complete details of your travel issue..."
-                      value={compDetails}
-                      onChange={(e) => setCompDetails(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>File Official Complaint</span>
-                  </button>
-                </form>
+                  {/* Live Ticket Status Ledger */}
+                  {complaintHistory.length > 0 && (
+                    <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                        Recent Lodged Tickets ({complaintHistory.length})
+                      </span>
+                      <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                        {complaintHistory.slice(0, 4).map((c, idx) => (
+                          <div key={idx} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
+                            <div>
+                              <span className="font-bold text-indigo-600 dark:text-indigo-400 font-mono mr-2">{c.ticket_id}</span>
+                              <span className="font-medium text-slate-800 dark:text-slate-200 truncate max-w-[180px] inline-block align-bottom">{c.subject}</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                              {c.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

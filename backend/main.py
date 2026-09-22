@@ -185,6 +185,11 @@ class ComplaintRequest(BaseModel):
     subject: str
     details: str
     submitted_by: str
+    from_email: Optional[str] = None
+
+class GoogleAuthRequest(BaseModel):
+    email: str
+    name: Optional[str] = None
 
 class CreateEmployeeRequest(BaseModel):
     employee_name: str
@@ -298,6 +303,45 @@ def signup(req: SignupRequest):
     if not user:
         raise HTTPException(status_code=400, detail=msg)
     
+    token = create_access_token({"sub": user.email, "role": user.role, "employee_id": user.employee_id})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "email": user.email,
+        "name": user.name,
+        "role": user.role,
+        "employee_id": user.employee_id
+    }
+
+@app.post("/api/auth/google")
+def google_auth(req: GoogleAuthRequest):
+    email = req.email.strip().lower()
+    name = (req.name or email.split("@")[0]).strip()
+    session = SessionLocal()
+    user = session.query(User).filter(func.lower(User.email) == email).first()
+    if not user:
+        emp = session.query(EmployeeMaster).filter(func.lower(EmployeeMaster.email) == email).first()
+        emp_id = emp.employee_id if emp else None
+        bu = emp.business_unit if emp else "Global Technology"
+        dept = emp.department if emp else "Software Engineering"
+        desig = emp.designation if emp else "Senior Engineer"
+        session.close()
+
+        user, msg = register_user(
+            email=email,
+            password=uuid.uuid4().hex,
+            name=name,
+            role="employee",
+            employee_id=emp_id,
+            business_unit=bu,
+            department=dept,
+            designation=desig
+        )
+        if not user:
+            raise HTTPException(status_code=400, detail=msg)
+    else:
+        session.close()
+
     token = create_access_token({"sub": user.email, "role": user.role, "employee_id": user.employee_id})
     return {
         "access_token": token,
@@ -1033,7 +1077,38 @@ def assistant_query(req: AIQueryRequest, current_user: User = Depends(get_curren
 @app.post("/api/assistant/complaint")
 def register_complaint(req: ComplaintRequest, current_user: User = Depends(get_current_user)):
     actor = current_user.name or current_user.email or req.submitted_by
-    return submit_complaint(req.subject, req.details, actor)
+    from_email = req.from_email or current_user.email or ""
+    return submit_complaint(req.subject, req.details, actor, from_email=from_email)
+
+@app.get("/api/assistant/complaints")
+def get_complaints(current_user: User = Depends(get_current_user)):
+    session = SessionLocal()
+    try:
+        if current_user.role == "employee":
+            actor = current_user.name or current_user.email
+            comps = session.query(Complaint).filter(
+                (Complaint.submitted_by == actor) | 
+                (Complaint.submitted_by.like(f"%{current_user.email}%")) |
+                (Complaint.details.like(f"%{current_user.email}%"))
+            ).order_by(Complaint.created_at.desc()).all()
+        else:
+            comps = session.query(Complaint).order_by(Complaint.created_at.desc()).all()
+
+        return [
+            {
+                "id": c.id,
+                "ticket_id": f"CMP-{c.id + 100}",
+                "subject": c.subject,
+                "details": c.details,
+                "status": c.status,
+                "submitted_by": c.submitted_by,
+                "created_at": c.created_at.isoformat() if c.created_at else None,
+                "official_email": "pparker062005@gmail.com"
+            }
+            for c in comps
+        ]
+    finally:
+        session.close()
 
 # Serve Frontend static dist files if built
 frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))

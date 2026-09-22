@@ -15,62 +15,10 @@ if os.path.exists(env_path):
                 k, v = line.split("=", 1)
                 os.environ.setdefault(k.strip(), v.strip())
 
-def get_gemini_api_key():
-    return os.environ.get("GEMINI_API_KEY", "")
+OFFICIAL_EMAIL = "pparker062005@gmail.com"
 
-def call_gemini_api(prompt: str, context_str: str) -> str:
-    api_key = get_gemini_api_key().strip()
-    if not api_key:
-        return None
-
-    models = [
-        "gemini-1.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-pro",
-        "gemini-2.5-flash"
-    ]
-    headers = {"Content-Type": "application/json"}
-    
-    system_instruction = (
-        "You are the senior AI Travel & Expense Intelligence Assistant for the Corporate Travel Analytics Platform. "
-        "You have full visibility into the live corporate travel warehouse database. "
-        "Answer any user question comprehensively, accurately, professionally, concisely, and helpfully. "
-        "You can answer questions about corporate travel spend, department budgets, flight bookings, policy compliance, "
-        "approvals, employee allowances, platform services/features, or general travel optimizations. "
-        "STRICT FORMATTING RULE: Do NOT include any asterisk characters (*) anywhere in your text response. Avoid bolding or italicizing with asterisks. Write in clean, modern prose. "
-        "SUPPORT RULE: For filing complaints or help desk requests, inform the user they can use the in-app support desk form or email complaints@travelintelligence.com. "
-        f"\nLive Corporate Travel Warehouse Context:\n{context_str}"
-    )
-    
-    payload = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": f"{system_instruction}\n\nUser Question: {prompt}"}
-                ]
-            }
-        ]
-    }
-    
-    for model_name in models:
-        try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-            req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
-            with urllib.request.urlopen(req, timeout=10) as response:
-                res_data = json.loads(response.read().decode("utf-8"))
-                if "candidates" in res_data and len(res_data["candidates"]) > 0:
-                    candidate = res_data["candidates"][0]
-                    content = candidate.get("content", {})
-                    parts = content.get("parts", [])
-                    if parts and "text" in parts[0]:
-                        text = parts[0]["text"]
-                        clean_text = text.replace('*', '').strip()
-                        return clean_text
-        except Exception as e:
-            print(f"[Gemini API Notice] {model_name} attempt: {e}")
-            continue
-
-    return None
+# External Gemini API has been completely removed to prevent data leakage and guarantee 100% data consistency.
+# All policy evaluation and spend analysis are executed 100% locally and deterministically against PostgreSQL.
 
 def process_ai_query(user_query: str, user_role: str = "manager", employee_id: str = None, user_name: str = None) -> dict:
     query_lower = user_query.lower().strip()
@@ -92,34 +40,6 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
         ticket_routes = [f"{t.origin_city}->{t.dest_city} (₹{t.amount_inr:,.0f} INR, {t.ticket_status})" for t in emp_tickets[:5]]
         routes_str = ", ".join(ticket_routes) if ticket_routes else "No bookings recorded yet"
 
-        db_context = (
-            f"User Profile: {emp_name} ({employee_id}), Department: {emp_dept}, Division: {emp_bu}. "
-            f"Quarterly Allowance: ₹{emp_allowance:,.2f} INR. Total Spend to Date: ₹{emp_spend:,.2f} INR. "
-            f"Remaining Quarterly Budget: ₹{remaining:,.2f} INR. "
-            f"Total Bookings: {len(emp_tickets)} ({len(flown_tickets)} flown, {len(cancelled_tickets)} cancelled/refunded). "
-            f"Recent Bookings: {routes_str}. "
-            f"Official Support Email: complaints@travelintelligence.com. "
-            f"Policy Guidelines: Domestic travel Economy only. Cross-border international flights (>6 hrs) allow Business Class for Lead/Director/VP levels. "
-            f"Hotel cap: ₹8,500 INR/night domestic, $250 USD international. Daily per diem: ₹1,800 INR/day domestic, $75 USD international."
-        )
-
-        gemini_response = call_gemini_api(user_query, db_context)
-        if gemini_response:
-            session.close()
-            clean_resp = gemini_response.replace('*', '').strip()
-            return {
-                "query": user_query,
-                "answer": clean_resp,
-                "data_summary": {
-                    "Employee": emp_name,
-                    "Quarterly Allowance": f"₹{emp_allowance:,.2f}",
-                    "Used Budget": f"₹{emp_spend:,.2f}",
-                    "Remaining Budget": f"₹{remaining:,.2f}"
-                },
-                "complaint_info": {"official_email": "complaints@travelintelligence.com"}
-            }
-
-        # Offline fallback for employee
         session.close()
         return {
             "query": user_query,
@@ -129,7 +49,10 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
                 "Spent": f"₹{emp_spend:,.2f}",
                 "Remaining": f"₹{remaining:,.2f}"
             },
-            "complaint_info": {"official_email": "complaints@travelintelligence.com"}
+            "complaint_info": {
+                "official_email": OFFICIAL_EMAIL,
+                "legacy_email": "complaints@travelintelligence.com"
+            }
         }
 
     # Company-wide context for Managers and Admins
@@ -154,61 +77,36 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
     
     top_emp_str = f"{top_emp_data[0]} ({top_emp_data[1]}) with ₹{top_emp_data[2]:,.2f} INR" if top_emp_data else "Priya Nair (Global Tech)"
 
-    db_context = (
-        f"Total Active Employees: {emp_count}. Total Published Tickets: {total_tickets}. Total Flown Spend: ₹{total_spend:,.2f} INR. "
-        f"Top Department by Spend: {top_bu[0]} (₹{top_bu[1]:,.2f} INR). Highest Individual Spender: {top_emp_str}. "
-        f"Non-travelled/Cancelled/Refunded: {cancelled_count}. Business Unit Spend Breakdown: {bu_summary_str}. "
-        f"Official Support Desk Email: complaints@travelintelligence.com. "
-        f"Corporate Policy Guidelines: Default quarterly employee allowance is ₹1,50,000 INR per employee. "
-        f"Domestic flights are restricted to Economy Class. Cross-border international flights (>6 hrs) allow Business Class for Lead/Director/VP levels. "
-        f"Hotel caps: ₹8,500 INR/night domestic, $250 USD/night international. Daily per diem: ₹1,800 INR/day domestic, $75 USD/day international."
-    )
-
-    # 1. Attempt Live Gemini Generative API Call
-    gemini_response = call_gemini_api(user_query, db_context)
-    if gemini_response:
-        session.close()
-        clean_resp = gemini_response.replace('*', '').strip()
-        return {
-            "query": user_query,
-            "answer": clean_resp,
-            "data_summary": {
-                "AI Engine": "Google Gemini 2.5 Flash Live API",
-                "Total Warehouse Spend": f"₹{total_spend:,.2f}",
-                "Active Employees": emp_count
-            },
-            "complaint_info": {"official_email": "complaints@travelintelligence.com"}
-        }
-
-    # 2. Intelligent Offline Fallback Engine
+    # 100% In-House Deterministic Rule Engine (No third-party LLM, no data leakage)
     response = {
         "query": user_query,
         "answer": "",
         "data_summary": None,
         "complaint_info": {
-            "official_email": "complaints@travelintelligence.com"
+            "official_email": OFFICIAL_EMAIL,
+            "legacy_email": "complaints@travelintelligence.com"
         }
     }
 
     if query_lower in ["hi", "hello", "hey", "greetings"]:
-        response["answer"] = f"Hello! I am your Corporate Travel AI Assistant connected to the live warehouse. We are currently tracking {total_tickets} tickets across {emp_count} active employees with ₹{total_spend:,.2f} INR in verified flown spend. How can I assist you with budgets, policies, spend optimizations, or approvals today?"
+        response["answer"] = f"Hello! I am your Corporate Travel Governance Desk connected to the live warehouse. We are currently tracking {total_tickets} tickets across {emp_count} active employees with ₹{total_spend:,.2f} INR in verified flown spend. How can I assist you with budgets, policies, spend optimizations, or approvals today?"
         response["data_summary"] = {"Total Records": total_tickets, "Total Spend": f"₹{total_spend:,.2f}", "Active Employees": emp_count}
 
     elif "service" in query_lower or "feature" in query_lower or "capabilities" in query_lower or "what do you do" in query_lower:
-        response["answer"] = "The Corporate Travel Intelligence Platform provides 6 core enterprise services: 1. Executive Command Center with dynamic spend analytics, route filters, and BI visualizations. 2. Governed multi-tier ETL Ingestion Pipeline with quarantine isolation, FX normalization, and deduplication. 3. 100-Employee Corporate Directory with real-time quarterly allowance limit management. 4. Manager Approval Desk & Policy Exemption Overrides. 5. Predictive Time-Series Spend Forecasting with QoQ projections. 6. AI Assistant with conversational data warehouse queries and automated compliance complaint filing."
-        response["data_summary"] = {"Core Services": "Executive BI, Governed Pipeline, Employee Directory, Approvals, Forecasting, AI Assistant"}
+        response["answer"] = "The Corporate Travel Intelligence Platform provides 6 core enterprise services: 1. Executive Command Center with dynamic spend analytics, route filters, and BI visualizations. 2. Governed multi-tier ETL Ingestion Pipeline with quarantine isolation, FX normalization, and deduplication. 3. 100-Employee Corporate Directory with real-time quarterly allowance limit management. 4. Manager Approval Desk & Policy Exemption Overrides. 5. Predictive Time-Series Spend Forecasting with QoQ projections. 6. Power BI Analytics Canvas with 14 production-grade DAX measures."
+        response["data_summary"] = {"Core Services": "Executive BI, Governed Pipeline, Employee Directory, Approvals, Forecasting, Power BI"}
 
     elif "optimize" in query_lower or "saving" in query_lower or "reduction" in query_lower:
         response["answer"] = "Corporate Spend Optimization Strategies: 1. Strict Enforcement of Economy Class for domestic flights under 6 hours saves up to 34% annually. 2. Implementing the Manager Approval Desk prevents unapproved bookings before tickets are issued. 3. Setting quarterly budget allowance caps (₹1,50,000 INR default) limits excessive divisional expenditures. 4. Capping hotel reimbursements at ₹8,500 INR domestic prevents accommodation cost overruns."
         response["data_summary"] = {"Flight Savings": "34%", "Default Allowance": "₹1,50,000 INR", "Domestic Hotel Cap": "₹8,500 INR"}
 
     elif "next" in query_lower or "what can i do" in query_lower or "options" in query_lower:
-        response["answer"] = "Here are key actions you can take in the platform: 1. Review and approve pending travel claims in the Manager Approvals tab. 2. Inspect the 100 corporate employee directory and adjust quarterly allowances in the Employees tab. 3. Import new vendor booking CSV feeds in the Pipeline tab. 4. Download executive C-Suite briefing reports in the Reports tab. 5. Ask me detailed questions about any employee, route, or department spend."
-        response["data_summary"] = {"Key Modules": "Approvals, Directory, ETL Pipeline, Reports, Support Desk"}
+        response["answer"] = "Here are key actions you can take in the platform: 1. Review and approve pending travel claims in the Manager Approvals tab. 2. Inspect the 100 corporate employee directory and adjust quarterly allowances in the Employees tab. 3. Import new vendor booking CSV feeds in the Pipeline tab. 4. Download executive C-Suite briefing reports in the Reports tab. 5. Access the full Power BI analytics canvas for deep drilldowns."
+        response["data_summary"] = {"Key Modules": "Approvals, Directory, ETL Pipeline, Reports, Power BI Desk"}
 
     elif "complain" in query_lower or "issue" in query_lower or "support" in query_lower or "file" in query_lower or "report" in query_lower:
-        response["answer"] = "You can submit your complaint or support inquiry directly using the in-app support desk form at the top right of this page, or email complaints@travelintelligence.com directly."
-        response["data_summary"] = {"Support Email": "complaints@travelintelligence.com"}
+        response["answer"] = f"Official support inquiries and complaints are dispatched directly to {OFFICIAL_EMAIL}. Employees can file official complaints via the Employee Portal Support Desk."
+        response["data_summary"] = {"Support Email": OFFICIAL_EMAIL}
 
     elif "budget" in query_lower or "plan" in query_lower or "finance" in query_lower or "cost" in query_lower:
         response["answer"] = f"Corporate Travel Budget & Financial Strategy: 1. Default quarterly employee allowance is set to ₹1,50,000 INR per employee across all divisions. 2. Mandating Economy class for domestic flights under 6 hours saves 34% annually. 3. Capping hotel stays at ₹8,500 INR per night domestic and $250 USD international ensures spend compliance."
@@ -246,11 +144,12 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
     session.close()
     return response
 
-def submit_complaint(subject: str, details: str, submitted_by: str) -> dict:
+def submit_complaint(subject: str, details: str, submitted_by: str, from_email: str = None) -> dict:
     session = SessionLocal()
+    complaint_body = f"From: {from_email}\n\n{details}" if from_email else details
     complaint_obj = Complaint(
         subject=subject,
-        details=details,
+        details=complaint_body,
         submitted_by=submitted_by,
         status="OPEN"
     )
@@ -261,6 +160,7 @@ def submit_complaint(subject: str, details: str, submitted_by: str) -> dict:
     
     return {
         "status": "SUCCESS",
-        "message": f"Complaint registered under ticket ID {comp_id}. Official support is also available at complaints@travelintelligence.com.",
-        "complaint_id": comp_id
+        "message": f"Complaint registered under ticket ID {comp_id}. Official dispatch routed to {OFFICIAL_EMAIL}.",
+        "complaint_id": comp_id,
+        "official_email": OFFICIAL_EMAIL
     }
