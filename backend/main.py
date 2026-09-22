@@ -1024,6 +1024,35 @@ def download_pbit():
         filename="Travel_Analytics_Dashboard.pbit"
     )
 
+@app.get("/api/powerbi/pbix")
+def download_pbix():
+    pbix_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "powerbi", "Corporate_Travel_Analytics.pbix"))
+    if not os.path.exists(pbix_path):
+        raise HTTPException(status_code=404, detail="Power BI report template not found")
+    return FileResponse(
+        pbix_path,
+        media_type="application/octet-stream",
+        filename="Corporate_Travel_Analytics.pbix"
+    )
+
+@app.get("/api/powerbi/feed")
+def powerbi_live_feed():
+    session = SessionLocal()
+    try:
+        results = session.execute(text("SELECT * FROM vw_travel")).mappings().all()
+        serialized = []
+        for r in results:
+            d = dict(r)
+            for k, v in d.items():
+                if isinstance(v, (datetime.date, datetime.datetime)):
+                    d[k] = v.isoformat()
+                elif hasattr(v, "__float__") and not isinstance(v, (int, float, str, bool)):
+                    d[k] = float(v)
+            serialized.append(d)
+        return serialized
+    finally:
+        session.close()
+
 # --- GOVERNED EXPORTS (CSV & PDF) ---
 
 @app.get("/api/export/csv")

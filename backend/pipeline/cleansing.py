@@ -21,6 +21,8 @@ APPROVED_FX_RATES = {
     "AUD": 55.0
 }
 
+_FX_CACHE = {}
+
 def get_applicable_fx_rate(currency: str, rate_date: str, session) -> tuple:
     """
     Looks up approved FX rate for given currency and date.
@@ -31,6 +33,10 @@ def get_applicable_fx_rate(currency: str, rate_date: str, session) -> tuple:
     if not curr:
         raise ValueError("MISSING_CURRENCY: Transaction currency is null or empty.")
 
+    cache_key = (curr, rate_date)
+    if cache_key in _FX_CACHE:
+        return _FX_CACHE[cache_key]
+
     # 1. Check database FXRate table first
     db_rate = session.query(FXRate).filter(
         FXRate.currency_code == curr,
@@ -38,11 +44,15 @@ def get_applicable_fx_rate(currency: str, rate_date: str, session) -> tuple:
     ).order_by(FXRate.effective_date.desc()).first()
 
     if db_rate:
-        return float(db_rate.rate_to_inr), db_rate.effective_date, db_rate.source
+        res = (float(db_rate.rate_to_inr), db_rate.effective_date, db_rate.source)
+        _FX_CACHE[cache_key] = res
+        return res
 
     # 2. Check approved baseline
     if curr in APPROVED_FX_RATES:
-        return APPROVED_FX_RATES[curr], "2026-01-01", "Approved Corporate Finance FX Baseline"
+        res = (APPROVED_FX_RATES[curr], "2026-01-01", "Approved Corporate Finance FX Baseline")
+        _FX_CACHE[cache_key] = res
+        return res
 
     # 3. Unknown currency: NEVER silently convert with 1.0
     raise ValueError(f"UNKNOWN_CURRENCY: Currency code '{curr}' has no approved FX rate.")
@@ -90,6 +100,7 @@ def cleanse_staging_tickets(batch_id: str = None) -> tuple:
     seen_hashes = {}
     cleansed_count = 0
     duplicate_count = 0
+    existing_cleansed = {c.ticket_id: c for c in session.query(CleansedTicket).all()}
     
     for r in staging_records:
         t_id = r.ticket_id.strip()
@@ -145,7 +156,7 @@ def cleanse_staging_tickets(batch_id: str = None) -> tuple:
             session.add(q_rec)
             continue
 
-        existing = session.query(CleansedTicket).filter_by(ticket_id=t_id).first()
+        existing = existing_cleansed.get(t_id)
         if existing:
             if existing.record_hash == r_hash:
                 is_dup = 1
@@ -209,6 +220,7 @@ def cleanse_staging_tickets(batch_id: str = None) -> tuple:
                 duplicate_reason=dup_reason
             )
             session.add(cleansed_obj)
+            existing_cleansed[t_id] = cleansed_obj
         cleansed_count += 1
 
     session.commit()
