@@ -243,9 +243,12 @@ export const PowerBI = () => {
               <span className="px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 font-bold text-[10px]">
                 DirectQuery • vw_travel
               </span>
+              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 font-bold text-[10px]">
+                Power BI Desktop (.pbix) Ready
+              </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live PostgreSQL Direct Lineage • 14 Enterprise DAX Measures • Interactive Analytical Canvas
+              Live PostgreSQL Direct Lineage • 14 Enterprise DAX Measures • Pre-Built Visuals Canvas
             </p>
           </div>
         </div>
@@ -266,10 +269,10 @@ export const PowerBI = () => {
             type="button"
             onClick={handleDownloadPBIX}
             className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
-            title="Download Corporate_Travel_Analytics.pbix master report"
+            title="Download Corporate_Travel_Analytics.pbix pre-built report with visuals"
           >
             <Laptop className="w-4 h-4 text-amber-300" />
-            <span>Open in Power BI Desktop (.pbix)</span>
+            <span>Open Pre-Built Power BI (.pbix)</span>
           </button>
 
           <button
@@ -281,6 +284,25 @@ export const PowerBI = () => {
             <Download className="w-4 h-4" />
             <span>Download Detailed Analysis Document</span>
           </button>
+        </div>
+      </div>
+
+      {/* Enterprise Architecture Notice */}
+      <div className="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-start gap-3 text-xs text-amber-200">
+        <div className="p-1 rounded-lg bg-amber-500/20 text-amber-400 flex-shrink-0 mt-0.5">
+          <ShieldCheck className="w-4 h-4" />
+        </div>
+        <div className="space-y-0.5">
+          <p className="font-bold text-amber-300">
+            Enterprise Two-Tier BI Architecture Notice
+          </p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            The web dashboard provides a lightweight in-browser operational overview (rendered via React/Recharts). 
+            For executive deep-dive analysis, decomposition trees, and master multi-dimensional modeling, click 
+            <strong className="text-amber-300"> "Open Pre-Built Power BI (.pbix)"</strong> or double-click 
+            <code className="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">Corporate_Travel_Analytics_Prebuilt.pbix</code> 
+            in your Downloads folder to render the full Power BI Desktop report with pre-built charts.
+          </p>
         </div>
       </div>
 
