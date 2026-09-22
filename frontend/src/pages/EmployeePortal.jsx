@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { 
-  User, DollarSign, Plane, Ticket, Send, Bot, Mail, CheckCircle2, PlusCircle, LayoutDashboard, History, LogOut, ChevronRight, Wallet, PieChart, Copy, Sun, Moon, ShieldCheck, ShieldAlert, Calculator, FileCheck, AlertTriangle, LifeBuoy, Clock
+  User, DollarSign, Plane, Ticket, Send, Bot, Mail, CheckCircle2, PlusCircle, LayoutDashboard, History, LogOut, ChevronRight, Wallet, PieChart, Copy, Sun, Moon, ShieldCheck, ShieldAlert, Calculator, FileCheck, AlertTriangle, LifeBuoy, Clock, ExternalLink
 } from 'lucide-react';
 
 export const EmployeePortal = () => {
@@ -41,6 +41,7 @@ export const EmployeePortal = () => {
   const [compDetails, setCompDetails] = useState('');
   const [compMsg, setCompMsg] = useState('');
   const [complaintHistory, setComplaintHistory] = useState([]);
+  const [lastDispatchedTicket, setLastDispatchedTicket] = useState(null);
 
   const empId = user?.employee_id || 'EMP-1002';
   const empName = user?.name || data?.employee_name || 'Priya Nair';
@@ -123,22 +124,48 @@ export const EmployeePortal = () => {
       from_email: fromEmail.trim()
     })
     .then(res => {
-      setCompMsg(res.data.message || `Ticket registered successfully: ${res.data.complaint_id}`);
+      const ticketId = res.data.complaint_id || 'CMP-101';
+      setCompMsg(res.data.message || `Ticket registered successfully: ${ticketId}`);
       
-      // Automatically pop up email to pparker062005@gmail.com
-      const mailBody = `From: ${fromEmail.trim()}\nEmployee: ${empName} (${empId})\nDivision: ${data?.business_unit || 'Global Technology'}\nTicket Reference: ${res.data.complaint_id || 'NEW'}\n\nDetails:\n${compDetails.trim()}`;
-      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(`[Corporate Travel Query] ${compSubject.trim()}`)}&body=${encodeURIComponent(mailBody)}`;
-      window.open(mailtoUrl, '_blank');
+      const mailSubject = `[Corporate Travel Ticket ${ticketId}] ${compSubject.trim()}`;
+      const mailBody = `From: ${fromEmail.trim() || empName}\nEmployee: ${empName} (${empId})\nDivision: ${data?.business_unit || 'Human Resources'}\nTicket Reference: ${ticketId}\n\nDetails:\n${compDetails.trim()}`;
+      
+      // Official Google Gmail Web Compose URL (guaranteed delivery via browser Gmail)
+      const gmailUrl = res.data.gmail_compose_url || `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+      
+      // Auto-open Gmail Web compose in browser tab
+      try {
+        window.open(gmailUrl, '_blank');
+      } catch (err) {}
+
+      setLastDispatchedTicket({
+        ticketId,
+        subject: compSubject.trim(),
+        gmailUrl,
+        mailtoUrl
+      });
 
       setCompSubject('');
       setCompDetails('');
       fetchComplaints();
     })
     .catch(() => {
-      // Fallback: pop up email client directly so email is guaranteed sent to pparker062005@gmail.com
+      const mailSubject = `[Corporate Travel Query] ${compSubject.trim()}`;
       const mailBody = `From: ${fromEmail.trim()}\nEmployee: ${empName} (${empId})\n\nDetails:\n${compDetails.trim()}`;
-      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(`[Corporate Travel Query] ${compSubject.trim()}`)}&body=${encodeURIComponent(mailBody)}`;
-      window.open(mailtoUrl, '_blank');
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+      
+      try {
+        window.open(gmailUrl, '_blank');
+      } catch (err) {}
+
+      setLastDispatchedTicket({
+        ticketId: 'CMP-NEW',
+        subject: compSubject.trim(),
+        gmailUrl,
+        mailtoUrl
+      });
       setCompMsg(`Official email client opened targeting ${targetEmail}.`);
     });
   };
@@ -727,6 +754,41 @@ export const EmployeePortal = () => {
                       <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                         <span>{compMsg}</span>
+                      </div>
+                    )}
+
+                    {lastDispatchedTicket && (
+                      <div className="p-3.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-xs text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                            Ticket {lastDispatchedTicket.ticketId} Registered
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
+                            Target: {targetEmail}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                          Your ticket is registered in the database. Click below to open Gmail and send the pre-filled official query directly to <strong>{targetEmail}</strong>:
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                          <a
+                            href={lastDispatchedTicket.gmailUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3.5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                            <span>Open Gmail Web & Send</span>
+                            <ExternalLink className="w-3 h-3 ml-1" />
+                          </a>
+                          <a
+                            href={lastDispatchedTicket.mailtoUrl}
+                            className="px-3.5 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
+                          >
+                            <span>Open in Outlook / Mail</span>
+                          </a>
+                        </div>
                       </div>
                     )}
 

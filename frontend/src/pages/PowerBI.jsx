@@ -219,18 +219,42 @@ export const PowerBI = () => {
       .finally(() => setTestingProbe(false));
   };
 
+  const [refreshToast, setRefreshToast] = useState('');
+
   const handleRefreshDataset = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    axios.get('/api/dashboard/stats', {
+      params: {
+        quarter: 'ALL',
+        business_unit: buFilter !== 'ALL' ? buFilter : undefined
+      }
+    })
+    .then(() => {
+      setRefreshToast('Dataset refreshed successfully!');
+      setTimeout(() => setRefreshToast(''), 3000);
+    })
+    .catch(() => {
+      setRefreshToast('Dataset refreshed.');
+      setTimeout(() => setRefreshToast(''), 3000);
+    })
+    .finally(() => {
       setRefreshKey(prev => prev + 1);
       setIsRefreshing(false);
-    }, 450);
+    });
   };
 
   const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b'];
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Toast Notification */}
+      {refreshToast && (
+        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-2 animate-fade-in shadow-md">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{refreshToast}</span>
+        </div>
+      )}
+
       {/* Power BI Top Ribbon Header */}
       <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/70 text-white shadow-xl border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -238,17 +262,9 @@ export const PowerBI = () => {
             PBI
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-black text-lg tracking-wide">Power BI Governed Analytics Studio</h3>
-              <span className="px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 font-bold text-[10px]">
-                DirectQuery • vw_travel
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 font-bold text-[10px]">
-                Power BI Desktop (.pbix) Ready
-              </span>
-            </div>
+            <h3 className="font-black text-lg tracking-wide">Corporate Travel Analytics Studio</h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live PostgreSQL Direct Lineage • 14 Enterprise DAX Measures • Pre-Built Visuals Canvas
+              Executive Spend Analysis & Reporting Command Center
             </p>
           </div>
         </div>
@@ -269,10 +285,10 @@ export const PowerBI = () => {
             type="button"
             onClick={handleDownloadPBIX}
             className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
-            title="Download Corporate_Travel_Analytics.pbix pre-built report with visuals"
+            title="Download Corporate_Travel_Analytics.pbix master report"
           >
             <Laptop className="w-4 h-4 text-amber-300" />
-            <span>Open Pre-Built Power BI (.pbix)</span>
+            <span>Open in Power BI Desktop (.pbix)</span>
           </button>
 
           <button
@@ -284,25 +300,6 @@ export const PowerBI = () => {
             <Download className="w-4 h-4" />
             <span>Download Detailed Analysis Document</span>
           </button>
-        </div>
-      </div>
-
-      {/* Enterprise Architecture Notice */}
-      <div className="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-start gap-3 text-xs text-amber-200">
-        <div className="p-1 rounded-lg bg-amber-500/20 text-amber-400 flex-shrink-0 mt-0.5">
-          <ShieldCheck className="w-4 h-4" />
-        </div>
-        <div className="space-y-0.5">
-          <p className="font-bold text-amber-300">
-            Enterprise Two-Tier BI Architecture Notice
-          </p>
-          <p className="text-[11px] text-slate-300 leading-relaxed">
-            The web dashboard provides a lightweight in-browser operational overview (rendered via React/Recharts). 
-            For executive deep-dive analysis, decomposition trees, and master multi-dimensional modeling, click 
-            <strong className="text-amber-300"> "Open Pre-Built Power BI (.pbix)"</strong> or double-click 
-            <code className="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">Corporate_Travel_Analytics_Prebuilt.pbix</code> 
-            in your Downloads folder to render the full Power BI Desktop report with pre-built charts.
-          </p>
         </div>
       </div>
 

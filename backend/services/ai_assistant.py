@@ -144,6 +144,35 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
     session.close()
     return response
 
+import smtplib
+import urllib.parse
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+def send_smtp_email(to_email: str, subject: str, body: str, from_email: str = None) -> tuple:
+    smtp_host = os.environ.get("SMTP_HOST")
+    smtp_port = int(os.environ.get("SMTP_PORT", 587))
+    smtp_user = os.environ.get("SMTP_USER")
+    smtp_pass = os.environ.get("SMTP_PASSWORD")
+    
+    if smtp_host and smtp_user and smtp_pass:
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = from_email or smtp_user
+            msg['To'] = to_email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body, 'plain'))
+            
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=8)
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.send_message(msg)
+            server.quit()
+            return True, "Email dispatched directly via SMTP"
+        except Exception as e:
+            return False, f"SMTP dispatch error: {str(e)}"
+    return False, "SMTP server credentials not configured; generated Gmail web link."
+
 def submit_complaint(subject: str, details: str, submitted_by: str, from_email: str = None) -> dict:
     session = SessionLocal()
     complaint_body = f"From: {from_email}\n\n{details}" if from_email else details
@@ -157,10 +186,20 @@ def submit_complaint(subject: str, details: str, submitted_by: str, from_email: 
     session.commit()
     comp_id = f"CMP-{complaint_obj.id + 100}"
     session.close()
+
+    mail_subject = f"[Corporate Travel Query - {comp_id}] {subject}"
+    mail_body = f"From: {from_email or submitted_by}\nEmployee: {submitted_by}\nTicket Reference: {comp_id}\n\nDetails:\n{details}"
+    sent, smtp_msg = send_smtp_email(OFFICIAL_EMAIL, mail_subject, mail_body, from_email)
+
+    gmail_url = f"https://mail.google.com/mail/?view=cm&fs=1&to={urllib.parse.quote(OFFICIAL_EMAIL)}&su={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
     
     return {
         "status": "SUCCESS",
         "message": f"Complaint registered under ticket ID {comp_id}. Official dispatch routed to {OFFICIAL_EMAIL}.",
         "complaint_id": comp_id,
-        "official_email": OFFICIAL_EMAIL
+        "official_email": OFFICIAL_EMAIL,
+        "smtp_sent": sent,
+        "smtp_message": smtp_msg,
+        "gmail_compose_url": gmail_url
     }
+
