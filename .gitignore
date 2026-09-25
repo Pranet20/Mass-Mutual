@@ -39,6 +39,7 @@ frontend/dist/
 *.db
 *.sqlite3
 backend/database/*.db
+scratch/
 
 # Environment Variables & Secrets
 .env
