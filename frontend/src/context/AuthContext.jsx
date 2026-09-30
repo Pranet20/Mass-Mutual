@@ -4,14 +4,22 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Always initialize user as null on app launch so Sign In modal pops up first
-  const [user, setUser] = useState(null);
+  // Initialize user from localStorage if previously authenticated session exists
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Set up global Axios interceptor for JWT Bearer token propagation
   useEffect(() => {
     const interceptor = axios.interceptors.request.use((config) => {
-      if (user?.access_token) {
-        config.headers.Authorization = `Bearer ${user.access_token}`;
+      const activeToken = user?.access_token || localStorage.getItem('access_token') || localStorage.getItem('token');
+      if (activeToken) {
+        config.headers.Authorization = `Bearer ${activeToken}`;
       }
       return config;
     }, (error) => {

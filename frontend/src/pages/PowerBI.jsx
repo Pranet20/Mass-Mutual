@@ -27,9 +27,11 @@ export const PowerBI = () => {
   const [liveAnalytics, setLiveAnalytics] = useState(null);
   const [feedRecords, setFeedRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
+    setLoadError(false);
     Promise.all([
       axios.get('/api/powerbi/analytics'),
       axios.get('/api/powerbi/feed')
@@ -43,7 +45,10 @@ export const PowerBI = () => {
     })
     .catch((err) => {
       console.error('Failed to load Power BI live feeds:', err);
-      if (isMounted) setLoading(false);
+      if (isMounted) {
+        setLoadError(true);
+        setLoading(false);
+      }
     });
     return () => { isMounted = false; };
   }, [refreshKey]);
@@ -62,20 +67,20 @@ export const PowerBI = () => {
 
   const flownFiltered = filteredDataset.filter(r => r.travelled_flag === 'Y');
 
-  // Dynamic Aggregated KPIs
+  // Dynamic Aggregated KPIs from Governed Data Contract
   const totalSpend = isFiltered
     ? flownFiltered.reduce((sum, r) => sum + (r.amount_inr || 0), 0)
-    : (liveAnalytics?.kpis?.total_spend ?? 14909910);
+    : (liveAnalytics?.kpis?.total_spend ?? 0);
 
   const totalTrips = isFiltered
     ? flownFiltered.length
-    : (liveAnalytics?.kpis?.total_trips ?? 241);
+    : (liveAnalytics?.kpis?.total_trips ?? 0);
 
   const totalBudget = isFiltered
     ? (buFilter !== 'ALL'
-        ? (liveAnalytics?.divisional_matrix?.find(d => d.name === buFilter)?.budget || 2500000)
-        : (liveAnalytics?.kpis?.total_budget ?? 19735000))
-    : (liveAnalytics?.kpis?.total_budget ?? 19735000);
+        ? (liveAnalytics?.divisional_matrix?.find(d => d.name === buFilter)?.budget || 0)
+        : (liveAnalytics?.kpis?.total_budget ?? 0))
+    : (liveAnalytics?.kpis?.total_budget ?? 0);
 
   const budgetVariance = totalBudget - totalSpend;
   const avgFare = totalTrips > 0 ? Math.round(totalSpend / totalTrips) : 0;
@@ -398,9 +403,9 @@ export const PowerBI = () => {
             PBI
           </div>
           <div>
-            <h3 className="font-black text-lg tracking-wide">Corporate Travel Analytics Studio</h3>
+            <h3 className="font-black text-lg tracking-wide">Operational Analytics Preview</h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Executive Spend Analysis & Reporting Command Center
+              This application view is backed by the governed analytics API. The formal BI report is delivered through Power BI.
             </p>
           </div>
         </div>
@@ -448,6 +453,15 @@ export const PowerBI = () => {
           </button>
         </div>
       </div>
+
+      {/* Analytics Data Unavailable Notice */}
+      {loadError && !liveAnalytics && (
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold text-center space-y-2">
+          <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto" />
+          <div className="text-base font-black">Analytics Data Unavailable</div>
+          <p className="text-xs text-slate-400">Unable to retrieve live telemetry from backend. Please verify that the API server and database are reachable.</p>
+        </div>
+      )}
 
       {/* Power BI Embedded Canvas Wrapper */}
       <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
@@ -522,7 +536,7 @@ export const PowerBI = () => {
 
           <div className="ml-auto text-[11px] text-slate-400 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>DirectQuery Active (12ms)</span>
+            <span>Governed API Feed Active</span>
           </div>
         </div>
 
@@ -618,7 +632,7 @@ export const PowerBI = () => {
                   ₹{totalSpend.toLocaleString('en-IN')}
                 </div>
                 <span className="text-[10px] text-emerald-400 font-semibold block">
-                  ✓ Verified by PostgreSQL DAX Measure
+                  ✓ Derived from PostgreSQL vw_travel contract
                 </span>
               </div>
 
@@ -884,7 +898,7 @@ export const PowerBI = () => {
                   <h4 className="font-bold text-xs text-amber-400 uppercase tracking-wider">
                     Divisional Spend vs Budget Allowance (INR ₹)
                   </h4>
-                  <span className="text-[10px] text-slate-400 font-mono">DAX: [Total Flown Spend]</span>
+                  <span className="text-[10px] text-slate-400 font-mono">Governed Metric: [Total Flown Spend]</span>
                 </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -937,7 +951,7 @@ export const PowerBI = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="font-black text-sm text-white">Divisional Spend & Budget Variance Matrix</h4>
-                <p className="text-xs text-slate-400">DirectQuery multi-dimensional matrix evaluating allocated budget against verified ticket expenditure</p>
+                <p className="text-xs text-slate-400">Multi-dimensional matrix evaluating allocated budget against verified ticket expenditure</p>
               </div>
               <div className="flex items-center gap-2">
                 <button

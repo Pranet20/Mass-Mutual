@@ -39,8 +39,8 @@ def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
     total_tickets = session.query(func.count(FactTravelTicket.ticket_id)).scalar() or 0
     flown_tickets_count = session.query(func.count(FactTravelTicket.ticket_id)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0
     cancelled_count = session.query(func.count(FactTravelTicket.ticket_id)).filter(FactTravelTicket.travelled_flag == 'N').scalar() or 0
-    total_spend_inr = session.query(func.sum(FactTravelTicket.amount_inr)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0.0
-    total_ingested_spend_inr = session.query(func.sum(FactTravelTicket.amount_inr)).scalar() or 0.0
+    total_spend_inr = float(session.query(func.sum(FactTravelTicket.amount_inr)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0.0)
+    total_ingested_spend_inr = float(session.query(func.sum(FactTravelTicket.amount_inr)).scalar() or 0.0)
     avg_fare_inr = (total_spend_inr / flown_tickets_count) if flown_tickets_count > 0 else 0.0
     
     cross_border_count = session.query(func.count(FactTravelTicket.ticket_id)).filter(
@@ -75,11 +75,11 @@ def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
         func.sum(FactTravelTicket.amount_inr)
     ).filter(FactTravelTicket.travelled_flag == 'Y').group_by(FactTravelTicket.business_unit).all()
     
-    bu_flown_map = {row[0]: (row[1] or 0.0) for row in bu_flown_rows}
+    bu_flown_map = {row[0]: float(row[1] or 0.0) for row in bu_flown_rows}
 
     bu_rows_html = ""
     for bu, tot_count, tot_amt in sorted(bu_raw, key=lambda x: (bu_flown_map.get(x[0], 0) or 0), reverse=True):
-        flown_amt = bu_flown_map.get(bu, 0.0) or 0.0
+        flown_amt = float(bu_flown_map.get(bu, 0.0) or 0.0)
         pct_spend = (flown_amt / total_spend_inr * 100) if total_spend_inr > 0 else 0.0
         bu_rows_html += f"""
         <tr>
@@ -137,7 +137,8 @@ def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
     dept_rows_html = ""
     for dept, d_bu, d_emp_cnt, d_trips, d_amt in sorted(dept_raw, key=lambda x: (x[4] or 0), reverse=True):
         dept_budget = d_emp_cnt * 150000.0  # Quarterly benchmark allowance
-        util_pct = ((d_amt or 0) / dept_budget * 100) if dept_budget > 0 else 0.0
+        d_amt_float = float(d_amt or 0)
+        util_pct = (d_amt_float / dept_budget * 100) if dept_budget > 0 else 0.0
         bar_color = "#ef4444" if util_pct > 90 else ("#f59e0b" if util_pct > 70 else "#10b981")
         dept_rows_html += f"""
         <tr>
@@ -173,7 +174,7 @@ def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
     emp_rows_html = ""
     for eid, ename, ebu, edept, etrips, espend in emp_raw:
         allowance = 150000.0
-        rem = max(0.0, allowance - (espend or 0))
+        rem = max(0.0, allowance - float(espend or 0))
         emp_rows_html += f"""
         <tr>
             <td style="font-family: monospace; font-weight: 600; color: #2563eb;">{eid}</td>
@@ -253,7 +254,8 @@ def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
 
     curr_rows_html = ""
     for c_code, c_cnt, c_orig, c_fx, c_inr in sorted(curr_raw, key=lambda x: (x[4] or 0), reverse=True):
-        c_pct = ((c_inr or 0) / total_spend_inr * 100) if total_spend_inr > 0 else 0.0
+        c_inr_float = float(c_inr or 0)
+        c_pct = (c_inr_float / total_spend_inr * 100) if total_spend_inr > 0 else 0.0
         curr_rows_html += f"""
         <tr>
             <td style="font-weight: 800; font-family: monospace; color: #1e3a8a;">{c_code}</td>
@@ -1224,3 +1226,235 @@ def generate_pbit_template() -> str:
         z.writestr("README.txt", "Connect this template directly to PostgreSQL/SQLite view: vw_travel")
         
     return output_path
+
+
+def generate_executive_audit_package_pdf_bytes() -> bytes:
+    """
+    Compiles a comprehensive, multi-page corporate PDF audit package using ReportLab.
+    Directly queries the live database (vw_travel and pipeline audit tables).
+    """
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+
+    session = SessionLocal()
+    try:
+        now_ist = datetime.datetime.now(IST_TZ)
+        time_str = now_ist.strftime("%d %B %Y, %I:%M:%S %p IST")
+
+        # Live Metrics
+        total_tickets = session.query(func.count(FactTravelTicket.ticket_id)).scalar() or 0
+        flown_tickets = session.query(func.count(FactTravelTicket.ticket_id)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0
+        total_spend = float(session.query(func.sum(FactTravelTicket.amount_inr)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0.0)
+        cross_border = session.query(func.count(FactTravelTicket.ticket_id)).filter(
+            FactTravelTicket.travelled_flag == 'Y',
+            FactTravelTicket.trip_classification == 'Cross-Border'
+        ).scalar() or 0
+        compliant_tickets = session.query(func.count(FactTravelTicket.ticket_id)).filter(
+            FactTravelTicket.policy_compliance_status == 'COMPLIANT'
+        ).scalar() or 0
+        compliance_pct = (compliant_tickets / total_tickets * 100) if total_tickets > 0 else 100.0
+
+        # Divisional rows
+        bu_rows = session.query(
+            FactTravelTicket.business_unit,
+            func.count(FactTravelTicket.ticket_id),
+            func.sum(FactTravelTicket.amount_inr)
+        ).filter(FactTravelTicket.travelled_flag == 'Y').group_by(FactTravelTicket.business_unit).all()
+
+        # Currency rows
+        curr_rows = session.query(
+            FactTravelTicket.currency,
+            func.count(FactTravelTicket.ticket_id),
+            func.sum(FactTravelTicket.amount_original),
+            func.avg(FactTravelTicket.fx_rate),
+            func.sum(FactTravelTicket.amount_inr)
+        ).filter(FactTravelTicket.travelled_flag == 'Y').group_by(FactTravelTicket.currency).all()
+
+        # Batch audit rows
+        batch_rows = session.query(PipelineBatchAudit).order_by(PipelineBatchAudit.started_at.desc()).limit(10).all()
+
+        # Document Setup
+        buf = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buf,
+            pagesize=landscape(letter),
+            leftMargin=36,
+            rightMargin=36,
+            topMargin=36,
+            bottomMargin=36
+        )
+
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'ReportTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            leading=22,
+            textColor=colors.HexColor('#0f172a'),
+            fontName='Helvetica-Bold'
+        )
+        subtitle_style = ParagraphStyle(
+            'ReportSubtitle',
+            parent=styles['Normal'],
+            fontSize=10,
+            leading=13,
+            textColor=colors.HexColor('#475569')
+        )
+        h2_style = ParagraphStyle(
+            'SectionH2',
+            parent=styles['Heading2'],
+            fontSize=12,
+            leading=15,
+            textColor=colors.HexColor('#1e3a8a'),
+            fontName='Helvetica-Bold',
+            spaceBefore=10,
+            spaceAfter=6
+        )
+        cell_style = ParagraphStyle('Cell', parent=styles['Normal'], fontSize=8, leading=10)
+        cell_bold = ParagraphStyle('CellBold', parent=styles['Normal'], fontSize=8, leading=10, fontName='Helvetica-Bold')
+
+        elements = []
+
+        # --- COVER / HEADER ---
+        elements.append(Paragraph("CORPORATE TRAVEL & EXPENSE AUDIT PACKAGE", title_style))
+        elements.append(Paragraph(f"MassMutual PS-04 Governed Pipeline & Analytical Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
+        elements.append(Spacer(1, 14))
+
+        # --- EXECUTIVE KPI TABLE ---
+        kpi_data = [
+            [
+                Paragraph("<b>Total Flown Spend</b><br/><font size='12'><b>₹{:,.2f}</b></font>".format(total_spend), cell_style),
+                Paragraph("<b>Completed Trips</b><br/><font size='12'><b>{:,}</b></font>".format(flown_tickets), cell_style),
+                Paragraph("<b>Gross Ingested Tickets</b><br/><font size='12'><b>{:,}</b></font>".format(total_tickets), cell_style),
+                Paragraph("<b>Cross-Border Volume</b><br/><font size='12'><b>{:,}</b></font>".format(cross_border), cell_style),
+                Paragraph("<b>Policy Compliance Rate</b><br/><font size='12'><b>{:.1f}%</b></font>".format(compliance_pct), cell_style)
+            ]
+        ]
+        kpi_table = Table(kpi_data, colWidths=[144, 144, 144, 144, 144])
+        kpi_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8fafc')),
+            ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
+            ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        elements.append(kpi_table)
+        elements.append(Spacer(1, 16))
+
+        # --- SECTION 1: DIVISIONAL BREAKDOWN ---
+        elements.append(Paragraph("1. Business Unit Spend & Mobility Breakdown", h2_style))
+        div_table_data = [["Business Unit", "Completed Tickets", "Realized Spend (INR)", "Share of Total Spend"]]
+        for bu, cnt, amt in sorted(bu_rows, key=lambda x: (float(x[2] or 0)), reverse=True):
+            amt_flt = float(amt or 0)
+            share = (amt_flt / total_spend * 100) if total_spend > 0 else 0.0
+            div_table_data.append([
+                bu or "General",
+                str(cnt),
+                f"INR {amt_flt:,.2f}",
+                f"{share:.1f}%"
+            ])
+        div_table = Table(div_table_data, colWidths=[240, 140, 180, 160])
+        div_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 5),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ]))
+        elements.append(div_table)
+        elements.append(Spacer(1, 16))
+
+        # --- SECTION 2: TREASURY & FX LINEAGE ---
+        elements.append(Paragraph("2. Treasury Multi-Currency Lineage & FX Conversion Audit", h2_style))
+        fx_table_data = [["Currency", "Tickets", "Original Booking Amount", "Applied FX Rate to INR", "Base Currency Spend (INR)", "Spend Share"]]
+        for c, cnt, orig, fx, inr in sorted(curr_rows, key=lambda x: (float(x[4] or 0)), reverse=True):
+            inr_flt = float(inr or 0)
+            orig_flt = float(orig or 0)
+            fx_flt = float(fx or 1.0)
+            share = (inr_flt / total_spend * 100) if total_spend > 0 else 0.0
+            fx_table_data.append([
+                c,
+                str(cnt),
+                f"{orig_flt:,.2f}",
+                f"{fx_flt:.4f}",
+                f"INR {inr_flt:,.2f}",
+                f"{share:.1f}%"
+            ])
+        fx_table = Table(fx_table_data, colWidths=[80, 80, 150, 130, 160, 120])
+        fx_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ]))
+        elements.append(fx_table)
+        elements.append(PageBreak())
+
+        # --- SECTION 3: PIPELINE BATCH AUDIT LOG ---
+        elements.append(Paragraph("3. Governed ETL Pipeline Batch Audit History", h2_style))
+        batch_table_data = [["Batch ID", "Status", "Started At (IST)", "Source File", "Received", "Cleaned", "Quarantined", "Published"]]
+        for b in batch_rows:
+            batch_table_data.append([
+                b.batch_id[:24],
+                b.status,
+                format_to_ist(b.started_at, "%Y-%m-%d %H:%M"),
+                os.path.basename(b.source_file or "vendor_tickets.csv"),
+                str(b.records_received or 0),
+                str(b.records_cleaned or 0),
+                str(b.records_quarantined or 0),
+                str(b.records_published or 0)
+            ])
+        batch_table = Table(batch_table_data, colWidths=[130, 70, 110, 130, 65, 65, 75, 75])
+        batch_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('ALIGN', (4, 0), (-1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+            ('FONTSIZE', (0, 1), (-1, -1), 7.5),
+        ]))
+        elements.append(batch_table)
+        elements.append(Spacer(1, 16))
+
+        # --- SECTION 4: GOVERNED DATA DICTIONARY REFERENCE ---
+        elements.append(Paragraph("4. Governed Analytical Contract (vw_travel 36-Column Schema)", h2_style))
+        dict_items = get_governed_data_dictionary().get("columns", [])
+        dict_table_data = [["Field Name", "Type", "Classification", "Business Description"]]
+        for item in dict_items[:22]:  # Key attributes summary
+            dict_table_data.append([
+                item.get("column_name", ""),
+                item.get("sql_type", ""),
+                item.get("category", ""),
+                Paragraph(item.get("description", "")[:120], cell_style)
+            ])
+        dict_table = Table(dict_table_data, colWidths=[140, 90, 130, 360])
+        dict_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+            ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ]))
+        elements.append(dict_table)
+
+        doc.build(elements)
+        return buf.getvalue()
+    finally:
+        session.close()
+

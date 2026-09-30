@@ -7,8 +7,13 @@ from typing import Optional, List
 from fastapi import HTTPException, Header, Depends, Query, status
 from database.models import SessionLocal, User, EmployeeMaster
 
-# Load JWT Secret securely from environment
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or os.environ.get("SECRET_KEY", "travel_analytics_enterprise_jwt_secret_2026_mass_mutual_prod")
+# Load JWT Secret securely from environment; fail startup in production if missing
+ENV = os.environ.get("ENV", "development").lower()
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    if ENV == "production":
+        raise RuntimeError("CRITICAL SECURITY VIOLATION: JWT_SECRET_KEY environment variable is mandatory in production mode. Refusing startup with unconfigured or default secrets.")
+    SECRET_KEY = "dev_local_jwt_secret_key_only_for_development"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = int(os.environ.get("ACCESS_TOKEN_EXPIRE_HOURS", "12"))
 

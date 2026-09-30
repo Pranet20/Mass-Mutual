@@ -1,6 +1,6 @@
 import datetime
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Index
+from sqlalchemy import create_engine, Column, Integer, String, Float, Numeric, DateTime, Text, Index
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 def get_utc_now():
@@ -18,7 +18,7 @@ class FXRate(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     currency_code = Column(String(10), nullable=False, index=True)
-    rate_to_inr = Column(Float, nullable=False)
+    rate_to_inr = Column(Numeric(18, 4), nullable=False)
     effective_date = Column(String(30), nullable=False, default="2026-01-01")
     source = Column(String(100), default="Approved Corporate Finance FX Source")
     created_at = Column(DateTime, default=get_utc_now)
@@ -41,7 +41,7 @@ class StagingTicket(Base):
     dest_city = Column(String(100))
     dest_country = Column(String(100))
     ticket_status = Column(String(50))
-    amount = Column(Float)
+    amount = Column(Numeric(18, 2))
     currency = Column(String(10))
     booking_channel = Column(String(50))
     cabin_class = Column(String(50))
@@ -67,13 +67,13 @@ class CleansedTicket(Base):
     dest_city = Column(String(100))
     dest_country = Column(String(100))
     ticket_status = Column(String(50))
-    amount_original = Column(Float)
+    amount_original = Column(Numeric(18, 2))
     currency = Column(String(10))
-    fx_rate = Column(Float, default=1.0)
-    amount_inr = Column(Float)
+    fx_rate = Column(Numeric(18, 4), default=1.0)
+    amount_inr = Column(Numeric(18, 2))
     fx_rate_date = Column(String(30), default="2026-01-01")
     fx_source = Column(String(100), default="Approved Corporate Finance FX Source")
-    original_amount = Column(Float)
+    original_amount = Column(Numeric(18, 2))
     original_currency = Column(String(10))
     booking_channel = Column(String(50))
     cabin_class = Column(String(50))
@@ -109,7 +109,7 @@ class EmployeeMaster(Base):
     manager_id = Column(String(50))
     effective_start_date = Column(String(30), nullable=False)
     effective_end_date = Column(String(30), nullable=False)
-    quarterly_allowance_inr = Column(Float, nullable=True)
+    quarterly_allowance_inr = Column(Numeric(18, 2), nullable=True)
     is_current = Column(Integer, default=1, index=True)
 
 class CountryReference(Base):
@@ -167,10 +167,10 @@ class FactTravelTicket(Base):
     ticket_status = Column(String(50), index=True)
     
     # Financial & FX Lineage
-    amount_original = Column(Float)
+    amount_original = Column(Numeric(18, 2))
     currency = Column(String(10))
-    fx_rate = Column(Float, default=1.0)
-    amount_inr = Column(Float)
+    fx_rate = Column(Numeric(18, 4), default=1.0)
+    amount_inr = Column(Numeric(18, 2))
     fx_rate_date = Column(String(30), default="2026-01-01")
     fx_source = Column(String(100), default="Approved Corporate Finance FX Source")
 

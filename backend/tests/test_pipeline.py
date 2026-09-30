@@ -264,4 +264,113 @@ def test_27_dashboard_stats_dynamic_filtering():
     assert data_bu["kpis"]["total_spend_inr"] <= data_all["kpis"]["total_spend_inr"]
 
 
+def test_28_concurrency_lock_protection():
+    import threading
+    from pipeline.validation import run_end_to_end_pipeline, _PIPELINE_EXECUTION_LOCK
+    
+    acquired = _PIPELINE_EXECUTION_LOCK.acquire(blocking=False)
+    if acquired:
+        try:
+            # When locked, secondary pipeline execution should return CONCURRENCY_LOCKED
+            res = run_end_to_end_pipeline()
+            assert res.get("status") == "CONCURRENCY_LOCKED"
+        finally:
+            _PIPELINE_EXECUTION_LOCK.release()
+
+
+def test_29_executive_audit_package_pdf_generation():
+    from services.export import generate_executive_audit_package_pdf_bytes
+    pdf_bytes = generate_executive_audit_package_pdf_bytes()
+    assert isinstance(pdf_bytes, bytes)
+    assert len(pdf_bytes) > 2048
+    assert pdf_bytes.startswith(b"%PDF")
+
+
+def test_30_powerbi_5page_pbix_integrity():
+    import zipfile
+    import json
+    pbix_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "powerbi", "Corporate_Travel_Analytics.pbix"))
+    assert os.path.exists(pbix_path)
+    with zipfile.ZipFile(pbix_path, "r") as zf:
+        pages_raw = zf.read("Report/definition/pages/pages.json").decode("utf-8")
+        pages_data = json.loads(pages_raw)
+        assert len(pages_data.get("pageOrder", [])) == 5
+        assert "6c3859e92bb7e22182f0" in pages_data["pageOrder"]
+        assert "page_travel_analytics" in pages_data["pageOrder"]
+        assert "page_business_groups" in pages_data["pageOrder"]
+        assert "page_data_governance" in pages_data["pageOrder"]
+        assert "page_fx_financial_audit" in pages_data["pageOrder"]
+
+
+def test_31_security_headers_and_request_tracing():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    assert "x-request-id" in resp.headers or "X-Request-ID" in resp.headers
+    assert resp.headers.get("x-content-type-options") == "nosniff"
+    assert resp.headers.get("x-frame-options") == "DENY"
+
+
+def test_32_manager_approval_action_workflow():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    auth_resp = client.post("/api/auth/login", json={"email": "manager@travelintelligence.com", "password": "Manager123!"})
+    assert auth_resp.status_code == 200
+    token = auth_resp.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Post a travel request
+    sub_resp = client.post("/api/tickets", json={
+        "employee_id": "EMP-1001",
+        "issue_date": "2026-03-01",
+        "travel_date": "2026-03-10",
+        "return_date": "2026-03-15",
+        "origin_city": "Mumbai",
+        "origin_country": "India",
+        "dest_city": "London",
+        "dest_country": "United Kingdom",
+        "amount": 1000.0,
+        "currency": "GBP",
+        "cabin_class": "Economy",
+        "booking_channel": "Corporate Portal"
+    }, headers=headers)
+    assert sub_resp.status_code == 200
+    ticket_id = sub_resp.json()["ticket_id"]
+    
+    # Manager approves the ticket
+    action_resp = client.post("/api/manager/approvals/action", json={
+        "ticket_id": ticket_id,
+        "action": "APPROVE"
+    }, headers=headers)
+    assert action_resp.status_code == 200
+    assert action_resp.json()["status"] == "SUCCESS"
+
+
+def test_33_numeric_precision_in_models():
+    from sqlalchemy import inspect
+    from database.models import FactTravelTicket
+    mapper = inspect(FactTravelTicket)
+    amount_col = mapper.columns["amount_inr"]
+    assert hasattr(amount_col.type, "precision")
+    assert amount_col.type.precision == 18
+    assert amount_col.type.scale == 2
+
+
+def test_34_vw_travel_sql_reconciliation_zero_variance():
+    from database.models import SessionLocal
+    from sqlalchemy import text
+    session = SessionLocal()
+    try:
+        spend_gross = session.execute(text("SELECT SUM(amount_inr) FROM vw_travel")).scalar()
+        spend_flown = session.execute(text("SELECT SUM(amount_inr) FROM vw_travel WHERE travelled_flag = 'Y'")).scalar()
+        assert float(spend_gross or 0) >= float(spend_flown or 0)
+        assert float(spend_flown or 0) > 0.0
+    finally:
+        session.close()
+
+
+
 

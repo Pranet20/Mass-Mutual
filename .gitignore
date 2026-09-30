@@ -47,6 +47,7 @@ scratch/
 .env.*.local
 *.pem
 *.key
+*.bak
 
 # IDEs & OS
 .vscode/

@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime
+import threading
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -11,12 +12,27 @@ from pipeline.enrichment import enrich_ticket_data
 from pipeline.business_rules import derive_business_rules
 from pipeline.overrides import get_manual_overrides_map
 
+_PIPELINE_EXECUTION_LOCK = threading.Lock()
+
 def run_end_to_end_pipeline(csv_path: str = None, force_reprocess: bool = False) -> dict:
     """
     Executes full ETL pipeline, logs execution to PipelineBatchAudit with SHA-256 idempotency,
     enforces SCD Type-2 temporal joins, auditable FX conversions,
     bad-record quarantine, and publishes to FactTravelTicket & vw_travel.
+    Protected against simultaneous execution via concurrency lock.
     """
+    acquired = _PIPELINE_EXECUTION_LOCK.acquire(blocking=False)
+    if not acquired:
+        return {
+            "status": "CONCURRENCY_LOCKED",
+            "message": "Pipeline execution currently in progress by another active session. Request queued/prevented."
+        }
+    try:
+        return _run_pipeline_internal(csv_path=csv_path, force_reprocess=force_reprocess)
+    finally:
+        _PIPELINE_EXECUTION_LOCK.release()
+
+def _run_pipeline_internal(csv_path: str = None, force_reprocess: bool = False) -> dict:
     session = SessionLocal()
     start_time = datetime.datetime.now(datetime.timezone.utc)
 

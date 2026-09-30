@@ -39,7 +39,7 @@ def enrich_ticket_data(batch_id: str = None) -> list:
         emp_id = t.employee_id
         t_date = t.travel_date or "2026-01-01"
         
-        # SCD Type-2 Temporal Lookup: Find active employee version during travel date
+        # Strict SCD Type-2 Temporal Lookup: Find active employee version during travel date
         matching_emp = None
         for e in all_employees:
             if e.employee_id == emp_id:
@@ -49,16 +49,16 @@ def enrich_ticket_data(batch_id: str = None) -> list:
                     matching_emp = e
                     break
         
-        # Fallback to current employee record if temporal lookup falls outside window
-        if not matching_emp:
-            for e in all_employees:
-                if e.employee_id == emp_id and e.is_current == 1:
-                    matching_emp = e
-                    break
-
-        emp_name = matching_emp.employee_name if matching_emp else "Unknown Employee"
-        bu = matching_emp.business_unit if matching_emp else "Unassigned BU"
-        dept = matching_emp.department if matching_emp else "Unassigned Dept"
+        # Enterprise SCD-2 Rule: Never silently fall back to current employee
+        # record if the ticket falls outside the governed temporal window.
+        if matching_emp:
+            emp_name = matching_emp.employee_name
+            bu = matching_emp.business_unit
+            dept = matching_emp.department
+        else:
+            emp_name = f"Unresolved ({emp_id})"
+            bu = "Unresolved Temporal BU"
+            dept = "Unresolved Temporal Dept"
         
         orig_country_clean = t.origin_country.lower().strip() if t.origin_country else ""
         dest_country_clean = t.dest_country.lower().strip() if t.dest_country else ""

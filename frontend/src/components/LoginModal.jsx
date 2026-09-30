@@ -7,12 +7,12 @@ export const LoginModal = () => {
   const [activeTab, setActiveTab] = useState('manager'); // 'manager', 'employee', or 'signup'
 
   // Manager Credentials State
-  const [managerEmail, setManagerEmail] = useState('manager@travelintelligence.com');
-  const [managerPassword, setManagerPassword] = useState('Manager123!');
+  const [managerEmail, setManagerEmail] = useState('');
+  const [managerPassword, setManagerPassword] = useState('');
 
   // Employee Credentials State
-  const [employeeEmail, setEmployeeEmail] = useState('priya.nair@travelintelligence.com');
-  const [employeePassword, setEmployeePassword] = useState('Priya@2026!');
+  const [employeeEmail, setEmployeeEmail] = useState('');
+  const [employeePassword, setEmployeePassword] = useState('');
 
   // Sign Up Form State
   const [signupName, setSignupName] = useState('');
@@ -31,7 +31,7 @@ export const LoginModal = () => {
     try {
       const googleEmail = window.prompt(
         'Sign in with Google Account:\nEnter your Google Email Address:',
-        'pparker062005@gmail.com'
+        ''
       );
       if (!googleEmail || !googleEmail.trim()) {
         setLoading(false);

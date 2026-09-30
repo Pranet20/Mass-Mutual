@@ -68,8 +68,7 @@ export const Pipeline = () => {
       override_travelled_flag: overrideFlag,
       override_classification: overrideClass,
       override_summary: `${overrideClass} (Manager Policy Exemption)`,
-      override_reason: overrideReason,
-      created_by: 'manager@travelintelligence.com'
+      override_reason: overrideReason
     })
     .then(res => {
       setOverrideMsg(`Exemption linked successfully! Ticket ${overrideTckId} for Employee ${overrideEmpId} updated live in Manager Desk & vw_travel.`);

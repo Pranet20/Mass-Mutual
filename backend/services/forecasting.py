@@ -17,9 +17,9 @@ def get_spend_forecasting():
     bu_totals = {}
     total_spend = 0.0
     for bu, amt in results:
-        amt = amt or 0.0
-        bu_totals[bu] = bu_totals.get(bu, 0.0) + amt
-        total_spend += amt
+        amt_flt = float(amt or 0.0)
+        bu_totals[bu] = bu_totals.get(bu, 0.0) + amt_flt
+        total_spend += amt_flt
         
     session.close()
 

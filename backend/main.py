@@ -29,8 +29,13 @@ from services.auth import (
 )
 from services.forecasting import get_spend_forecasting
 from services.ai_assistant import process_ai_query, submit_complaint
-from services.export import generate_csuite_briefing_html, generate_executive_audit_package_html, generate_pbit_template
 from services.data_dictionary import get_governed_data_dictionary
+from services.export import (
+    generate_csuite_briefing_html,
+    generate_executive_audit_package_html,
+    generate_executive_audit_package_pdf_bytes,
+    generate_pbit_template
+)
 from services.test_runner import execute_automated_system_tests
 
 def ensure_database_populated(session):
@@ -65,12 +70,19 @@ app = FastAPI(
 )
 
 # CORS Configuration with Enterprise Origin Governance
-allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "*")
-allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+env = os.environ.get("ENV", os.environ.get("ENVIRONMENT", "development")).lower()
+allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
+if not allowed_origins_env:
+    if env == "production":
+        allowed_origins = ["https://travelanalytics.massmutual.com", "https://app.travelanalytics.internal"]
+    else:
+        allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "*"]
+else:
+    allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=allowed_origins if ("*" not in allowed_origins or env != "production") else ["https://travelanalytics.massmutual.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -400,7 +412,7 @@ def get_dashboard_stats(
     flown_tickets = [t for t in filtered_tickets if t.travelled_flag == 'Y']
     cancelled_tickets = [t for t in filtered_tickets if t.travelled_flag == 'N']
     
-    total_spend_inr = sum(t.amount_inr or 0.0 for t in flown_tickets)
+    total_spend_inr = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
     cross_border_count = sum(1 for t in filtered_tickets if t.trip_classification == 'Cross-Border')
     domestic_count = sum(1 for t in filtered_tickets if t.trip_classification == 'Domestic')
     multi_country_count = sum(1 for t in filtered_tickets if t.trip_classification == 'Multi-Country')
@@ -414,7 +426,7 @@ def get_dashboard_stats(
         if bu not in bu_buckets:
             bu_buckets[bu] = {"trips": 0, "spend": 0.0}
         bu_buckets[bu]["trips"] += 1
-        bu_buckets[bu]["spend"] += (t.amount_inr or 0.0)
+        bu_buckets[bu]["spend"] += float(t.amount_inr or 0.0)
 
     by_bu = [
         {"business_unit": bu, "trip_count": data["trips"], "total_spend_inr": round(data["spend"], 2)}
@@ -440,7 +452,7 @@ def get_dashboard_stats(
         if m_key not in month_buckets:
             month_buckets[m_key] = {"trips": 0, "spend": 0.0}
         month_buckets[m_key]["trips"] += 1
-        month_buckets[m_key]["spend"] += (t.amount_inr or 0.0)
+        month_buckets[m_key]["spend"] += float(t.amount_inr or 0.0)
 
     sorted_months = sorted(month_buckets.keys())
     monthly_data = [
@@ -534,9 +546,9 @@ def get_all_employees(current_user: User = Depends(require_role(["manager", "adm
     for e in employees:
         tickets = session.query(FactTravelTicket).filter_by(employee_id=e.employee_id).all()
         flown_tickets = [t for t in tickets if t.travelled_flag == 'Y']
-        total_spent = sum(t.amount_inr for t in flown_tickets)
+        total_spent = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
         is_null = e.quarterly_allowance_inr is None
-        allowance = e.quarterly_allowance_inr if not is_null else 0.0
+        allowance = float(e.quarterly_allowance_inr if not is_null else 0.0)
         remaining = max(0.0, allowance - total_spent) if not is_null else 0.0
         burn_pct = min(100.0, round((total_spent / allowance) * 100, 1)) if (not is_null and allowance > 0) else 0.0
         
@@ -680,9 +692,9 @@ def get_employee_detail(employee_id: str, current_user: User = Depends(get_curre
     tickets = session.query(FactTravelTicket).filter_by(employee_id=employee_id).order_by(FactTravelTicket.ticket_id.desc()).all()
     flown_tickets = [t for t in tickets if t.travelled_flag == 'Y']
     cancelled_tickets = [t for t in tickets if t.travelled_flag == 'N']
-    total_spent = sum(t.amount_inr for t in flown_tickets)
+    total_spent = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
     
-    allowance = emp.quarterly_allowance_inr or 150000.0
+    allowance = float(emp.quarterly_allowance_inr or 150000.0)
     remaining = max(0.0, allowance - total_spent)
     burn_pct = min(100.0, round((total_spent / allowance) * 100, 1)) if allowance > 0 else 0.0
     
@@ -1025,9 +1037,17 @@ def get_csuite_briefing():
 def get_audit_package_html():
     return generate_executive_audit_package_html()
 
-@app.get("/api/export/audit-package-pdf", response_class=HTMLResponse)
-def get_audit_package_pdf():
-    return generate_executive_audit_package_html()
+@app.get("/api/export/audit-package-pdf")
+@app.get("/api/export/pdf")
+def get_audit_package_pdf(format: Optional[str] = Query(None, description="Format: 'pdf' or 'html'")):
+    if format and format.lower() == "html":
+        return HTMLResponse(generate_executive_audit_package_html())
+    pdf_bytes = generate_executive_audit_package_pdf_bytes()
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=Executive_Travel_Audit_Package.pdf"}
+    )
 
 @app.get("/api/powerbi/pbit")
 def download_pbit():
@@ -1079,12 +1099,12 @@ def get_powerbi_analytics():
         bu_budgets = {}
         for emp in employees:
             bu = emp.business_unit or "General"
-            bu_budgets[bu] = bu_budgets.get(bu, 0.0) + (emp.quarterly_allowance_inr or 150000.0)
+            bu_budgets[bu] = bu_budgets.get(bu, 0.0) + float(emp.quarterly_allowance_inr or 150000.0)
             
         total_budget = sum(bu_budgets.values())
         
         flown_tickets = [t for t in tickets if t.travelled_flag == 'Y']
-        total_spend = sum(t.amount_inr or 0.0 for t in flown_tickets)
+        total_spend = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
         total_flown = len(flown_tickets)
         total_tickets = len(tickets)
         budget_variance = total_budget - total_spend
@@ -1100,7 +1120,7 @@ def get_powerbi_analytics():
             bu = t.business_unit or "Other"
             if bu not in bu_groups:
                 bu_groups[bu] = {"name": bu, "budget": 0.0, "spend": 0.0, "trips": 0}
-            bu_groups[bu]["spend"] += (t.amount_inr or 0.0)
+            bu_groups[bu]["spend"] += float(t.amount_inr or 0.0)
             bu_groups[bu]["trips"] += 1
             
         bu_matrix = []
@@ -1135,7 +1155,7 @@ def get_powerbi_analytics():
                     "spend": 0.0,
                     "trips": 0
                 }
-            route_buckets[r_key]["spend"] += (t.amount_inr or 0.0)
+            route_buckets[r_key]["spend"] += float(t.amount_inr or 0.0)
             route_buckets[r_key]["trips"] += 1
             
         sorted_routes = sorted(route_buckets.values(), key=lambda x: x["spend"], reverse=True)[:15]
@@ -1146,14 +1166,14 @@ def get_powerbi_analytics():
         class_buckets = {}
         for t in flown_tickets:
             c = t.trip_classification or "Domestic"
-            class_buckets[c] = class_buckets.get(c, 0.0) + (t.amount_inr or 0.0)
+            class_buckets[c] = class_buckets.get(c, 0.0) + float(t.amount_inr or 0.0)
         class_split = [{"name": k, "value": round(v, 2)} for k, v in class_buckets.items()]
         
         # Monthly trend
         month_spend = {}
         for t in flown_tickets:
             m = t.travel_date[:7] if (t.travel_date and len(t.travel_date) >= 7) else "2026-01"
-            month_spend[m] = month_spend.get(m, 0.0) + (t.amount_inr or 0.0)
+            month_spend[m] = month_spend.get(m, 0.0) + float(t.amount_inr or 0.0)
             
         sorted_months = sorted(month_spend.keys())
         monthly_trend = [
@@ -1174,9 +1194,9 @@ def get_powerbi_analytics():
         active_employees = len(set(t.employee_id for t in tickets if t.employee_id))
         
         # Spend classifications
-        dom_spend = sum(t.amount_inr or 0.0 for t in dom_flown)
-        cb_spend = sum(t.amount_inr or 0.0 for t in flown_tickets if t.trip_classification == "Cross-Border")
-        mc_spend = sum(t.amount_inr or 0.0 for t in flown_tickets if t.trip_classification == "Multi-Country")
+        dom_spend = sum(float(t.amount_inr or 0.0) for t in dom_flown)
+        cb_spend = sum(float(t.amount_inr or 0.0) for t in flown_tickets if t.trip_classification == "Cross-Border")
+        mc_spend = sum(float(t.amount_inr or 0.0) for t in flown_tickets if t.trip_classification == "Multi-Country")
         
         dax_measures = [
             {

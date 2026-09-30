@@ -9,14 +9,20 @@ def derive_business_rules(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     4. policy_compliance_status ('COMPLIANT', 'NON_COMPLIANT_CABIN', 'NON_COMPLIANT_FARE')
     """
 
+    trip_countries = {}
     trip_destinations = {}
     for r in records:
-        tr_id = r["trip_id"]
-        d_cntry = r["dest_country"]
-        if tr_id not in trip_destinations:
+        tr_id = r.get("trip_id")
+        orig_c = (r.get("origin_country") or "").strip().title()
+        dest_c = (r.get("dest_country") or "").strip().title()
+        if tr_id not in trip_countries:
+            trip_countries[tr_id] = set()
             trip_destinations[tr_id] = set()
-        if d_cntry:
-            trip_destinations[tr_id].add(d_cntry)
+        if orig_c:
+            trip_countries[tr_id].add(orig_c)
+        if dest_c:
+            trip_countries[tr_id].add(dest_c)
+            trip_destinations[tr_id].add(dest_c)
 
     processed_records = []
 
@@ -31,22 +37,27 @@ def derive_business_rules(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         else:
             travelled_flag = "N"
 
-        orig_cntry = rec.get("origin_country", "")
-        dest_cntry = rec.get("dest_country", "")
+        orig_cntry = rec.get("origin_country", "").strip().title()
+        dest_cntry = rec.get("dest_country", "").strip().title()
         orig_iso = rec.get("origin_iso", "XX")
         dest_iso = rec.get("dest_iso", "XX")
         tr_id = rec.get("trip_id")
         cabin = rec.get("cabin_class", "Economy")
         amount_inr = rec.get("amount_inr", 0.0)
 
+        all_countries = trip_countries.get(tr_id, set())
         distinct_dests = trip_destinations.get(tr_id, set())
 
-        if len(distinct_dests) > 1 and "India" not in distinct_dests:
-            classification = "Multi-Country"
-            summary = f"{orig_iso} to GBS Multi-Country"
-        elif orig_cntry.lower() == dest_cntry.lower() or (orig_iso == "IN" and dest_iso == "IN"):
+        # Enterprise Multi-Dimensional Trip Classification:
+        # 1. Domestic: All trip endpoints reside within the same single country
+        if len(all_countries) == 1 or (orig_cntry.lower() == dest_cntry.lower() and len(distinct_dests) <= 1):
             classification = "Domestic"
             summary = f"Domestic {orig_cntry if orig_cntry else 'India'}"
+        # 2. Multi-Country: Trip contains more than 2 distinct countries across its legs, or visits multiple foreign destinations
+        elif len(all_countries) > 2 or (len(distinct_dests) > 1 and orig_cntry not in distinct_dests):
+            classification = "Multi-Country"
+            summary = f"{orig_iso} to Multi-Country"
+        # 3. Cross-Border: Trip spans exactly 2 distinct countries (e.g. Origin Country A -> Destination Country B)
         else:
             classification = "Cross-Border"
             summary = f"{orig_iso} to {dest_iso} Cross-Border"
