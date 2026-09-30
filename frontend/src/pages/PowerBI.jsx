@@ -80,6 +80,17 @@ export const PowerBI = () => {
   const budgetVariance = totalBudget - totalSpend;
   const avgFare = totalTrips > 0 ? Math.round(totalSpend / totalTrips) : 0;
 
+  // Interactive "What-If" Budget & Inflation Scenario Simulator State
+  const [simBudgetDelta, setSimBudgetDelta] = useState(0); // -40% to +40%
+  const [simInflationDelta, setSimInflationDelta] = useState(0); // 0% to +30%
+
+  // Simulated Dynamic Financial Metrics
+  const simulatedBudget = Math.round(totalBudget * (1 + simBudgetDelta / 100));
+  const simulatedSpend = Math.round(totalSpend * (1 + simInflationDelta / 100));
+  const simulatedVariance = simulatedBudget - simulatedSpend;
+  const simulatedUtilPct = simulatedBudget > 0 ? (simulatedSpend / simulatedBudget) * 100 : 0;
+  const isSimulationActive = (simBudgetDelta !== 0 || simInflationDelta !== 0);
+
   // Department Aggregates for Bar Chart & Divisional Matrix
   const buChartData = React.useMemo(() => {
     if (!isFiltered && liveAnalytics?.divisional_matrix?.length) {
@@ -302,6 +313,12 @@ export const PowerBI = () => {
     window.open(url, '_blank');
   };
 
+  const handleDownloadAuditPackage = () => {
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const url = token ? `/api/reports/audit-package-html?token=${encodeURIComponent(token)}` : '/api/reports/audit-package-html';
+    window.open(url, '_blank');
+  };
+
   const handleDownloadPBIX = () => {
     window.location.href = '/api/powerbi/pbix';
   };
@@ -413,11 +430,21 @@ export const PowerBI = () => {
           <button
             type="button"
             onClick={handleDownloadAnalysisDocument}
-            className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
-            title="Download full 5-page executive analytical document"
+            className="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            title="Download full 5-page executive analytical briefing"
           >
-            <Download className="w-4 h-4" />
-            <span>Download Detailed Analysis Document</span>
+            <Download className="w-3.5 h-3.5" />
+            <span>Executive Briefing (5-Page)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadAuditPackage}
+            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            title="1-Click download: 5-page report + 36-column data dictionary + batch audit history into a certified 7-page PDF"
+          >
+            <FileText className="w-4 h-4 text-emerald-200" />
+            <span>1-Click Executive PDF Audit Package</span>
           </button>
         </div>
       </div>
@@ -626,6 +653,229 @@ export const PowerBI = () => {
               </div>
             </div>
 
+            {/* INTERACTIVE "WHAT-IF" BUDGET & INFLATION SCENARIO SIMULATOR */}
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/40 border border-indigo-500/30 shadow-xl space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/40">
+                    <Sliders className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-black text-sm text-white tracking-wide">
+                        Interactive &quot;What-If&quot; Budget &amp; Inflation Scenario Simulator
+                      </h4>
+                      {isSimulationActive && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+                          SIMULATION ACTIVE
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Executive sensitivity engine: dynamically model quarterly budget adjustments and fuel inflation shocks in real-time
+                    </p>
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Presets:</span>
+                  <button
+                    type="button"
+                    onClick={() => { setSimBudgetDelta(0); setSimInflationDelta(0); }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      simBudgetDelta === 0 && simInflationDelta === 0
+                        ? 'bg-slate-700 text-white border border-slate-600'
+                        : 'bg-slate-800/60 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Baseline (0%/0%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSimBudgetDelta(-15); setSimInflationDelta(0); }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      simBudgetDelta === -15 && simInflationDelta === 0
+                        ? 'bg-amber-500 text-slate-950 font-black'
+                        : 'bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20'
+                    }`}
+                  >
+                    Fiscal Austerity (-15% Budget)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSimBudgetDelta(0); setSimInflationDelta(10); }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      simBudgetDelta === 0 && simInflationDelta === 10
+                        ? 'bg-orange-500 text-white font-black'
+                        : 'bg-orange-500/10 text-orange-300 border border-orange-500/30 hover:bg-orange-500/20'
+                    }`}
+                  >
+                    Fuel Price Surge (+10% Airfare)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSimBudgetDelta(-20); setSimInflationDelta(15); }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      simBudgetDelta === -20 && simInflationDelta === 15
+                        ? 'bg-rose-600 text-white font-black'
+                        : 'bg-rose-500/10 text-rose-300 border border-rose-500/30 hover:bg-rose-500/20'
+                    }`}
+                  >
+                    Severe Market Shock (-20% / +15%)
+                  </button>
+                  {isSimulationActive && (
+                    <button
+                      type="button"
+                      onClick={() => { setSimBudgetDelta(0); setSimInflationDelta(0); }}
+                      className="px-2 py-1 text-slate-400 hover:text-rose-400 text-xs font-bold underline ml-1 cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Slider Controls & Live Simulated Metric Cards */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                {/* Left: 2 Sliders */}
+                <div className="lg:col-span-5 space-y-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                  {/* Slider 1: Budget Adjustment */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="font-bold text-slate-300 flex items-center gap-1.5">
+                        <span>Corporate Travel Budget Adjustment:</span>
+                      </label>
+                      <span className={`font-mono font-black text-sm ${simBudgetDelta < 0 ? 'text-rose-400' : simBudgetDelta > 0 ? 'text-emerald-400' : 'text-slate-300'}`}>
+                        {simBudgetDelta > 0 ? `+${simBudgetDelta}%` : `${simBudgetDelta}%`}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-40"
+                      max="40"
+                      step="5"
+                      value={simBudgetDelta}
+                      onChange={(e) => setSimBudgetDelta(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                      <span>-40% (Austerity)</span>
+                      <span>0% (Baseline)</span>
+                      <span>+40% (Expansion)</span>
+                    </div>
+                  </div>
+
+                  {/* Slider 2: Inflation / Fuel Surge */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="font-bold text-slate-300 flex items-center gap-1.5">
+                        <span>Airfare Inflation &amp; Fuel Surcharge:</span>
+                      </label>
+                      <span className={`font-mono font-black text-sm ${simInflationDelta > 0 ? 'text-amber-400' : 'text-slate-300'}`}>
+                        +{simInflationDelta}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="30"
+                      step="5"
+                      value={simInflationDelta}
+                      onChange={(e) => setSimInflationDelta(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                      <span>0% (Stable Fuel)</span>
+                      <span>+15% (Moderate Surge)</span>
+                      <span>+30% (Severe Spike)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Live Simulated KPI Output Cards */}
+                <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Simulated Budget */}
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Simulated Budget Cap</span>
+                    <div className="text-lg font-black text-white font-mono">
+                      ₹{simulatedBudget.toLocaleString('en-IN')}
+                    </div>
+                    <span className={`text-[10px] font-semibold block ${simBudgetDelta < 0 ? 'text-rose-400' : simBudgetDelta > 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
+                      {simBudgetDelta === 0 ? 'Baseline Allowance' : `${simBudgetDelta > 0 ? '+' : ''}${simBudgetDelta}% vs Target`}
+                    </span>
+                  </div>
+
+                  {/* Simulated Spend */}
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Simulated Flown Spend</span>
+                    <div className="text-lg font-black text-amber-400 font-mono">
+                      ₹{simulatedSpend.toLocaleString('en-IN')}
+                    </div>
+                    <span className={`text-[10px] font-semibold block ${simInflationDelta > 0 ? 'text-amber-400' : 'text-slate-500'}`}>
+                      {simInflationDelta === 0 ? 'Uninflated Realized' : `+₹${(simulatedSpend - totalSpend).toLocaleString('en-IN')} Inflation`}
+                    </span>
+                  </div>
+
+                  {/* Simulated Variance & Utilization */}
+                  <div className={`p-3.5 rounded-xl border space-y-1 ${
+                    simulatedVariance < 0
+                      ? 'bg-rose-950/30 border-rose-500/40 text-rose-300'
+                      : simulatedUtilPct > 90
+                        ? 'bg-amber-950/30 border-amber-500/40 text-amber-300'
+                        : 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300'
+                  }`}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider block opacity-80">
+                      {simulatedVariance < 0 ? 'Projected Deficit' : 'Simulated Surplus'}
+                    </span>
+                    <div className="text-lg font-black font-mono">
+                      {simulatedVariance < 0 ? `-₹${Math.abs(simulatedVariance).toLocaleString('en-IN')}` : `₹${simulatedVariance.toLocaleString('en-IN')}`}
+                    </div>
+                    <span className="text-[10px] font-bold block">
+                      {simulatedUtilPct.toFixed(1)}% Capacity Utilization
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Strategic Advisory Banner */}
+              <div className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                simulatedVariance < 0
+                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-200'
+                  : simulatedUtilPct > 90
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className={`w-4 h-4 shrink-0 ${simulatedVariance < 0 ? 'text-rose-400' : simulatedUtilPct > 90 ? 'text-amber-400' : 'text-emerald-400'}`} />
+                  <div>
+                    <strong className="font-black mr-1">
+                      {simulatedVariance < 0
+                        ? 'CRITICAL DEFICIT ADVISORY:'
+                        : simulatedUtilPct > 90
+                          ? 'TIGHT CAPACITY WARNING:'
+                          : 'SOLVENT & GOVERNED:'}
+                    </strong>
+                    <span>
+                      {simulatedVariance < 0
+                        ? `Under these parameters, travel expenditure exceeds the authorized ceiling by ₹${Math.abs(simulatedVariance).toLocaleString('en-IN')}. CFO policy recommends halting non-essential trips and capping business class bookings.`
+                        : simulatedUtilPct > 90
+                          ? `Budget utilization reaches ${simulatedUtilPct.toFixed(1)}%. Operating buffer is limited to ₹${simulatedVariance.toLocaleString('en-IN')}. Recommend pre-clearing high-value cross-border itineraries.`
+                          : `Travel program retains ₹${simulatedVariance.toLocaleString('en-IN')} in verified fiscal reserve. Projected surplus accommodates planned headcount mobility.`}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadAuditPackage}
+                  className="shrink-0 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 flex items-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Export Package</span>
+                </button>
+              </div>
+            </div>
+
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Divisional Spend vs Budget Bar Chart */}
@@ -689,14 +939,26 @@ export const PowerBI = () => {
                 <h4 className="font-black text-sm text-white">Divisional Spend & Budget Variance Matrix</h4>
                 <p className="text-xs text-slate-400">DirectQuery multi-dimensional matrix evaluating allocated budget against verified ticket expenditure</p>
               </div>
-              <button
-                type="button"
-                onClick={handleDownloadAnalysisDocument}
-                className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export Executive Briefing</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownloadAnalysisDocument}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                  title="Download full 5-page analytical briefing"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>5-Page Briefing</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadAuditPackage}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                  title="1-Click download: 5-page report + 36-column data dictionary + batch audit history into a certified 7-page PDF"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>1-Click PDF Audit Package</span>
+                </button>
+              </div>
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-950/60">

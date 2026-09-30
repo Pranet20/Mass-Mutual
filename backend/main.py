@@ -29,7 +29,7 @@ from services.auth import (
 )
 from services.forecasting import get_spend_forecasting
 from services.ai_assistant import process_ai_query, submit_complaint
-from services.export import generate_csuite_briefing_html, generate_pbit_template
+from services.export import generate_csuite_briefing_html, generate_executive_audit_package_html, generate_pbit_template
 from services.data_dictionary import get_governed_data_dictionary
 from services.test_runner import execute_automated_system_tests
 
@@ -1020,6 +1020,14 @@ def get_briefing_html():
 @app.get("/api/export/csuite-briefing", response_class=HTMLResponse)
 def get_csuite_briefing():
     return generate_csuite_briefing_html()
+
+@app.get("/api/reports/audit-package-html", response_class=HTMLResponse)
+def get_audit_package_html():
+    return generate_executive_audit_package_html()
+
+@app.get("/api/export/audit-package-pdf", response_class=HTMLResponse)
+def get_audit_package_pdf():
+    return generate_executive_audit_package_html()
 
 @app.get("/api/powerbi/pbit")
 def download_pbit():
