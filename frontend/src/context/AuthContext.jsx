@@ -8,6 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('user');
+      const activeToken = localStorage.getItem('access_token') || localStorage.getItem('token');
+      if (activeToken) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${activeToken}`;
+      }
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -18,6 +22,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const activeToken = localStorage.getItem('access_token') || localStorage.getItem('token');
     if (activeToken) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${activeToken}`;
       axios.get('/api/auth/me', {
         headers: { Authorization: `Bearer ${activeToken}` }
       })
@@ -34,6 +39,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem('access_token');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          delete axios.defaults.headers.common['Authorization'];
           setUser(null);
         }
       });
@@ -43,7 +49,7 @@ export const AuthProvider = ({ children }) => {
   // Set up global Axios interceptors for JWT Bearer token propagation and 401 auto-logout
   useEffect(() => {
     const reqInterceptor = axios.interceptors.request.use((config) => {
-      const activeToken = user?.access_token || localStorage.getItem('access_token') || localStorage.getItem('token');
+      const activeToken = localStorage.getItem('access_token') || localStorage.getItem('token');
       if (activeToken) {
         config.headers.Authorization = `Bearer ${activeToken}`;
       }
@@ -60,6 +66,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem('access_token');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          delete axios.defaults.headers.common['Authorization'];
           setUser(null);
         }
         return Promise.reject(error);
@@ -70,7 +77,7 @@ export const AuthProvider = ({ children }) => {
       axios.interceptors.request.eject(reqInterceptor);
       axios.interceptors.response.eject(resInterceptor);
     };
-  }, [user]);
+  }, []);
 
   const login = async (email, password) => {
     const res = await axios.post('/api/auth/login', { email, password });
@@ -79,6 +86,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('access_token', userData.access_token);
       localStorage.setItem('token', userData.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
     }
     setUser(userData);
     return userData;
@@ -100,6 +108,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('access_token', userData.access_token);
       localStorage.setItem('token', userData.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
     }
     setUser(userData);
     return userData;
@@ -112,6 +121,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('access_token', userData.access_token);
       localStorage.setItem('token', userData.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.access_token}`;
     }
     setUser(userData);
     return userData;
@@ -121,6 +131,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
   };
 

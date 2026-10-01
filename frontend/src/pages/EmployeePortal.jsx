@@ -43,22 +43,31 @@ export const EmployeePortal = () => {
   const [complaintHistory, setComplaintHistory] = useState([]);
   const [lastDispatchedTicket, setLastDispatchedTicket] = useState(null);
 
-  const empId = user?.employee_id || 'EMP-1002';
-  const empName = user?.name || data?.employee_name || 'Priya Nair';
+  const empId = user?.employee_id || data?.employee_id || 'me';
+  const empName = user?.name || data?.employee_name || 'Corporate Employee';
   const [fetchError, setFetchError] = useState(null);
 
   const fetchPersonalData = () => {
+    const targetId = user?.employee_id || 'me';
+    const activeToken = user?.access_token || localStorage.getItem('access_token') || localStorage.getItem('token');
+    const headers = activeToken ? { Authorization: `Bearer ${activeToken}` } : {};
+
     setLoading(true);
-    setFetchError(null);
-    const targetId = user?.employee_id || 'EMP-1002';
-    axios.get(`/api/employees/${targetId}`)
+    axios.get(`/api/employees/${targetId}`, { headers })
       .then(res => {
         setData(res.data);
+        setFetchError(null);
         setLoading(false);
       })
       .catch((err) => {
         console.error('Failed to fetch employee data:', err);
-        setFetchError(err.response?.data?.detail || 'Unable to connect to server');
+        // Only present error banner if valid employee data is not already loaded
+        setData((current) => {
+          if (!current) {
+            setFetchError(err.response?.data?.detail || 'Unable to connect to server');
+          }
+          return current;
+        });
         setLoading(false);
       });
   };

@@ -659,10 +659,10 @@ def adjust_employee_allowance(req: AdjustAllowanceRequest, current_user: User = 
 @app.get("/api/employees/{employee_id}")
 def get_employee_detail(employee_id: str, current_user: User = Depends(get_current_user)):
     # Enforce RBAC: Employees default to viewing their own profile
-    if current_user.role == "employee":
+    if employee_id == "me" or current_user.role == "employee":
         if current_user.employee_id:
             employee_id = current_user.employee_id
-        elif current_user.employee_id != employee_id:
+        elif employee_id != "me" and current_user.employee_id != employee_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Access Denied: Employees are restricted to viewing their own travel records only."
