@@ -325,7 +325,9 @@ export const PowerBI = () => {
   };
 
   const handleDownloadPBIX = () => {
-    window.location.href = '/api/powerbi/pbix';
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const url = token ? `/api/powerbi/pbix?token=${encodeURIComponent(token)}` : '/api/powerbi/pbix';
+    window.location.href = url;
   };
 
   const handleCopyText = (text, fieldName) => {

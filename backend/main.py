@@ -991,6 +991,9 @@ def apply_analyst_override(req: OverrideRequest, current_user: User = Depends(re
         ov.override_summary = req.override_summary
         ov.override_reason = req.override_reason
         ov.created_by = actor_email
+        ov.approved_by = actor_email
+        ov.approved_at = datetime.datetime.now(datetime.timezone.utc)
+        ov.status = "APPROVED"
     else:
         ov = ManualOverride(
             ticket_id=req.ticket_id,
@@ -998,7 +1001,10 @@ def apply_analyst_override(req: OverrideRequest, current_user: User = Depends(re
             override_classification=req.override_classification,
             override_summary=req.override_summary,
             override_reason=req.override_reason,
-            created_by=actor_email
+            created_by=actor_email,
+            approved_by=actor_email,
+            approved_at=datetime.datetime.now(datetime.timezone.utc),
+            status="APPROVED"
         )
         session.add(ov)
         
@@ -1050,7 +1056,7 @@ def get_audit_package_pdf(format: Optional[str] = Query(None, description="Forma
     )
 
 @app.get("/api/powerbi/pbit")
-def download_pbit():
+def download_pbit(current_user: User = Depends(get_current_user)):
     pbit_path = generate_pbit_template()
     return FileResponse(
         pbit_path,
@@ -1059,7 +1065,7 @@ def download_pbit():
     )
 
 @app.get("/api/powerbi/pbix")
-def download_pbix():
+def download_pbix(current_user: User = Depends(get_current_user)):
     pbix_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "powerbi", "Corporate_Travel_Analytics.pbix"))
     if not os.path.exists(pbix_path):
         raise HTTPException(status_code=404, detail="Power BI report template not found")
@@ -1070,7 +1076,7 @@ def download_pbix():
     )
 
 @app.get("/api/powerbi/feed")
-def powerbi_live_feed():
+def powerbi_live_feed(current_user: User = Depends(get_current_user)):
     session = SessionLocal()
     try:
         results = session.execute(text("SELECT * FROM vw_travel ORDER BY travel_date DESC, ticket_id DESC")).mappings().all()
@@ -1088,7 +1094,7 @@ def powerbi_live_feed():
         session.close()
 
 @app.get("/api/powerbi/analytics")
-def get_powerbi_analytics():
+def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
     session = SessionLocal()
     try:
         tickets = session.query(FactTravelTicket).all()

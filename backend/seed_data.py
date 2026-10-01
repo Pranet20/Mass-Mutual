@@ -2,7 +2,7 @@ import os
 import csv
 import random
 from datetime import datetime, timedelta
-from database.models import init_db, SessionLocal, User, EmployeeMaster, CountryReference, ManualOverride, FXRate
+from database.models import init_db, SessionLocal, User, EmployeeMaster, CountryReference, ManualOverride, ManualOverrideAudit, FXRate
 from services.auth import hash_password
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -212,6 +212,7 @@ def generate_all_data():
                     employee_name=item[0],
                     email=email,
                     business_unit="Operations & Risk",
+                    business_group="Operations & Risk",
                     department="Internal Audit",
                     designation="Risk Analyst",
                     location=item[4],
@@ -229,6 +230,7 @@ def generate_all_data():
                     employee_name=item[0],
                     email=email,
                     business_unit=item[1],
+                    business_group=item[1],
                     department=item[2],
                     designation=item[3],
                     location=item[4],
@@ -246,6 +248,7 @@ def generate_all_data():
                     employee_name=item[0],
                     email=email,
                     business_unit=item[1],
+                    business_group=item[1],
                     department=item[2],
                     designation=item[3],
                     location=item[4],
@@ -365,15 +368,35 @@ def generate_all_data():
         for r in records:
             writer.writerow(r)
 
-    # 6. Seed Manual Overrides
-    if not session.query(ManualOverride).filter_by(ticket_id="TCK-8012").first():
+    # 6. Seed Manual Overrides & Synced Audit Trail
+    existing_override = session.query(ManualOverride).filter_by(ticket_id="TCK-8012").first()
+    if not existing_override:
         session.add(ManualOverride(
             ticket_id="TCK-8012",
             override_travelled_flag="Y",
             override_classification="Cross-Border",
             override_summary="IN to AU Cross-Border (Analyst Exemption)",
             override_reason="Analyst verified employee boarded replacement charter flight despite status flag",
-            created_by="analyst@travelintelligence.com"
+            created_by="analyst@travelintelligence.com",
+            status="APPROVED",
+            approved_by="manager@massmutual.com",
+            approved_at=datetime.now()
+        ))
+        session.commit()
+    else:
+        existing_override.status = "APPROVED"
+        existing_override.approved_by = "manager@massmutual.com"
+        existing_override.approved_at = datetime.now()
+        session.commit()
+
+    if not session.query(ManualOverrideAudit).filter_by(ticket_id="TCK-8012").first():
+        session.add(ManualOverrideAudit(
+            ticket_id="TCK-8012",
+            field_changed="travelled_flag",
+            old_value="N",
+            new_value="Y",
+            override_reason="Analyst verified employee boarded replacement charter flight despite status flag",
+            changed_by="analyst@travelintelligence.com"
         ))
         session.commit()
 

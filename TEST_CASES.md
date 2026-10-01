@@ -3,7 +3,7 @@
 **Problem Statement PS-04**: End-to-End Corporate Travel Analytics Pipeline (Raw Tickets → Warehouse View → Dashboard)  
 **Target Domain**: Data Engineering & Enterprise BI Analytics  
 **Governed Analytical View**: `vw_travel` (PostgreSQL / SQLite)  
-**Verification Suite**: 41 / 41 Tests Passing (**100% Pass Rate**)
+**Verification Suite**: 44 / 44 Tests Passing (**100% Pass Rate**)
 
 ---
 
@@ -77,12 +77,15 @@ pytest -q
 32. `backend/tests/test_pipeline.py::test_32_manager_approval_action_workflow` **PASSED**
 33. `backend/tests/test_pipeline.py::test_33_numeric_precision_in_models` **PASSED**
 34. `backend/tests/test_pipeline.py::test_34_vw_travel_sql_reconciliation_zero_variance` **PASSED**
-35. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_auth_password_hashing_dynamic_salt` **PASSED**
-36. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_currency_conversion` **PASSED**
-37. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_database_governed_view_and_models` **PASSED**
-38. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_iso_date_standardization` **PASSED**
-39. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_jwt_token_generation_and_decode` **PASSED**
-40. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_quarantined_record_structure` **PASSED**
-41. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_scd_type2_temporal_enrichment` **PASSED**
+35. `backend/tests/test_pipeline.py::test_35_powerbi_endpoints_security` **PASSED**
+36. `backend/tests/test_pipeline.py::test_36_business_group_in_vw_travel_and_fact` **PASSED**
+37. `backend/tests/test_pipeline.py::test_37_manual_override_audit_synchronization` **PASSED**
+38. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_auth_password_hashing_dynamic_salt` **PASSED**
+39. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_currency_conversion` **PASSED**
+40. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_database_governed_view_and_models` **PASSED**
+41. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_iso_date_standardization` **PASSED**
+42. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_jwt_token_generation_and_decode` **PASSED**
+43. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_quarantined_record_structure` **PASSED**
+44. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_scd_type2_temporal_enrichment` **PASSED**
 
 ```

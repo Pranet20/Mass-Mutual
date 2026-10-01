@@ -103,6 +103,7 @@ class EmployeeMaster(Base):
     employee_name = Column(String(100), nullable=False)
     email = Column(String(100))
     business_unit = Column(String(100), nullable=False, index=True)
+    business_group = Column(String(100), nullable=True, index=True)
     department = Column(String(100))
     designation = Column(String(100))
     location = Column(String(100))
@@ -132,6 +133,9 @@ class ManualOverride(Base):
     override_reason = Column(Text)
     created_by = Column(String(100))
     created_at = Column(DateTime, default=get_utc_now)
+    approved_by = Column(String(100), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    status = Column(String(50), default="APPROVED")
 
 class ManualOverrideAudit(Base):
     __tablename__ = "manual_override_audits"
@@ -154,6 +158,7 @@ class FactTravelTicket(Base):
     employee_id = Column(String(50), nullable=False, index=True)
     employee_name = Column(String(100))
     business_unit = Column(String(100), index=True)
+    business_group = Column(String(100), index=True)
     department = Column(String(100))
     issue_date = Column(String(30))
     travel_date = Column(String(30), index=True)
@@ -231,6 +236,29 @@ def init_db():
     Base.metadata.create_all(bind=engine)
     
     with engine.connect() as conn:
+        from sqlalchemy import inspect
+        inspector = inspect(engine)
+        existing_tables = inspector.get_table_names()
+        
+        if 'employee_master' in existing_tables:
+            emp_cols = [c['name'] for c in inspector.get_columns('employee_master')]
+            if 'business_group' not in emp_cols:
+                conn.exec_driver_sql("ALTER TABLE employee_master ADD COLUMN business_group VARCHAR(100);")
+        
+        if 'fact_travel_tickets' in existing_tables:
+            fact_cols = [c['name'] for c in inspector.get_columns('fact_travel_tickets')]
+            if 'business_group' not in fact_cols:
+                conn.exec_driver_sql("ALTER TABLE fact_travel_tickets ADD COLUMN business_group VARCHAR(100);")
+                
+        if 'manual_overrides' in existing_tables:
+            mo_cols = [c['name'] for c in inspector.get_columns('manual_overrides')]
+            if 'approved_by' not in mo_cols:
+                conn.exec_driver_sql("ALTER TABLE manual_overrides ADD COLUMN approved_by VARCHAR(100);")
+            if 'approved_at' not in mo_cols:
+                conn.exec_driver_sql("ALTER TABLE manual_overrides ADD COLUMN approved_at TIMESTAMP;")
+            if 'status' not in mo_cols:
+                conn.exec_driver_sql("ALTER TABLE manual_overrides ADD COLUMN status VARCHAR(50) DEFAULT 'APPROVED';")
+
         conn.exec_driver_sql("DROP VIEW IF EXISTS vw_travel;")
         create_view_sql = """
         CREATE VIEW vw_travel AS
@@ -241,6 +269,7 @@ def init_db():
             employee_id,
             employee_name,
             business_unit,
+            business_group,
             department,
             issue_date,
             travel_date,

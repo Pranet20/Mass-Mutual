@@ -52,7 +52,8 @@ def _run_pipeline_internal(csv_path: str = None, force_reprocess: bool = False) 
             published_total = session.query(FactTravelTicket).count()
             session.close()
             return {
-                "status": "SUCCESS",
+                "status": "ALREADY_PROCESSED",
+                "message": f"Identical source file '{existing_successful_batch.source_file}' with SHA-256 '{file_hash[:16]}...' was already processed in batch '{existing_successful_batch.batch_id}'. Idempotent skip.",
                 "batch_id": existing_successful_batch.batch_id,
                 "source_file": existing_successful_batch.source_file,
                 "source_file_hash": file_hash,
@@ -84,8 +85,8 @@ def _run_pipeline_internal(csv_path: str = None, force_reprocess: bool = False) 
         # 2. Cleansing & Deduplication (with Auditable FX Conversion)
         cleansed_count, duplicate_count = cleanse_staging_tickets(batch_id)
         
-        # 3. SCD Type-2 Temporal Enrichment
-        enriched_records = enrich_ticket_data()
+        # 3. SCD Type-2 Temporal Enrichment (with explicit batch context)
+        enriched_records = enrich_ticket_data(batch_id)
         
         # 4. Business Rules & Metric Derivations
         processed_records = derive_business_rules(enriched_records)
@@ -124,6 +125,7 @@ def _run_pipeline_internal(csv_path: str = None, force_reprocess: bool = False) 
                 existing.employee_id = rec["employee_id"]
                 existing.employee_name = rec["employee_name"]
                 existing.business_unit = rec["business_unit"]
+                existing.business_group = rec.get("business_group", rec.get("business_unit"))
                 existing.department = rec["department"]
                 existing.issue_date = rec["issue_date"]
                 existing.travel_date = rec["travel_date"]
@@ -163,6 +165,7 @@ def _run_pipeline_internal(csv_path: str = None, force_reprocess: bool = False) 
                     employee_id=rec["employee_id"],
                     employee_name=rec["employee_name"],
                     business_unit=rec["business_unit"],
+                    business_group=rec.get("business_group", rec.get("business_unit")),
                     department=rec["department"],
                     issue_date=rec["issue_date"],
                     travel_date=rec["travel_date"],

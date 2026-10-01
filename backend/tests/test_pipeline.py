@@ -372,5 +372,73 @@ def test_34_vw_travel_sql_reconciliation_zero_variance():
         session.close()
 
 
+def test_35_powerbi_endpoints_security():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+
+    # 1. Unauthenticated calls must return 401
+    assert client.get("/api/powerbi/feed").status_code == 401
+    assert client.get("/api/powerbi/analytics").status_code == 401
+    assert client.get("/api/powerbi/pbix").status_code == 401
+
+    # 2. Authenticate
+    auth_resp = client.post("/api/auth/login", json={"email": "manager@travelintelligence.com", "password": "Manager123!"})
+    assert auth_resp.status_code == 200
+    token = auth_resp.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 3. Authenticated with Bearer Header
+    feed_resp = client.get("/api/powerbi/feed", headers=headers)
+    assert feed_resp.status_code == 200
+    assert isinstance(feed_resp.json(), list)
+
+    analytics_resp = client.get("/api/powerbi/analytics", headers=headers)
+    assert analytics_resp.status_code == 200
+    assert "kpis" in analytics_resp.json()
+
+    pbix_resp = client.get("/api/powerbi/pbix", headers=headers)
+    assert pbix_resp.status_code == 200
+
+    # 4. Authenticated with ?token= query parameter (for Power BI Desktop Web connector and direct browser downloads)
+    feed_param_resp = client.get(f"/api/powerbi/feed?token={token}")
+    assert feed_param_resp.status_code == 200
+    assert len(feed_param_resp.json()) == len(feed_resp.json())
+
+    pbix_param_resp = client.get(f"/api/powerbi/pbix?token={token}")
+    assert pbix_param_resp.status_code == 200
+
+
+def test_36_business_group_in_vw_travel_and_fact():
+    from database.models import SessionLocal
+    from sqlalchemy import text
+    session = SessionLocal()
+    try:
+        row = session.execute(text("SELECT * FROM vw_travel LIMIT 1")).mappings().first()
+        assert row is not None
+        assert "business_group" in row
+        assert row["business_group"] is not None
+        assert len(str(row["business_group"]).strip()) > 0
+    finally:
+        session.close()
+
+
+def test_37_manual_override_audit_synchronization():
+    from database.models import SessionLocal, ManualOverride, ManualOverrideAudit
+    session = SessionLocal()
+    try:
+        mo_count = session.query(ManualOverride).count()
+        audit_count = session.query(ManualOverrideAudit).count()
+        assert mo_count > 0
+        assert mo_count == audit_count
+        override = session.query(ManualOverride).filter_by(ticket_id="TCK-8012").first()
+        assert override is not None
+        assert override.status == "APPROVED"
+        assert override.approved_by is not None
+    finally:
+        session.close()
+
+
+
 
 

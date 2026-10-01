@@ -1,13 +1,14 @@
 # Corporate Travel & Expense Intelligence Platform (PS-04)
 
 [![CI Pipeline](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml)
-[![Tests: 41 Passed](https://img.shields.io/badge/Tests-41%20Passed-brightgreen)](TEST_CASES.md)
+[![Tests: 44 Passed](https://img.shields.io/badge/Tests-44%20Passed-brightgreen)](TEST_CASES.md)
+[![Verification: 20/20 Checks](https://img.shields.io/badge/Verification-20%2F20%20Checks%20Passed-brightgreen)](scripts/verify_production_readiness.py)
 [![FastAPI](https://img.shields.io/badge/FastAPI-2.1.0-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.x-61dafb.svg)](https://reactjs.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg)](https://www.postgresql.org)
 [![Power BI](https://img.shields.io/badge/Power_BI-Governed_vw__travel-F2C811.svg)](powerbi/)
 
-An enterprise-grade multi-tier ETL, data warehousing, and business intelligence platform engineered to ingest multi-vendor corporate travel records, execute automated data cleansing, apply temporal Slowly Changing Dimension (SCD Type 2) enrichments, enforce business rules, support audited manual overrides, and expose an authoritative 36-column analytical view (`vw_travel`) to Power BI, executive React dashboards, and AI services.
+An enterprise-grade multi-tier ETL, data warehousing, and business intelligence platform engineered to ingest multi-vendor corporate travel records, execute automated data cleansing, apply temporal Slowly Changing Dimension (SCD Type 2) enrichments, enforce business rules, support audited manual overrides, and expose an authoritative 37-column analytical view (`vw_travel`) to Power BI, executive React dashboards, and AI services.
 
 ---
 
@@ -28,14 +29,22 @@ Vendor Travel CSVs (Q3/Q4 2026)
     ↓
 6. Fact Storage (fact_travel_tickets)
     ↓
-7. Governed Single Source of Truth View (vw_travel - 36 Columns)
+7. Governed Single Source of Truth View (vw_travel - 37 Columns)
     ├── PostgreSQL (localhost:5433)
     ├── Microsoft Power BI Desktop (DirectQuery & Import)
     ├── FastAPI REST & Analytics Services (localhost:8000)
     └── React Executive UI (localhost:3000)
 ```
 
-For complete technical diagrams and ER models, see [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+For complete technical documentation:
+- Architecture & ER Diagrams: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
+- Schema & Data Dictionary: [`DATA_DICTIONARY.md`](./DATA_DICTIONARY.md)
+- Derivation Logic & Thresholds: [`BUSINESS_RULES.md`](./BUSINESS_RULES.md)
+- Lineage & Traceability: [`DATA_LINEAGE.md`](./DATA_LINEAGE.md)
+- Security & RBAC Protocols: [`SECURITY.md`](./SECURITY.md)
+- Power BI 5-Page PBIR Specification: [`POWERBI_SETUP.md`](./POWERBI_SETUP.md)
+- Requirement Traceability Matrix: [`REQUIREMENT_TRACEABILITY.md`](./REQUIREMENT_TRACEABILITY.md)
+- Automated Test Inventory: [`TEST_CASES.md`](./TEST_CASES.md)
 
 ---
 
@@ -59,14 +68,20 @@ cp .env.example .env
 ```
 *(Configure `DATABASE_URL`, `JWT_SECRET_KEY`, and `ALLOWED_ORIGINS` in `.env`)*
 
-### 3. Backend Setup
+### 3. Backend Setup & Single-Command Verification
 ```bash
 # Install Python dependencies
 pip install -r requirements.txt
 
+# Run database migrations
+alembic upgrade head
+
 # Seed sample data & run initial pipeline
 python backend/seed_data.py
 python backend/pipeline/validation.py
+
+# Run master 20-point production readiness verification
+python scripts/verify_production_readiness.py
 
 # Start FastAPI server
 python backend/main.py
@@ -96,11 +111,18 @@ Run all automated unit, integration, and security tests:
 pytest -q
 ```
 ```text
-.........................................                                [100%]
-41 passed in 19.35s (100% Pass Rate)
+............................................                             [100%]
+44 passed in 5.12s (100% Pass Rate)
 ```
 
-See [`TEST_CASES.md`](./TEST_CASES.md) for the complete 41-item test inventory and [`REQUIREMENT_TRACEABILITY.md`](./REQUIREMENT_TRACEABILITY.md) for full PS-04 matrix mapping.
+Run the master 20-point production verification checklist:
+```bash
+python scripts/verify_production_readiness.py
+```
+```text
+VERIFICATION SUMMARY: 20/20 CHECKS PASSED (100% Target)
+ALL 20 PRODUCTION READINESS CHECKS CONFIRMED! READY FOR CLIENT PANEL PRESENTATION.
+```
 
 ---
 

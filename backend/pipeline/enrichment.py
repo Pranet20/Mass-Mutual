@@ -54,10 +54,12 @@ def enrich_ticket_data(batch_id: str = None) -> list:
         if matching_emp:
             emp_name = matching_emp.employee_name
             bu = matching_emp.business_unit
+            bg = getattr(matching_emp, "business_group", None) or matching_emp.business_unit
             dept = matching_emp.department
         else:
             emp_name = f"Unresolved ({emp_id})"
             bu = "Unresolved Temporal BU"
+            bg = "Unresolved Temporal BU"
             dept = "Unresolved Temporal Dept"
         
         orig_country_clean = t.origin_country.lower().strip() if t.origin_country else ""
@@ -73,6 +75,7 @@ def enrich_ticket_data(batch_id: str = None) -> list:
             "employee_id": t.employee_id,
             "employee_name": emp_name,
             "business_unit": bu,
+            "business_group": bg,
             "department": dept,
             "issue_date": t.issue_date,
             "travel_date": t.travel_date,
