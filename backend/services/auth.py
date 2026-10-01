@@ -167,6 +167,7 @@ def register_user(email: str, password: str, name: str, role: str = "employee", 
         session.add(emp_obj)
         
     session.commit()
+    session.refresh(new_user)
     session.close()
     
     return new_user, "User registered successfully."

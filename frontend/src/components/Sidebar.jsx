@@ -7,7 +7,6 @@ import {
   FileText, 
   TrendingUp, 
   BarChart3, 
-  Bot,
   LogOut
 } from 'lucide-react';
 
@@ -18,7 +17,6 @@ const navItems = [
   { id: 'reports', label: 'Reports', icon: FileText },
   { id: 'forecasting', label: 'Forecasting', icon: TrendingUp },
   { id: 'powerbi', label: 'PowerBI', icon: BarChart3 },
-  { id: 'assistant', label: 'Assistant', icon: Bot },
 ];
 
 export const Sidebar = ({ activeTab, setActiveTab }) => {

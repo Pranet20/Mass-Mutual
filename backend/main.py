@@ -669,89 +669,90 @@ def get_employee_detail(employee_id: str, current_user: User = Depends(get_curre
             )
 
     session = SessionLocal()
-    emp = session.query(EmployeeMaster).filter_by(employee_id=employee_id).order_by(EmployeeMaster.is_current.desc()).first()
-    if not emp:
-        # Fallback: create employee profile record if not yet initialized
-        emp = EmployeeMaster(
-            employee_id=employee_id,
-            employee_name=current_user.name or "Corporate Employee",
-            email=current_user.email,
-            business_unit="Global Technology",
-            department="Software Engineering",
-            designation="Senior Engineer",
-            location="Bengaluru",
-            manager_id="MGR-5001",
-            effective_start_date="2026-01-01",
-            effective_end_date="9999-12-31",
-            quarterly_allowance_inr=150000.0,
-            is_current=1
-        )
-        session.add(emp)
-        session.commit()
+    try:
+        emp = session.query(EmployeeMaster).filter_by(employee_id=employee_id).order_by(EmployeeMaster.is_current.desc()).first()
+        if not emp:
+            # Fallback: create employee profile record if not yet initialized
+            emp = EmployeeMaster(
+                employee_id=employee_id,
+                employee_name=current_user.name or "Corporate Employee",
+                email=current_user.email,
+                business_unit="Global Technology",
+                department="Software Engineering",
+                designation="Senior Engineer",
+                location="Bengaluru",
+                manager_id="MGR-5001",
+                effective_start_date="2026-01-01",
+                effective_end_date="9999-12-31",
+                quarterly_allowance_inr=150000.0,
+                is_current=1
+            )
+            session.add(emp)
+            session.commit()
+            
+        tickets = session.query(FactTravelTicket).filter_by(employee_id=employee_id).order_by(FactTravelTicket.ticket_id.desc()).all()
+        flown_tickets = [t for t in tickets if t.travelled_flag == 'Y']
+        cancelled_tickets = [t for t in tickets if t.travelled_flag == 'N']
+        total_spent = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
         
-    tickets = session.query(FactTravelTicket).filter_by(employee_id=employee_id).order_by(FactTravelTicket.ticket_id.desc()).all()
-    flown_tickets = [t for t in tickets if t.travelled_flag == 'Y']
-    cancelled_tickets = [t for t in tickets if t.travelled_flag == 'N']
-    total_spent = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
-    
-    allowance = float(emp.quarterly_allowance_inr or 150000.0)
-    remaining = max(0.0, allowance - total_spent)
-    burn_pct = min(100.0, round((total_spent / allowance) * 100, 1)) if allowance > 0 else 0.0
-    
-    summary_text = (
-        f"{emp.employee_name} serves as {emp.designation} in the {emp.department} department "
-        f"under the {emp.business_unit} division based out of {emp.location}. "
-        f"To date, {emp.employee_name.split()[0]} has recorded a total of {len(tickets)} travel bookings "
-        f"({len(flown_tickets)} flown trips and {len(cancelled_tickets)} cancelled/refunded bookings), "
-        f"accumulating ₹{total_spent:,.2f} INR in total travel expenditure."
-    )
-    
-    ticket_details = [
-        {
-            "ticket_id": t.ticket_id,
-            "trip_id": t.trip_id,
-            "issue_date": t.issue_date,
-            "travel_date": t.travel_date,
-            "origin": f"{t.origin_city}, {t.origin_country}",
-            "destination": f"{t.dest_city}, {t.dest_country}",
-            "status": t.ticket_status,
-            "travelled": t.travelled_flag,
-            "classification": t.trip_classification,
-            "summary": t.travel_summary,
-            "policy_compliance_status": t.policy_compliance_status,
-            "approval_status": t.approval_status or "APPROVED",
-            "rejection_reason": t.rejection_reason or "None",
-            "amount_inr": t.amount_inr,
-            "booking_channel": t.booking_channel
+        allowance = float(emp.quarterly_allowance_inr or 150000.0)
+        remaining = max(0.0, allowance - total_spent)
+        burn_pct = min(100.0, round((total_spent / allowance) * 100, 1)) if allowance > 0 else 0.0
+        
+        summary_text = (
+            f"{emp.employee_name} serves as {emp.designation} in the {emp.department} department "
+            f"under the {emp.business_unit} division based out of {emp.location}. "
+            f"To date, {emp.employee_name.split()[0]} has recorded a total of {len(tickets)} travel bookings "
+            f"({len(flown_tickets)} flown trips and {len(cancelled_tickets)} cancelled/refunded bookings), "
+            f"accumulating ₹{total_spent:,.2f} INR in total travel expenditure."
+        )
+        
+        ticket_details = [
+            {
+                "ticket_id": t.ticket_id,
+                "trip_id": t.trip_id,
+                "issue_date": t.issue_date,
+                "travel_date": t.travel_date,
+                "origin": f"{t.origin_city}, {t.origin_country}",
+                "destination": f"{t.dest_city}, {t.dest_country}",
+                "status": t.ticket_status,
+                "travelled": t.travelled_flag,
+                "classification": t.trip_classification,
+                "summary": t.travel_summary,
+                "policy_compliance_status": t.policy_compliance_status,
+                "approval_status": t.approval_status or "APPROVED",
+                "rejection_reason": t.rejection_reason or "None",
+                "amount_inr": t.amount_inr,
+                "booking_channel": t.booking_channel
+            }
+            for t in tickets
+        ]
+        
+        return {
+            "employee_id": emp.employee_id,
+            "employee_name": emp.employee_name,
+            "email": emp.email,
+            "business_unit": emp.business_unit,
+            "department": emp.department,
+            "designation": emp.designation,
+            "location": emp.location,
+            "manager_id": emp.manager_id,
+            "quarterly_allowance_inr": round(allowance, 2),
+            "used_allowance_inr": round(total_spent, 2),
+            "remaining_allowance_inr": round(remaining, 2),
+            "allowance_burn_pct": burn_pct,
+            "numbers": {
+                "total_bookings": len(tickets),
+                "flown_trips": len(flown_tickets),
+                "cancelled_trips": len(cancelled_tickets),
+                "total_spend_inr": round(total_spent, 2),
+                "cancellation_rate_pct": f"{round((len(cancelled_tickets)/len(tickets)*100), 1)}%" if tickets else "0%"
+            },
+            "narrative_summary": summary_text,
+            "tickets": ticket_details
         }
-        for t in tickets
-    ]
-    
-    session.close()
-    
-    return {
-        "employee_id": emp.employee_id,
-        "employee_name": emp.employee_name,
-        "email": emp.email,
-        "business_unit": emp.business_unit,
-        "department": emp.department,
-        "designation": emp.designation,
-        "location": emp.location,
-        "manager_id": emp.manager_id,
-        "quarterly_allowance_inr": round(allowance, 2),
-        "used_allowance_inr": round(total_spent, 2),
-        "remaining_allowance_inr": round(remaining, 2),
-        "allowance_burn_pct": burn_pct,
-        "numbers": {
-            "total_bookings": len(tickets),
-            "flown_trips": len(flown_tickets),
-            "cancelled_trips": len(cancelled_tickets),
-            "total_spend_inr": round(total_spent, 2),
-            "cancellation_rate_pct": f"{round((len(cancelled_tickets)/len(tickets)*100), 1)}%" if tickets else "0%"
-        },
-        "narrative_summary": summary_text,
-        "tickets": ticket_details
-    }
+    finally:
+        session.close()
 
 @app.post("/api/employees")
 def create_employee(req: CreateEmployeeRequest, current_user: User = Depends(require_role(["manager", "admin"]))):

@@ -11,7 +11,6 @@ import { Pipeline } from './pages/Pipeline';
 import { Reports } from './pages/Reports';
 import { Forecasting } from './pages/Forecasting';
 import { PowerBI } from './pages/PowerBI';
-import { Assistant } from './pages/Assistant';
 
 const MainLayout = () => {
   const { user } = useAuth();
@@ -42,8 +41,6 @@ const MainLayout = () => {
         return <Forecasting />;
       case 'powerbi':
         return <PowerBI />;
-      case 'assistant':
-        return <Assistant />;
       default:
         return <Dashboard />;
     }

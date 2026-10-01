@@ -84,8 +84,17 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-  const signup = async (email, password, name, role, employee_id) => {
-    const res = await axios.post('/api/auth/signup', { email, password, name, role, employee_id });
+  const signup = async (email, password, name, role = 'employee', employee_id = null, business_unit = 'Global Technology', department = 'Software Engineering', designation = 'Senior Engineer') => {
+    const res = await axios.post('/api/auth/signup', { 
+      email, 
+      password, 
+      name, 
+      role, 
+      employee_id,
+      business_unit,
+      department,
+      designation
+    });
     const userData = res.data;
     if (userData.access_token) {
       localStorage.setItem('access_token', userData.access_token);

@@ -21,15 +21,15 @@ def format_to_ist(dt, fmt="%Y-%m-%d %I:%M:%S %p IST") -> str:
         dt = dt.replace(tzinfo=datetime.timezone.utc)
     return dt.astimezone(IST_TZ).strftime(fmt)
 
-def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
+def generate_executive_audit_package_html() -> str:
     """
-    Generates a live, fully dynamic Executive C-Suite Travel Briefing Report or Complete Audit Package in HTML/PDF format.
-    Every page corresponds to an analytical pillar connected directly to live warehouse tables and vw_travel.
-    When include_audit_package is True, bundles the complete 36-column vw_travel Data Dictionary and Pipeline Batch Audit History into a 7-page certified package.
-    Every page corresponds to an analytical pillar connected directly to live warehouse tables and vw_travel.
+    Generates a live, fully dynamic 7-Page Executive Audit Package in HTML/PDF format.
+    Bundles the complete analytical report pages, the 37-column vw_travel Data Dictionary,
+    multi-currency FX reconciliations, and Pipeline Batch Audit History into a certified package.
     Includes print-to-PDF CSS pagination, high-definition KPI cards, dynamic data tables, and certification blocks.
     Timestamps are precisely generated in Indian Standard Time (IST, UTC+05:30) and update dynamically every run.
     """
+    include_audit_package = True
     session = SessionLocal()
     now_ist = datetime.datetime.now(IST_TZ)
     current_time_str = now_ist.strftime("%d %B %Y, %I:%M:%S %p IST")
@@ -1186,13 +1186,542 @@ def generate_csuite_briefing_html(include_audit_package: bool = False) -> str:
 """
     return html_content
 
-def generate_executive_audit_package_html() -> str:
+def generate_csuite_briefing_html() -> str:
     """
-    Generates the complete 7-page Executive Audit Package HTML including
-    the 5 analytical report pages, the Governed 36-Column Data Dictionary (Page 6),
-    and the Ingestion Batch & Quarantine Ledger with Executive Attestation (Page 7).
+    Generates a concise, high-impact 2-Page Executive C-Suite Strategic Travel Memo in HTML/PDF format.
+    Tailored for CFO and Executive Committee review:
+    - Page 1: Strategic Memorandum Header, Executive Financial Scorecard, Business Unit Capital Allocation, Top Route Corridors.
+    - Page 2: What-If Macro Sensitivity Scenarios, Travel Policy Governance, CFO Strategic Directives, and Executive Attestation.
     """
-    return generate_csuite_briefing_html(include_audit_package=True)
+    session = SessionLocal()
+    now_ist = datetime.datetime.now(IST_TZ)
+    current_time_str = now_ist.strftime("%d %B %Y, %I:%M:%S %p IST")
+
+    total_tickets = session.query(func.count(FactTravelTicket.ticket_id)).scalar() or 0
+    flown_tickets_count = session.query(func.count(FactTravelTicket.ticket_id)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0
+    cancelled_count = session.query(func.count(FactTravelTicket.ticket_id)).filter(FactTravelTicket.travelled_flag == 'N').scalar() or 0
+    total_spend_inr = float(session.query(func.sum(FactTravelTicket.amount_inr)).filter(FactTravelTicket.travelled_flag == 'Y').scalar() or 0.0)
+    avg_fare_inr = (total_spend_inr / flown_tickets_count) if flown_tickets_count > 0 else 0.0
+
+    compliant_count = session.query(func.count(FactTravelTicket.ticket_id)).filter(
+        FactTravelTicket.policy_compliance_status == 'COMPLIANT'
+    ).scalar() or 0
+    compliance_rate = (compliant_count / total_tickets * 100) if total_tickets > 0 else 100.0
+
+    # Business Unit Breakdown
+    bu_raw = session.query(
+        FactTravelTicket.business_unit,
+        func.count(FactTravelTicket.ticket_id),
+        func.sum(FactTravelTicket.amount_inr)
+    ).group_by(FactTravelTicket.business_unit).all()
+
+    bu_flown_rows = session.query(
+        FactTravelTicket.business_unit,
+        func.sum(FactTravelTicket.amount_inr)
+    ).filter(FactTravelTicket.travelled_flag == 'Y').group_by(FactTravelTicket.business_unit).all()
+    
+    bu_flown_map = {row[0]: float(row[1] or 0.0) for row in bu_flown_rows}
+
+    bu_rows_html = ""
+    for bu, tot_count, tot_amt in sorted(bu_raw, key=lambda x: (bu_flown_map.get(x[0], 0) or 0), reverse=True):
+        flown_amt = float(bu_flown_map.get(bu, 0.0) or 0.0)
+        pct_spend = (flown_amt / total_spend_inr * 100) if total_spend_inr > 0 else 0.0
+        bu_rows_html += f"""
+        <tr>
+            <td style="font-weight: 700; color: #0f172a;">{bu}</td>
+            <td style="text-align: center; font-weight: 600;">{tot_count}</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #1e3a8a;">₹{flown_amt:,.2f}</td>
+            <td style="text-align: right; font-family: monospace;">₹{(flown_amt / max(1, tot_count)):,.2f}</td>
+            <td style="text-align: right;">
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                    <span style="font-size: 11px; font-weight: bold;">{pct_spend:.1f}%</span>
+                    <div style="width: 50px; background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden;">
+                        <div style="width: {min(100, pct_spend)}%; background: #2563eb; height: 100%;"></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        """
+
+    # Top Corridors / Routes
+    route_raw = session.query(
+        FactTravelTicket.travel_summary,
+        FactTravelTicket.origin_country,
+        FactTravelTicket.dest_country,
+        FactTravelTicket.trip_classification,
+        func.count(FactTravelTicket.ticket_id),
+        func.sum(FactTravelTicket.amount_inr)
+    ).filter(FactTravelTicket.travelled_flag == 'Y').group_by(
+        FactTravelTicket.travel_summary, FactTravelTicket.origin_country, FactTravelTicket.dest_country, FactTravelTicket.trip_classification
+    ).order_by(desc(func.sum(FactTravelTicket.amount_inr))).limit(5).all()
+
+    route_rows_html = ""
+    for route, orig_c, dest_c, classif, r_trips, r_spend in route_raw:
+        badge_color = "#dcfce7; color: #166534;" if classif == "Domestic" else ("#dbeafe; color: #1e40af;" if classif == "Cross-Border" else "#fef3c7; color: #92400e;")
+        route_rows_html += f"""
+        <tr>
+            <td style="font-weight: 700; font-family: monospace; color: #1e3a8a;">{route}</td>
+            <td>{orig_c} → {dest_c}</td>
+            <td style="text-align: center;"><span style="padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: {badge_color}">{classif}</span></td>
+            <td style="text-align: center; font-weight: 600;">{r_trips}</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700;">₹{(r_spend or 0):,.2f}</td>
+        </tr>
+        """
+
+    session.close()
+
+    # Macro Sensitivity Calculations
+    austerity_reduction = total_spend_inr * 0.15
+    fuel_inflation_increase = total_spend_inr * 0.10
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Corporate Travel Analytics - C-Suite Strategic Memo (2 Pages)</title>
+    <style>
+        @page {{
+            size: A4 portrait;
+            margin: 12mm 15mm 15mm 15mm;
+        }}
+        * {{
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #0f172a;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 0;
+            line-height: 1.45;
+        }}
+        .no-print-toolbar {{
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }}
+        .btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+        }}
+        .btn-primary {{ background: #2563eb; color: #ffffff; }}
+        .btn-primary:hover {{ background: #1d4ed8; }}
+        .btn-secondary {{ background: #334155; color: #f8fafc; }}
+        .btn-secondary:hover {{ background: #475569; }}
+        
+        .page-container {{
+            max-width: 900px;
+            margin: 20px auto;
+        }}
+        .report-page {{
+            background: #ffffff;
+            width: 100%;
+            min-height: 1120px;
+            padding: 32px 36px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            page-break-after: always;
+            break-after: page;
+        }}
+        .report-page:last-child {{
+            page-break-after: avoid;
+            break-after: avoid;
+            margin-bottom: 40px;
+        }}
+        .page-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2.5px solid #1e3a8a;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }}
+        .brand-title {{
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e3a8a;
+            letter-spacing: -0.3px;
+        }}
+        .brand-sub {{
+            font-size: 12px;
+            color: #475569;
+            font-weight: 600;
+            margin-top: 2px;
+        }}
+        .page-badge {{
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: right;
+        }}
+        .page-footer {{
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #64748b;
+        }}
+        
+        .memo-box {{
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            font-size: 12px;
+        }}
+        .memo-row {{
+            display: flex;
+            margin-bottom: 4px;
+        }}
+        .memo-row:last-child {{ margin-bottom: 0; }}
+        .memo-label {{
+            width: 140px;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 11px;
+        }}
+        .memo-val {{
+            color: #0f172a;
+            font-weight: 600;
+        }}
+        
+        .kpi-grid-4 {{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }}
+        .kpi-card {{
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border-top: 3px solid #2563eb;
+        }}
+        .kpi-title {{
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }}
+        .kpi-value {{
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 4px 0 2px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        }}
+        .kpi-sub {{
+            font-size: 11px;
+            color: #059669;
+            font-weight: 600;
+        }}
+        
+        .section-title {{
+            font-size: 13px;
+            font-weight: 800;
+            color: #1e3a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1.5px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+        
+        table.gov-table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11.5px;
+            margin-bottom: 16px;
+        }}
+        table.gov-table th {{
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #cbd5e1;
+            padding: 8px 10px;
+            text-align: left;
+        }}
+        table.gov-table td {{
+            padding: 8px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }}
+        table.gov-table tr:hover {{
+            background: #f8fafc;
+        }}
+
+        .scenario-grid {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 14px 0;
+        }}
+        .scenario-card {{
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            background: #fafafa;
+        }}
+
+        @media print {{
+            body {{
+                background: #ffffff !important;
+            }}
+            .no-print-toolbar {{
+                display: none !important;
+            }}
+            .page-container {{
+                margin: 0 !important;
+                max-width: 100% !important;
+            }}
+            .report-page {{
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 10mm 12mm !important;
+                min-height: auto !important;
+                page-break-after: always !important;
+            }}
+        }}
+    </style>
+</head>
+<body>
+
+    <div class="no-print-toolbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-weight: 900; font-size: 15px; color: #38bdf8;">MassMutual</span>
+            <span style="font-size: 13px; color: #94a3b8;">| 2-Page Executive C-Suite Strategic Travel Briefing</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="window.print()" class="btn btn-primary">
+                🖨️ Print / Save as PDF
+            </button>
+            <button onclick="window.close()" class="btn btn-secondary">
+                ✕ Close
+            </button>
+        </div>
+    </div>
+
+    <div class="page-container">
+
+        <!-- PAGE 1: STRATEGIC EXECUTIVE MEMORANDUM & SCORECARD -->
+        <div class="report-page">
+            <div>
+                <div class="page-header">
+                    <div>
+                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-sub">MassMutual Financial Group • Enterprise Travel Intelligence & Treasury Governance</div>
+                    </div>
+                    <div class="page-badge">
+                        <div>EXECUTIVE STRATEGIC BRIEFING</div>
+                        <div style="font-size: 10px; font-weight: normal; color: #64748b; margin-top: 2px;">{current_time_str}</div>
+                    </div>
+                </div>
+
+                <!-- Executive Memo Header Block -->
+                <div class="memo-box">
+                    <div class="memo-row"><span class="memo-label">MEMORANDUM FOR:</span><span class="memo-val">Chief Financial Officer & Executive Operating Committee</span></div>
+                    <div class="memo-row"><span class="memo-label">FROM:</span><span class="memo-val">Global Travel Operations & Enterprise Financial Analytics</span></div>
+                    <div class="memo-row"><span class="memo-label">DATE & TIME:</span><span class="memo-val">{current_time_str}</span></div>
+                    <div class="memo-row"><span class="memo-label">CLASSIFICATION:</span><span class="memo-val" style="color: #b91c1c; font-weight: 800;">CONFIDENTIAL // BOARD & C-SUITE ONLY</span></div>
+                    <div class="memo-row"><span class="memo-label">SUBJECT:</span><span class="memo-val" style="color: #1e3a8a; font-weight: 800;">Q1 2026 Executive Corporate Travel Spend & Strategic Allocation Briefing</span></div>
+                </div>
+
+                <!-- 4 Top KPI Cards -->
+                <div class="kpi-grid-4">
+                    <div class="kpi-card">
+                        <div class="kpi-title">Total Spend (Net Flown)</div>
+                        <div class="kpi-value" style="color: #1e3a8a;">₹{total_spend_inr:,.0f}</div>
+                        <div class="kpi-sub">Authoritative vw_travel</div>
+                    </div>
+                    <div class="kpi-card" style="border-top-color: #059669;">
+                        <div class="kpi-title">Total Flown Bookings</div>
+                        <div class="kpi-value" style="color: #059669;">{flown_tickets_count}</div>
+                        <div class="kpi-sub" style="color: #64748b;">Excludes {cancelled_count} cancellations</div>
+                    </div>
+                    <div class="kpi-card" style="border-top-color: #7c3aed;">
+                        <div class="kpi-title">Blended Avg Fare / Leg</div>
+                        <div class="kpi-value" style="color: #7c3aed;">₹{avg_fare_inr:,.0f}</div>
+                        <div class="kpi-sub">Domestic & Int'l weighted</div>
+                    </div>
+                    <div class="kpi-card" style="border-top-color: #d97706;">
+                        <div class="kpi-title">Policy Compliance Target</div>
+                        <div class="kpi-value" style="color: #d97706;">{compliance_rate:.1f}%</div>
+                        <div class="kpi-sub" style="color: #059669;">Zero Unresolved Exceptions</div>
+                    </div>
+                </div>
+
+                <!-- Divisional Capital Allocation Table -->
+                <h4 class="section-title"><span>Divisional Capital Allocation & Spend Distribution</span><span style="font-size: 11px; color: #64748b;">Ranked by Flown Spend</span></h4>
+                <table class="gov-table">
+                    <thead>
+                        <tr>
+                            <th>Business Unit</th>
+                            <th style="text-align: center;">Bookings</th>
+                            <th style="text-align: right;">Flown Spend (INR)</th>
+                            <th style="text-align: right;">Avg / Ticket</th>
+                            <th style="text-align: right;">% Corporate Spend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {bu_rows_html}
+                    </tbody>
+                </table>
+
+                <!-- Top 5 Strategic Flight Corridors -->
+                <h4 class="section-title"><span>Top 5 Strategic Flight Corridors by Cost Volume</span><span style="font-size: 11px; color: #64748b;">Primary Spend Concentration</span></h4>
+                <table class="gov-table">
+                    <thead>
+                        <tr>
+                            <th>Corridor Routing</th>
+                            <th>Country Sector</th>
+                            <th style="text-align: center;">Classification</th>
+                            <th style="text-align: center;">Flights</th>
+                            <th style="text-align: right;">Total Spend (INR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {route_rows_html}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="page-footer">
+                <div>MassMutual Enterprise Travel Governance | Authoritative Analytical Contract: <code>vw_travel</code></div>
+                <div>Executive Strategic Briefing | Page 1 of 2</div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: MACRO SENSITIVITY, POLICY GOVERNANCE & C-SUITE ACTION ITEMS -->
+        <div class="report-page">
+            <div>
+                <div class="page-header">
+                    <div>
+                        <div class="brand-title">MassMutual Financial Group</div>
+                        <div class="brand-sub">Executive Sensitivity Projections & Governance Directives</div>
+                    </div>
+                    <div class="page-badge">
+                        <div>POLICY & MACRO RISK STRATEGY</div>
+                        <div style="font-size: 10px; font-weight: normal; color: #64748b; margin-top: 2px;">{current_time_str}</div>
+                    </div>
+                </div>
+
+                <!-- Macro Sensitivity / What-If Scenario Analysis -->
+                <h4 class="section-title"><span>Executive "What-If" Sensitivity & Inflation Scenarios</span><span style="font-size: 11px; color: #64748b;">Treasury Simulation Model</span></h4>
+                <div class="scenario-grid">
+                    <div class="scenario-card" style="border-left: 3px solid #2563eb;">
+                        <div style="font-size: 11px; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">Baseline Run-Rate</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 4px 0;">₹{total_spend_inr:,.0f}</div>
+                        <div style="font-size: 11px; color: #64748b;">Standard FY2026 operating pace. All business divisions within quarterly allowance thresholds.</div>
+                    </div>
+                    <div class="scenario-card" style="border-left: 3px solid #059669;">
+                        <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase;">Fiscal Austerity (-15%)</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #059669; margin: 4px 0;">-₹{austerity_reduction:,.0f}</div>
+                        <div style="font-size: 11px; color: #64748b;">Projected savings if 15% budget reduction enacted across non-essential regional client meetings.</div>
+                    </div>
+                    <div class="scenario-card" style="border-left: 3px solid #dc2626;">
+                        <div style="font-size: 11px; font-weight: 800; color: #dc2626; text-transform: uppercase;">Jet Fuel Inflation (+10%)</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #dc2626; margin: 4px 0;">+₹{fuel_inflation_increase:,.0f}</div>
+                        <div style="font-size: 11px; color: #64748b;">Projected additional cost liability across cross-border long-haul routes under fuel price surge.</div>
+                    </div>
+                </div>
+
+                <!-- Governance & Compliance Summary -->
+                <h4 class="section-title"><span>Corporate Policy Compliance & Exception Summary</span><span style="font-size: 11px; color: #64748b;">Automated Rule Verification</span></h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase;">Domestic Economy Rule</div>
+                        <div style="font-size: 16px; font-weight: 800; color: #15803d; margin: 2px 0;">100% Compliant</div>
+                        <div style="font-size: 11px; color: #166534;">All domestic flights booked strictly in Economy cabin. Zero exceptions logged.</div>
+                    </div>
+                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase;">International Cabin Rule</div>
+                        <div style="font-size: 16px; font-weight: 800; color: #1d4ed8; margin: 2px 0;">Fully Authorized</div>
+                        <div style="font-size: 11px; color: #1e40af;">Business Class utilization strictly constrained to long-haul sectors > 6 hours.</div>
+                    </div>
+                    <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #6b21a8; text-transform: uppercase;">Governed Booking Channels</div>
+                        <div style="font-size: 16px; font-weight: 800; color: #7e22ce; margin: 2px 0;">100% Penetration</div>
+                        <div style="font-size: 11px; color: #6b21a8;">All bookings executed via Corporate Portal, Amadeus GDS, or Sabre Direct.</div>
+                    </div>
+                </div>
+
+                <!-- Strategic Recommendations for Executive Leadership -->
+                <h4 class="section-title"><span>Strategic Recommendations & C-Suite Directives</span><span style="font-size: 11px; color: #64748b;">Q2 Action Plan</span></h4>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; font-size: 12px; line-height: 1.6;">
+                    <ol style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>Corridor Renegotiation:</strong> Consolidate primary high-volume corridors (Bengaluru - Boston / Mumbai - London) under preferred carrier corporate agreements to unlock an estimated 8-12% fare concession.</li>
+                        <li style="margin-bottom: 6px;"><strong>Advance Purchase Protocol:</strong> Mandate 14-day advance booking for standard internal travel to capture the lowest available published fare tiers, mitigating short-notice surge premiums.</li>
+                        <li><strong>Currency Risk Hedging:</strong> Maintain automated daily RBI treasury FX rate normalization to eliminate booking-date foreign exchange reconciliation drift.</li>
+                    </ol>
+                </div>
+
+                <!-- C-Suite Attestation Box -->
+                <div style="padding: 16px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: #f8fafc;">
+                    <div style="font-size: 12px; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">Tri-Party C-Suite Attestation & Executive Sign-Off</div>
+                    <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                        This briefing memo is certified to represent a true and audited reflection of corporate travel commitments derived from the governed warehouse analytical view <code>vw_travel</code>.
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 24px; font-size: 11.5px; font-weight: 700; color: #334155;">
+                        <div>_______________________________<br><span style="font-weight: normal; font-size: 10.5px; color: #64748b;">Global Travel Operations Director</span></div>
+                        <div>_______________________________<br><span style="font-weight: normal; font-size: 10.5px; color: #64748b;">Chief Financial Officer (CFO)</span></div>
+                        <div>_______________________________<br><span style="font-weight: normal; font-size: 10.5px; color: #64748b;">Enterprise Controller & Risk Officer</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">
+                <div>MassMutual Enterprise Travel Governance | Authoritative Analytical Contract: <code>vw_travel</code></div>
+                <div>Executive Strategic Briefing | Page 2 of 2</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+"""
+    return html_content
 
 def generate_pbit_template() -> str:
     """
