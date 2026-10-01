@@ -196,10 +196,30 @@ export const LoginModal = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? 'Authenticating Manager...' : 'Sign In as Manager'}
               </button>
+
+              <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 text-xs">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-indigo-700 dark:text-indigo-300 text-[11px]">Demo Manager Credentials</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setManagerEmail('manager@travelintelligence.com');
+                      setManagerPassword('Manager123!');
+                      login('manager@travelintelligence.com', 'Manager123!');
+                    }}
+                    className="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-[10px] font-bold shadow-sm transition-all cursor-pointer"
+                  >
+                    ⚡ Quick Demo Login
+                  </button>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">manager@travelintelligence.com</span> / <span className="font-semibold text-slate-700 dark:text-slate-300">Manager123!</span>
+                </p>
+              </div>
             </form>
           )}
 
@@ -241,10 +261,30 @@ export const LoginModal = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? 'Authenticating Employee...' : 'Sign In as Employee'}
               </button>
+
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-emerald-700 dark:text-emerald-300 text-[11px]">Demo Employee (Priya Nair)</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmployeeEmail('priya.nair@travelintelligence.com');
+                      setEmployeePassword('Employee123!');
+                      login('priya.nair@travelintelligence.com', 'Employee123!');
+                    }}
+                    className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-sm transition-all cursor-pointer"
+                  >
+                    ⚡ Quick Demo Login
+                  </button>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">priya.nair@travelintelligence.com</span> / <span className="font-semibold text-slate-700 dark:text-slate-300">Employee123!</span>
+                </p>
+              </div>
 
               {/* Or Divider */}
               <div className="relative my-3 flex items-center justify-center">

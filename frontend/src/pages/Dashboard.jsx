@@ -61,8 +61,45 @@ export const Dashboard = () => {
     });
   };
 
-  if (loading && !rawData) return <div className="p-8 text-center text-slate-500">Loading Dynamic Command Center...</div>;
-  if (!rawData) return null;
+  if (loading && !rawData) {
+    return (
+      <div className="p-12 text-center">
+        <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p className="text-xs text-slate-500 font-medium">Loading Governed Executive Analytics...</p>
+      </div>
+    );
+  }
+
+  if (!rawData) {
+    return (
+      <div className="p-8 max-w-lg mx-auto mt-12 text-center bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700">
+        <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mx-auto mb-4">
+          <Clock className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-bold text-slate-800 dark:text-white mb-2">Session Expired or Server Reconnected</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
+          Your credentials require re-authentication. Click below to reconnect your session.
+        </p>
+        <div className="flex justify-center gap-3">
+          <button
+            onClick={() => fetchDashboard(quarterFilter, buFilter)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+          >
+            Retry Connection
+          </button>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition-all"
+          >
+            Log In Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Real Database-Driven Metrics
   const spendInr = rawData.kpis.total_spend_inr || 0;

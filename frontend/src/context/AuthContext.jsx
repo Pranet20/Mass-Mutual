@@ -14,9 +14,35 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  // Set up global Axios interceptor for JWT Bearer token propagation
+  // Validate session against /api/auth/me on initial app load
   useEffect(() => {
-    const interceptor = axios.interceptors.request.use((config) => {
+    const activeToken = localStorage.getItem('access_token') || localStorage.getItem('token');
+    if (activeToken) {
+      axios.get('/api/auth/me', {
+        headers: { Authorization: `Bearer ${activeToken}` }
+      })
+      .then((res) => {
+        setUser((prev) => ({
+          ...(prev || {}),
+          ...res.data,
+          access_token: activeToken
+        }));
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          console.warn('Session expired or invalid, clearing stale credentials.');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        }
+      });
+    }
+  }, []);
+
+  // Set up global Axios interceptors for JWT Bearer token propagation and 401 auto-logout
+  useEffect(() => {
+    const reqInterceptor = axios.interceptors.request.use((config) => {
       const activeToken = user?.access_token || localStorage.getItem('access_token') || localStorage.getItem('token');
       if (activeToken) {
         config.headers.Authorization = `Bearer ${activeToken}`;
@@ -26,8 +52,23 @@ export const AuthProvider = ({ children }) => {
       return Promise.reject(error);
     });
 
+    const resInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          // Stale, expired, or invalid JWT detected: purge storage and show LoginModal
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        }
+        return Promise.reject(error);
+      }
+    );
+
     return () => {
-      axios.interceptors.request.eject(interceptor);
+      axios.interceptors.request.eject(reqInterceptor);
+      axios.interceptors.response.eject(resInterceptor);
     };
   }, [user]);
 
