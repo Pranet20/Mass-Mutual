@@ -439,6 +439,154 @@ def test_37_manual_override_audit_synchronization():
         session.close()
 
 
+def test_38_powerbi_source_contract_vw_travel_schema():
+    from database.models import SessionLocal
+    from sqlalchemy import text
+    session = SessionLocal()
+    try:
+        row = session.execute(text("SELECT * FROM vw_travel LIMIT 1")).mappings().first()
+        assert row is not None
+        required_cols = [
+            "ticket_id", "trip_id", "batch_id", "employee_id", "employee_name",
+            "business_group", "business_unit", "department", "issue_date", "travel_date",
+            "return_date", "origin_city", "origin_country", "dest_city", "dest_country",
+            "origin_iso", "dest_iso", "ticket_status", "amount_original", "currency",
+            "fx_rate", "amount_inr", "fx_rate_date", "fx_source", "booking_channel",
+            "cabin_class", "travelled_flag", "trip_classification", "travel_summary",
+            "policy_compliance_status", "policy_violation_reason", "approval_status",
+            "rejection_reason", "override_applied", "record_hash", "source_file", "updated_at"
+        ]
+        for col in required_cols:
+            assert col in row, f"Missing required column in vw_travel: {col}"
+        assert len(row.keys()) == 37, f"Expected exactly 37 columns in vw_travel, got {len(row.keys())}"
+    finally:
+        session.close()
 
 
+def test_39_powerbi_trips_by_month_aggregation():
+    from database.models import SessionLocal
+    from sqlalchemy import text
+    session = SessionLocal()
+    try:
+        query = text("""
+            SELECT substr(travel_date, 1, 7) as yr_month, COUNT(DISTINCT trip_id) as distinct_trips
+            FROM vw_travel
+            GROUP BY yr_month
+            ORDER BY yr_month
+        """)
+        results = session.execute(query).fetchall()
+        assert len(results) > 0, "No monthly trips returned"
+        for yr_month, distinct_trips in results:
+            assert yr_month is not None and len(yr_month) == 7
+            assert distinct_trips > 0
+    finally:
+        session.close()
 
+
+def test_40_powerbi_trips_by_business_group_aggregation():
+    from database.models import SessionLocal
+    from sqlalchemy import text
+    session = SessionLocal()
+    try:
+        query = text("""
+            SELECT business_group, COUNT(DISTINCT trip_id) as distinct_trips
+            FROM vw_travel
+            GROUP BY business_group
+            ORDER BY distinct_trips DESC
+        """)
+        results = session.execute(query).fetchall()
+        assert len(results) > 0, "No business group trips returned"
+        bg_names = [r[0] for r in results if r[0] is not None]
+        assert "Global Technology" in bg_names
+        assert "Finance & Actuarial" in bg_names
+    finally:
+        session.close()
+
+
+def test_41_powerbi_trips_by_travel_summary_aggregation():
+    from database.models import SessionLocal
+    from sqlalchemy import text
+    session = SessionLocal()
+    try:
+        query = text("""
+            SELECT travel_summary, COUNT(DISTINCT trip_id) as distinct_trips
+            FROM vw_travel
+            GROUP BY travel_summary
+            ORDER BY distinct_trips DESC
+        """)
+        results = session.execute(query).fetchall()
+        assert len(results) > 0, "No travel summary trips returned"
+        summaries = [r[0] for r in results if r[0] is not None]
+        assert any("Domestic India" in s for s in summaries)
+        assert any("Cross-Border" in s for s in summaries)
+    finally:
+        session.close()
+
+
+def test_42_pbix_package_and_pbir_visual_structure():
+    import zipfile
+    import json
+    pbix_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "powerbi", "Corporate_Travel_Analytics.pbix"))
+    assert os.path.exists(pbix_path), f"PBIX file not found at: {pbix_path}"
+    with zipfile.ZipFile(pbix_path, 'r') as z:
+        names = z.namelist()
+        
+        # 1. Report structure & 5 pages
+        assert "Report/definition/pages/pages.json" in names
+        pages_meta = json.loads(z.read("Report/definition/pages/pages.json").decode("utf-8"))
+        assert len(pages_meta.get("pageOrder", [])) == 5
+
+        # 2. Non-Negotiable Visual A: Trips by Month on Page 1
+        p1_trips_month = "Report/definition/pages/6c3859e92bb7e22182f0/visuals/chartTripsByMonth/visual.json"
+        assert p1_trips_month in names, "chartTripsByMonth visual missing in PBIX Page 1"
+        v1 = json.loads(z.read(p1_trips_month).decode("utf-8"))
+        assert v1["visual"]["visualType"] == "clusteredColumnChart"
+        assert v1["name"] == "chartTripsByMonth"
+
+        # 3. Non-Negotiable Visual C: Trips by Travel Summary on Page 2
+        p2_trips_summary = "Report/definition/pages/page_travel_analytics/visuals/chartTripsByTravelSummary/visual.json"
+        assert p2_trips_summary in names, "chartTripsByTravelSummary visual missing in PBIX Page 2"
+        v2 = json.loads(z.read(p2_trips_summary).decode("utf-8"))
+        assert v2["visual"]["visualType"] == "clusteredColumnChart"
+        assert v2["name"] == "chartTripsByTravelSummary"
+
+        # 4. Non-Negotiable Visual B: Trips by Business Group on Page 3
+        p3_trips_bg = "Report/definition/pages/page_business_groups/visuals/chartTripsByBusinessGroup/visual.json"
+        assert p3_trips_bg in names, "chartTripsByBusinessGroup visual missing in PBIX Page 3"
+        v3 = json.loads(z.read(p3_trips_bg).decode("utf-8"))
+        assert v3["visual"]["visualType"] == "clusteredColumnChart"
+        assert v3["name"] == "chartTripsByBusinessGroup"
+
+        # 5. Slicers: Business Group slicer on Page 3
+        p3_slicer_bg = "Report/definition/pages/page_business_groups/visuals/slicerBusinessGroup/visual.json"
+        assert p3_slicer_bg in names, "slicerBusinessGroup visual missing in PBIX Page 3"
+
+
+def test_43_powerbi_dax_and_data_model_artifacts():
+    powerbi_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "powerbi"))
+    
+    # 1. Measures.dax
+    dax_path = os.path.join(powerbi_dir, "Measures.dax")
+    assert os.path.exists(dax_path)
+    with open(dax_path, "r", encoding="utf-8") as f:
+        dax_text = f.read()
+    assert "Trips by Month" in dax_text
+    assert "Trips by Business Group" in dax_text
+    assert "Trips by Travel Summary" in dax_text
+    assert "Total Trips" in dax_text
+
+    # 2. PowerQuery.m
+    m_path = os.path.join(powerbi_dir, "PowerQuery.m")
+    assert os.path.exists(m_path)
+    with open(m_path, "r", encoding="utf-8") as f:
+        m_text = f.read()
+    assert "business_group" in m_text
+    assert "37 Governed Attributes" in m_text
+
+    # 3. DataModel.md
+    dm_path = os.path.join(powerbi_dir, "DataModel.md")
+    assert os.path.exists(dm_path)
+    with open(dm_path, "r", encoding="utf-8") as f:
+        dm_text = f.read()
+    assert "37 Governed Attributes" in dm_text
+    assert "business_group" in dm_text

@@ -126,27 +126,37 @@ export const PowerBI = () => {
       currMap[c] = (currMap[c] || 0) + (r.amount_inr || 0);
     });
     if (Object.keys(currMap).length === 0) {
-      return [
-        { name: 'INR', value: 12500000 },
-        { name: 'USD', value: 4200000 },
-        { name: 'EUR', value: 2800000 },
-        { name: 'GBP', value: 2100000 },
-        { name: 'SGD', value: 1100000 },
-        { name: 'CAD', value: 650000 }
-      ];
+      return [];
     }
     return Object.entries(currMap).map(([name, value]) => ({ name, value: Math.round(value) }));
   }, [flownFiltered]);
 
-  // Approved Treasury FX Rates Data for Bar Chart
-  const fxRatesChartData = [
-    { currency: 'GBP', rate: 108.00, label: '£1 = ₹108.00' },
-    { currency: 'EUR', rate: 92.00, label: '€1 = ₹92.00' },
-    { currency: 'USD', rate: 85.00, label: '$1 = ₹85.00' },
-    { currency: 'SGD', rate: 63.50, label: 'S$1 = ₹63.50' },
-    { currency: 'CAD', rate: 62.00, label: 'C$1 = ₹62.00' },
-    { currency: 'AED', rate: 23.15, label: 'AED 1 = ₹23.15' }
-  ];
+  // Approved Treasury FX Rates Data for Bar Chart (derived from governed feed records)
+  const fxRatesChartData = React.useMemo(() => {
+    const rateMap = {};
+    feedRecords.forEach(r => {
+      if (r.currency && r.currency !== 'INR' && r.fx_rate) {
+        if (!rateMap[r.currency]) {
+          rateMap[r.currency] = Number(r.fx_rate);
+        }
+      }
+    });
+    if (Object.keys(rateMap).length > 0) {
+      return Object.entries(rateMap).map(([currency, rate]) => ({
+        currency,
+        rate,
+        label: `${currency} = ₹${rate.toFixed(2)}`
+      }));
+    }
+    return [
+      { currency: 'GBP', rate: 108.00, label: '£1 = ₹108.00' },
+      { currency: 'EUR', rate: 92.00, label: '€1 = ₹92.00' },
+      { currency: 'USD', rate: 85.00, label: '$1 = ₹85.00' },
+      { currency: 'SGD', rate: 63.50, label: 'S$1 = ₹63.50' },
+      { currency: 'CAD', rate: 62.00, label: 'C$1 = ₹62.00' },
+      { currency: 'AED', rate: 23.15, label: 'AED 1 = ₹23.15' }
+    ];
+  }, [feedRecords]);
 
   // FX Transactions Ledger
   const fxLedgerData = React.useMemo(() => {

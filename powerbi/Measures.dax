@@ -2,38 +2,32 @@
    Corporate Travel Analytics — Production DAX Measure Library
    Governed Source: vw_travel
    Base Currency: INR
+   Client: MassMutual Financial Group (PS-04 Specification)
    ========================================================================= */
 
-// 1. Total Gross Booking Spend (All Bookings)
+// -------------------------------------------------------------------------
+// 1. Core Financial Spend Measures
+// -------------------------------------------------------------------------
+
+// 1.1 Total Gross Booking Spend (All Ingested Records)
+Total Spend = 
+SUM(vw_travel[amount_inr])
+
 Total Spend INR = 
 SUM(vw_travel[amount_inr])
 
-// 2. Total Net Realized Travel Spend (Only Completed / Travelled Tickets)
+// 1.2 Total Net Realized Travel Spend (Only Flown / Travelled Tickets)
 Total Completed Spend INR = 
 CALCULATE(
     SUM(vw_travel[amount_inr]),
     vw_travel[travelled_flag] = "Y"
 )
 
-// 3. Total Tickets Count
-Total Tickets = 
-COUNTROWS(vw_travel)
+// 1.3 Spend by Business Group (INR)
+Spend by Business Group = 
+SUM(vw_travel[amount_inr])
 
-// 4. Completed Travel Tickets Count
-Completed Travel Tickets = 
-CALCULATE(
-    COUNTROWS(vw_travel),
-    vw_travel[travelled_flag] = "Y"
-)
-
-// 5. Cancelled or Refunded Tickets Count
-Cancelled or Refunded Tickets = 
-CALCULATE(
-    COUNTROWS(vw_travel),
-    vw_travel[travelled_flag] = "N"
-)
-
-// 6. Cross-Border Travel Spend (INR)
+// 1.4 Cross-Border Travel Spend (INR)
 Cross-Border Spend INR = 
 CALCULATE(
     SUM(vw_travel[amount_inr]),
@@ -41,7 +35,23 @@ CALCULATE(
     vw_travel[travelled_flag] = "Y"
 )
 
-// 7. Cross-Border Spend Percentage of Completed Spend
+// 1.5 Domestic Travel Spend (INR)
+Domestic Spend INR = 
+CALCULATE(
+    SUM(vw_travel[amount_inr]),
+    vw_travel[trip_classification] = "Domestic",
+    vw_travel[travelled_flag] = "Y"
+)
+
+// 1.6 Multi-Country Travel Spend (INR)
+Multi-Country Spend INR = 
+CALCULATE(
+    SUM(vw_travel[amount_inr]),
+    vw_travel[trip_classification] = "Multi-Country",
+    vw_travel[travelled_flag] = "Y"
+)
+
+// 1.7 Cross-Border Spend Percentage of Completed Spend
 Cross-Border Spend % = 
 DIVIDE(
     [Cross-Border Spend INR],
@@ -49,29 +59,118 @@ DIVIDE(
     0
 )
 
-// 8. Policy Flagged Tickets Count (Exceptions / Violations)
-Flagged Tickets Count = 
+
+// -------------------------------------------------------------------------
+// 2. Core Volume & Distinct Trip Measures (PS-04 Trip Grain)
+// -------------------------------------------------------------------------
+
+// 2.1 Total Distinct Trips (Primary PS-04 Trip Metric)
+Total Trips = 
+DISTINCTCOUNT(vw_travel[trip_id])
+
+// 2.2 Total Flown / Travelled Trips
+Travelled Trips = 
 CALCULATE(
-    COUNTROWS(vw_travel),
-    vw_travel[policy_compliance_status] <> "COMPLIANT"
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[travelled_flag] = "Y"
 )
 
-// 9. Policy Violation Rate Percentage
-Policy Violation Rate % = 
+// 2.3 Cancelled or Non-Travelled Trips
+Non-Travelled Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[travelled_flag] = "N"
+)
+
+// 2.4 Total Ingested Ticket Leg Records
+Total Tickets = 
+COUNTROWS(vw_travel)
+
+// 2.5 Completed / Flown Ticket Legs Count
+Completed Travel Tickets = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[travelled_flag] = "Y"
+)
+
+// 2.6 Cancelled or Refunded Ticket Legs Count
+Cancelled or Refunded Tickets = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[travelled_flag] = "N"
+)
+
+// 2.7 Domestic Distinct Trips Count
+Domestic Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[trip_classification] = "Domestic"
+)
+
+// 2.8 Cross-Border Distinct Trips Count
+Cross-Border Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[trip_classification] = "Cross-Border"
+)
+
+// 2.9 Multi-Country Distinct Trips Count
+Multi-Country Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[trip_classification] = "Multi-Country"
+)
+
+// 2.10 Ticket Status Breakdown (Cancelled / Refunded / Exchanged)
+Cancelled Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[ticket_status] = "CANCELLED"
+)
+
+Refunded Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[ticket_status] = "REFUNDED"
+)
+
+Exchanged Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    vw_travel[ticket_status] = "EXCHANGED"
+)
+
+
+// -------------------------------------------------------------------------
+// 3. Required PS-04 Analytical Visual Measures
+// -------------------------------------------------------------------------
+
+// 3.1 Non-Negotiable Requirement A: Trips by Month
+Trips by Month = 
+DISTINCTCOUNT(vw_travel[trip_id])
+
+// 3.2 Non-Negotiable Requirement B: Trips by Business Group
+Trips by Business Group = 
+DISTINCTCOUNT(vw_travel[trip_id])
+
+// 3.3 Non-Negotiable Requirement C: Trips by Travel Summary
+Trips by Travel Summary = 
+DISTINCTCOUNT(vw_travel[trip_id])
+
+
+// -------------------------------------------------------------------------
+// 4. Efficiency, Unit Cost & Utilization Measures
+// -------------------------------------------------------------------------
+
+// 4.1 Average Spend Per Ingested Trip
+Average Trip Spend = 
 DIVIDE(
-    [Flagged Tickets Count],
-    [Total Tickets],
+    [Total Spend],
+    [Total Trips],
     0
 )
 
-// 10. Manual Overrides Count (Analyst Exceptions Applied)
-Manual Overrides Count = 
-CALCULATE(
-    COUNTROWS(vw_travel),
-    vw_travel[override_applied] = 1
-)
-
-// 11. Average Ticket Cost (INR)
+// 4.2 Average Ticket Cost (INR)
 Average Ticket Cost INR = 
 DIVIDE(
     [Total Completed Spend INR],
@@ -79,11 +178,19 @@ DIVIDE(
     0
 )
 
-// 12. Total Approved Quarterly Budget (₹1,50,000 INR baseline per corporate employee)
+// 4.3 Spend Per Realized / Travelled Trip
+Spend per Travelled Trip = 
+DIVIDE(
+    [Total Completed Spend INR],
+    [Travelled Trips],
+    0
+)
+
+// 4.4 Total Approved Quarterly Allowance Baseline (₹1,50,000 INR per employee)
 Total Quarterly Allowance INR = 
 DISTINCTCOUNT(vw_travel[employee_id]) * 150000.0
 
-// 13. Budget Utilization Percentage
+// 4.5 Budget Utilization Percentage
 Budget Utilization % = 
 DIVIDE(
     [Total Completed Spend INR],
@@ -91,7 +198,60 @@ DIVIDE(
     0
 )
 
-// 14. Quarter-over-Quarter Spend Growth % (For Import Mode with Date Table)
+
+// -------------------------------------------------------------------------
+// 5. Governance, Audit & Compliance Measures
+// -------------------------------------------------------------------------
+
+// 5.1 Manual Overrides Count
+Override Count = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[override_applied] = 1
+)
+
+Manual Overrides Count = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[override_applied] = 1
+)
+
+// 5.2 Manual Override Rate
+Override Rate = 
+DIVIDE(
+    [Override Count],
+    COUNTROWS(vw_travel),
+    0
+)
+
+// 5.3 Policy Flagged Tickets Count (Exceptions / Non-Compliant)
+Flagged Tickets Count = 
+CALCULATE(
+    COUNTROWS(vw_travel),
+    vw_travel[policy_compliance_status] <> "COMPLIANT"
+)
+
+// 5.4 Policy Compliance Rate Percentage
+Policy Compliance Rate % = 
+1 - DIVIDE(
+    [Flagged Tickets Count],
+    [Total Tickets],
+    0
+)
+
+Policy Violation Rate % = 
+DIVIDE(
+    [Flagged Tickets Count],
+    [Total Tickets],
+    0
+)
+
+
+// -------------------------------------------------------------------------
+// 6. Time Intelligence (For Import Mode with DimDate Table)
+// -------------------------------------------------------------------------
+
+// 6.1 Quarter-over-Quarter Flown Spend Growth %
 QoQ Spend Growth % = 
 VAR CurrentQtrSpend = [Total Completed Spend INR]
 VAR PriorQtrSpend = 

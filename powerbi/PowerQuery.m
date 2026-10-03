@@ -1,6 +1,7 @@
 // =========================================================================
 // Corporate Travel Analytics — Power Query (M) Script
-// Governed Entity: vw_travel (Authoritative 36-Column Schema)
+// Governed Entity: vw_travel (Authoritative 37-Column Enterprise Schema)
+// Client: MassMutual Financial Group (PS-04 Specification)
 // =========================================================================
 
 // OPTION 1: PostgreSQL DirectQuery / Import Connector
@@ -12,7 +13,7 @@ let
     public_Schema = Source{[Schema="public"]}[Data],
     vw_travel_View = public_Schema{[Name="vw_travel"]}[Data],
     
-    // 3. Enforce Strict Data Typing across all 36 Governed Attributes
+    // 3. Enforce Strict Data Typing across all 37 Governed Attributes
     #"Changed Types" = Table.TransformColumnTypes(vw_travel_View, {
         {"ticket_id", type text},
         {"trip_id", type text},
@@ -20,6 +21,7 @@ let
         {"employee_id", type text},
         {"employee_name", type text},
         {"business_unit", type text},
+        {"business_group", type text},
         {"department", type text},
         {"issue_date", type date},
         {"travel_date", type date},
@@ -56,7 +58,7 @@ in
 
 
 // -------------------------------------------------------------------------
-// OPTION 2: SQLite ODBC Connector (Development / Local Evaluation)
+// OPTION 2: SQLite ODBC Connector (Development / Local Demonstration)
 // -------------------------------------------------------------------------
 /*
 let
@@ -68,6 +70,7 @@ let
         {"employee_id", type text},
         {"employee_name", type text},
         {"business_unit", type text},
+        {"business_group", type text},
         {"department", type text},
         {"issue_date", type date},
         {"travel_date", type date},
@@ -101,4 +104,26 @@ let
     })
 in
     #"Changed Types"
+*/
+
+// -------------------------------------------------------------------------
+// OPTION 3: DimDate Dimension Generator (Power Query M)
+// -------------------------------------------------------------------------
+/*
+let
+    StartDate = #date(2026, 1, 1),
+    EndDate = #date(2026, 12, 31),
+    NumberOfDays = Duration.Days(EndDate - StartDate) + 1,
+    DateList = List.Dates(StartDate, NumberOfDays, #duration(1, 0, 0, 0)),
+    #"Date Table" = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}, null, ExtraValues.Error),
+    #"Typed Date" = Table.TransformColumnTypes(#"Date Table", {{"Date", type date}}),
+    #"Added Year" = Table.AddColumn(#"Typed Date", "Year", each Date.Year([Date]), Int64.Type),
+    #"Added Quarter" = Table.AddColumn(#"Added Year", "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+    #"Added Month Number" = Table.AddColumn(#"Added Quarter", "Month Number", each Date.Month([Date]), Int64.Type),
+    #"Added Month Name" = Table.AddColumn(#"Added Month Number", "Month Name", each Date.MonthName([Date]), type text),
+    #"Added Year Month" = Table.AddColumn(#"Added Month Name", "Year Month", each Date.ToText([Date], "yyyy-MM"), type text),
+    #"Added Month Start" = Table.AddColumn(#"Added Year Month", "Month Start", each Date.StartOfMonth([Date]), type date),
+    #"Added Year Quarter" = Table.AddColumn(#"Added Month Start", "Year Quarter", each Text.From(Date.Year([Date])) & "-Q" & Text.From(Date.QuarterOfYear([Date])), type text)
+in
+    #"Added Year Quarter"
 */

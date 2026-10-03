@@ -460,6 +460,20 @@ def get_dashboard_stats(
         for m in sorted_months
     ]
 
+    # Business Group Aggregation (Core PS-04 Reporting Dimension)
+    bg_buckets = {}
+    for t in flown_tickets:
+        bg = t.business_group or "Unknown"
+        if bg not in bg_buckets:
+            bg_buckets[bg] = {"trips": 0, "spend": 0.0}
+        bg_buckets[bg]["trips"] += 1
+        bg_buckets[bg]["spend"] += float(t.amount_inr or 0.0)
+
+    by_bg = [
+        {"business_group": bg, "trip_count": data["trips"], "total_spend_inr": round(data["spend"], 2)}
+        for bg, data in sorted(bg_buckets.items(), key=lambda x: x[1]["spend"], reverse=True)
+    ]
+
     session.close()
 
     return {
@@ -473,6 +487,7 @@ def get_dashboard_stats(
             "cancelled_refunded_trips": cancelled_count,
             "pending_approvals": pending_approvals_count
         },
+        "by_business_group": by_bg,
         "by_business_unit": by_bu,
         "by_travel_summary": by_summary,
         "monthly_trend": monthly_data

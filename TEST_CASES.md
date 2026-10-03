@@ -80,12 +80,18 @@ pytest -q
 35. `backend/tests/test_pipeline.py::test_35_powerbi_endpoints_security` **PASSED**
 36. `backend/tests/test_pipeline.py::test_36_business_group_in_vw_travel_and_fact` **PASSED**
 37. `backend/tests/test_pipeline.py::test_37_manual_override_audit_synchronization` **PASSED**
-38. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_auth_password_hashing_dynamic_salt` **PASSED**
-39. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_currency_conversion` **PASSED**
-40. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_database_governed_view_and_models` **PASSED**
-41. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_iso_date_standardization` **PASSED**
-42. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_jwt_token_generation_and_decode` **PASSED**
-43. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_quarantined_record_structure` **PASSED**
-44. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_scd_type2_temporal_enrichment` **PASSED**
+38. `backend/tests/test_pipeline.py::test_38_powerbi_source_contract_vw_travel_schema` **PASSED**
+39. `backend/tests/test_pipeline.py::test_39_powerbi_trips_by_month_aggregation` **PASSED**
+40. `backend/tests/test_pipeline.py::test_40_powerbi_trips_by_business_group_aggregation` **PASSED**
+41. `backend/tests/test_pipeline.py::test_41_powerbi_trips_by_travel_summary_aggregation` **PASSED**
+42. `backend/tests/test_pipeline.py::test_42_pbix_package_and_pbir_visual_structure` **PASSED**
+43. `backend/tests/test_pipeline.py::test_43_powerbi_dax_and_data_model_artifacts` **PASSED**
+44. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_auth_password_hashing_dynamic_salt` **PASSED**
+45. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_currency_conversion` **PASSED**
+46. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_database_governed_view_and_models` **PASSED**
+47. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_iso_date_standardization` **PASSED**
+48. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_jwt_token_generation_and_decode` **PASSED**
+49. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_quarantined_record_structure` **PASSED**
+50. `backend/tests/test_system.py::TestTravelAnalyticsSystem::test_scd_type2_temporal_enrichment` **PASSED**
 
 ```

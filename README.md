@@ -1,7 +1,7 @@
 # Corporate Travel & Expense Intelligence Platform (PS-04)
 
 [![CI Pipeline](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml)
-[![Tests: 44 Passed](https://img.shields.io/badge/Tests-44%20Passed-brightgreen)](TEST_CASES.md)
+[![Tests: 50 Passed](https://img.shields.io/badge/Tests-50%20Passed-brightgreen)](TEST_CASES.md)
 [![Verification: 20/20 Checks](https://img.shields.io/badge/Verification-20%2F20%20Checks%20Passed-brightgreen)](scripts/verify_production_readiness.py)
 [![FastAPI](https://img.shields.io/badge/FastAPI-2.1.0-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.x-61dafb.svg)](https://reactjs.org)
@@ -111,8 +111,8 @@ Run all automated unit, integration, and security tests:
 pytest -q
 ```
 ```text
-............................................                             [100%]
-44 passed in 5.12s (100% Pass Rate)
+..................................................                       [100%]
+50 passed in 4.29s (100% Pass Rate)
 ```
 
 Run the master 20-point production verification checklist:
@@ -128,20 +128,20 @@ ALL 20 PRODUCTION READINESS CHECKS CONFIRMED! READY FOR CLIENT PANEL PRESENTATIO
 
 ## 📊 Power BI & Governed BI Reporting
 
-The governed view **`vw_travel`** exposes 36 standardized attributes:
+The governed view **`vw_travel`** exposes 37 standardized attributes:
 
 - **Star Schema Data Model**: Detailed in [`powerbi/DataModel.md`](./powerbi/DataModel.md)
-- **14 Production DAX Measures**: Ready in [`powerbi/Measures.dax`](./powerbi/Measures.dax)
+- **Production DAX Measures**: Ready in [`powerbi/Measures.dax`](./powerbi/Measures.dax)
 - **Power Query M Transformation Script**: Located in [`powerbi/PowerQuery.m`](./powerbi/PowerQuery.m)
 - **Setup & DirectQuery Guide**: Located in [`powerbi/PowerBI_Setup_Guide.md`](./powerbi/PowerBI_Setup_Guide.md)
 - **Power BI Template / Report**: [`powerbi/Corporate_Travel_Analytics.pbix`](./powerbi/Corporate_Travel_Analytics.pbix)
 
-### Core Required Power BI Visuals:
-1. **Travel Volume & Spend Timeline**: Line & Clustered Column Chart (Monthly trend from `vw_travel[travel_date]`).
-2. **Spend by Business Division**: Clustered Bar Chart sorted descending by `[Total Completed Spend INR]`.
-3. **Travel Route & Country Distribution**: Donut Chart showing Domestic vs Cross-Border vs Multi-Country.
-4. **Interactive Slicers**: Travel Date Range, Business Unit, Trip Classification, and Ticket Status.
-5. **Top KPI Cards**: Total Spend (`₹1.41 Cr`), Total Flown Trips (`242`), Average Fare (`₹58.3K`), Cross-Border Share (`60.1%`).
+### Core Required Power BI Visuals (Embedded in `.pbix`):
+1. **Trips by Month** (`chartTripsByMonth` on Page 1): Distinct trips grouped chronologically by departure month.
+2. **Trips by Business Group** (`chartTripsByBusinessGroup` on Page 3): Distinct trips by corporate division (`business_group`).
+3. **Trips by Travel Summary** (`chartTripsByTravelSummary` on Page 2): Route volume distribution by travel summary.
+4. **Interactive Slicers**: Business Group, Business Unit, Trip Classification, Travel Summary, and Cabin Class.
+5. **Top KPI Cards**: Total Distinct Trips, Total Gross Spend (INR), Total Ticket Legs, Average Ticket Cost.
 
 ---
 

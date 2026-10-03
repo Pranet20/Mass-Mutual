@@ -257,7 +257,7 @@ def run_all_checks():
     except Exception as e:
         record_check(17, "FastAPI Endpoints & Security", False, str(e))
 
-    # 18. Power BI Desktop PBIX Integrity
+    # 18. Power BI Desktop PBIX Integrity & Core Visual Verification
     try:
         pbix_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.pbix"))
         assert os.path.exists(pbix_path), f"File not found: {pbix_path}"
@@ -267,7 +267,14 @@ def run_all_checks():
             pages_data = json.loads(z.read("Report/definition/pages/pages.json").decode("utf-8"))
             page_order = pages_data.get("pageOrder", [])
             assert len(page_order) == 5, f"Expected 5 pages, got {len(page_order)}"
-        record_check(18, "Power BI Desktop PBIX Integrity", True, f"Validated 5-page PBIR report format with {len(page_order)} structured reporting pages.")
+
+            # Verify the 3 Non-Negotiable PS-04 Visuals
+            assert "Report/definition/pages/6c3859e92bb7e22182f0/visuals/chartTripsByMonth/visual.json" in namelist, "PBIX Page 1 missing chartTripsByMonth visual"
+            assert "Report/definition/pages/page_travel_analytics/visuals/chartTripsByTravelSummary/visual.json" in namelist, "PBIX Page 2 missing chartTripsByTravelSummary visual"
+            assert "Report/definition/pages/page_business_groups/visuals/chartTripsByBusinessGroup/visual.json" in namelist, "PBIX Page 3 missing chartTripsByBusinessGroup visual"
+            assert "Report/definition/pages/page_business_groups/visuals/slicerBusinessGroup/visual.json" in namelist, "PBIX Page 3 missing slicerBusinessGroup visual"
+
+        record_check(18, "Power BI Desktop PBIX Integrity", True, "Validated 5-page PBIR report with Trips by Month, Trips by Business Group, and Trips by Travel Summary.")
     except Exception as e:
         record_check(18, "Power BI Desktop PBIX Integrity", False, str(e))
 
