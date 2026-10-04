@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "kpiTotalSpend",
+  "position": {
+    "x": 500,
+    "y": 40,
+    "width": 440,
+    "height": 140,
+    "z": 101
+  },
+  "visual": {
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualConfiguration/2.0.0/schema.json",
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "amount_inr"
+                }
+              },
+              "queryRef": "Sum(vw_travel.amount_inr)",
+              "displayName": "Total Spend (INR)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

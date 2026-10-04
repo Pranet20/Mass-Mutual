@@ -61,82 +61,139 @@ DIVIDE(
 
 
 // -------------------------------------------------------------------------
-// 2. Core Volume & Distinct Trip Measures (PS-04 Trip Grain)
+// 2. Core Volume & Reconciled Distinct Trip Measures (PS-04 Trip Grain vs Ticket Leg Grain)
+// -------------------------------------------------------------------------
+// GRAIN RECONCILIATION AUDIT NOTE:
+// In vw_travel, the grain of each row is an individual TICKET LEG (Fact Grain: 394 records).
+// Multi-leg itineraries share a common `trip_id` (Trip Grain: 280 distinct trips).
+// When analysing by `travelled_flag`:
+//   - 164 trips are Fully Flown (all legs 'Y')
+//   -  60 trips are Fully Cancelled (all legs 'N')
+//   -  56 trips are Mixed (multi-leg trips with at least one 'Y' and one 'N' leg)
+// Total Distinct Trips = 164 + 60 + 56 = 280.
+// Trips with Travelled Legs (Any Leg 'Y') = 164 + 56 = 220.
+// Trips with Cancelled Legs (Any Leg 'N') = 60 + 56 = 116.
+// Note: 220 + 116 = 336 (> 280) because the 56 mixed trips appear in both sets.
+// Ticket Leg Grain (Strictly Partitioned):
+//   Completed Ticket Legs (260) + Cancelled Ticket Legs (134) = 394 Total Tickets.
+// Spend Grain (Strictly Partitioned):
+//   Completed Spend (₹16,823,590.00) + Cancelled Spend (₹8,058,920.00) = ₹24,882,510.00.
 // -------------------------------------------------------------------------
 
-// 2.1 Total Distinct Trips (Primary PS-04 Trip Metric)
+// 2.1 Total Distinct Trips (Primary PS-04 Trip Metric: 280)
 Total Trips = 
 DISTINCTCOUNT(vw_travel[trip_id])
 
-// 2.2 Total Flown / Travelled Trips
-Travelled Trips = 
+// 2.2 Trips with Realized Travel (At least one leg flown: 220)
+Trips with Travelled Legs = 
 CALCULATE(
     DISTINCTCOUNT(vw_travel[trip_id]),
     vw_travel[travelled_flag] = "Y"
 )
 
-// 2.3 Cancelled or Non-Travelled Trips
-Non-Travelled Trips = 
+// Legacy alias for backward compatibility
+Travelled Trips = [Trips with Travelled Legs]
+
+// 2.3 Trips with Cancelled Legs (At least one leg cancelled/refunded: 116)
+Trips with Cancelled Legs = 
 CALCULATE(
     DISTINCTCOUNT(vw_travel[trip_id]),
     vw_travel[travelled_flag] = "N"
 )
 
-// 2.4 Total Ingested Ticket Leg Records
+// Legacy alias for backward compatibility
+Non-Travelled Trips = [Trips with Cancelled Legs]
+
+// 2.4 Fully Flown Trips (100% legs flown 'Y', zero 'N' legs: 164)
+Fully Flown Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    FILTER(
+        VALUES(vw_travel[trip_id]),
+        CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = "N") = 0
+    )
+)
+
+// 2.5 Fully Cancelled Trips (100% legs cancelled 'N', zero 'Y' legs: 60)
+Fully Cancelled Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    FILTER(
+        VALUES(vw_travel[trip_id]),
+        CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = "Y") = 0
+    )
+)
+
+// 2.6 Partially Cancelled Trips (Mixed trips with both 'Y' and 'N' legs: 56)
+Partially Cancelled Trips = 
+CALCULATE(
+    DISTINCTCOUNT(vw_travel[trip_id]),
+    FILTER(
+        VALUES(vw_travel[trip_id]),
+        CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = "Y") > 0 &&
+        CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = "N") > 0
+    )
+)
+
+// -------------------------------------------------------------------------
+// Ticket Leg Grain Measures (Row-Level Fact Grain: 394 Records)
+// -------------------------------------------------------------------------
+
+// 2.7 Total Ingested Ticket Leg Records (394)
 Total Tickets = 
 COUNTROWS(vw_travel)
 
-// 2.5 Completed / Flown Ticket Legs Count
+// 2.8 Completed / Flown Ticket Legs Count (260)
 Completed Travel Tickets = 
 CALCULATE(
     COUNTROWS(vw_travel),
     vw_travel[travelled_flag] = "Y"
 )
 
-// 2.6 Cancelled or Refunded Ticket Legs Count
+// 2.9 Cancelled or Refunded Ticket Legs Count (134)
 Cancelled or Refunded Tickets = 
 CALCULATE(
     COUNTROWS(vw_travel),
     vw_travel[travelled_flag] = "N"
 )
 
-// 2.7 Domestic Distinct Trips Count
+// 2.10 Domestic Distinct Trips Count (79)
 Domestic Trips = 
 CALCULATE(
     DISTINCTCOUNT(vw_travel[trip_id]),
     vw_travel[trip_classification] = "Domestic"
 )
 
-// 2.8 Cross-Border Distinct Trips Count
+// 2.11 Cross-Border Distinct Trips Count (164)
 Cross-Border Trips = 
 CALCULATE(
     DISTINCTCOUNT(vw_travel[trip_id]),
     vw_travel[trip_classification] = "Cross-Border"
 )
 
-// 2.9 Multi-Country Distinct Trips Count
+// 2.12 Multi-Country Distinct Trips Count (37)
 Multi-Country Trips = 
 CALCULATE(
     DISTINCTCOUNT(vw_travel[trip_id]),
     vw_travel[trip_classification] = "Multi-Country"
 )
 
-// 2.10 Ticket Status Breakdown (Cancelled / Refunded / Exchanged)
-Cancelled Trips = 
+// 2.13 Ticket Status Breakdown
+Cancelled Tickets Count = 
 CALCULATE(
-    DISTINCTCOUNT(vw_travel[trip_id]),
+    COUNTROWS(vw_travel),
     vw_travel[ticket_status] = "CANCELLED"
 )
 
-Refunded Trips = 
+Refunded Tickets Count = 
 CALCULATE(
-    DISTINCTCOUNT(vw_travel[trip_id]),
+    COUNTROWS(vw_travel),
     vw_travel[ticket_status] = "REFUNDED"
 )
 
-Exchanged Trips = 
+Exchanged Tickets Count = 
 CALCULATE(
-    DISTINCTCOUNT(vw_travel[trip_id]),
+    COUNTROWS(vw_travel),
     vw_travel[ticket_status] = "EXCHANGED"
 )
 

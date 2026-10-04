@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "chartPolicyStatusBreakdown",
+  "position": {
+    "x": 40,
+    "y": 210,
+    "width": 920,
+    "height": 470,
+    "z": 402
+  },
+  "visual": {
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualConfiguration/2.0.0/schema.json",
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "policy_compliance_status"
+                }
+              },
+              "queryRef": "vw_travel.policy_compliance_status",
+              "displayName": "Compliance Status"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "amount_inr"
+                }
+              },
+              "queryRef": "Sum(vw_travel.amount_inr)",
+              "displayName": "Impacted Spend"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "chartBookingChannelMix",
+  "position": {
+    "x": 800,
+    "y": 210,
+    "width": 740,
+    "height": 470,
+    "z": 203
+  },
+  "visual": {
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualConfiguration/2.0.0/schema.json",
+    "visualType": "pieChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "booking_channel"
+                }
+              },
+              "queryRef": "vw_travel.booking_channel",
+              "displayName": "Booking Channel"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "amount_inr"
+                }
+              },
+              "queryRef": "Sum(vw_travel.amount_inr)",
+              "displayName": "Channel Spend (INR)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

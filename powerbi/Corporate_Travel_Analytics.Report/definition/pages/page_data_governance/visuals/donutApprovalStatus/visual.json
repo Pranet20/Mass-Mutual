@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "donutApprovalStatus",
+  "position": {
+    "x": 980,
+    "y": 210,
+    "width": 560,
+    "height": 470,
+    "z": 403
+  },
+  "visual": {
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualConfiguration/2.0.0/schema.json",
+    "visualType": "pieChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "approval_status"
+                }
+              },
+              "queryRef": "vw_travel.approval_status",
+              "displayName": "Approval Status"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "amount_inr"
+                }
+              },
+              "queryRef": "Sum(vw_travel.amount_inr)",
+              "displayName": "Spend by Approval"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

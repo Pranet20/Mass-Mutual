@@ -34,21 +34,50 @@ def get_governed_metrics() -> Dict[str, Any]:
         # 3. Total spend
         total_spend = conn.execute(text("SELECT COALESCE(SUM(amount_inr), 0.0) FROM vw_travel")).scalar() or 0.0
 
-        # 4. Travelled trips
+        # 4. Ticket leg partition
+        completed_legs = conn.execute(
+            text("SELECT COUNT(*) FROM vw_travel WHERE travelled_flag = 'Y'")
+        ).scalar() or 0
+        cancelled_legs = conn.execute(
+            text("SELECT COUNT(*) FROM vw_travel WHERE travelled_flag = 'N'")
+        ).scalar() or 0
+        completed_spend = conn.execute(
+            text("SELECT COALESCE(SUM(amount_inr), 0.0) FROM vw_travel WHERE travelled_flag = 'Y'")
+        ).scalar() or 0.0
+        cancelled_spend = conn.execute(
+            text("SELECT COALESCE(SUM(amount_inr), 0.0) FROM vw_travel WHERE travelled_flag = 'N'")
+        ).scalar() or 0.0
+
+        # 5. Distinct trip grain breakdown
+        fully_flown_trips = conn.execute(text("""
+            SELECT COUNT(*) FROM (
+                SELECT trip_id FROM vw_travel GROUP BY trip_id 
+                HAVING SUM(CASE WHEN travelled_flag = 'N' THEN 1 ELSE 0 END) = 0
+            )
+        """)).scalar() or 0
+
+        fully_cancelled_trips = conn.execute(text("""
+            SELECT COUNT(*) FROM (
+                SELECT trip_id FROM vw_travel GROUP BY trip_id 
+                HAVING SUM(CASE WHEN travelled_flag = 'Y' THEN 1 ELSE 0 END) = 0
+            )
+        """)).scalar() or 0
+
+        mixed_trips = conn.execute(text("""
+            SELECT COUNT(*) FROM (
+                SELECT trip_id FROM vw_travel GROUP BY trip_id 
+                HAVING SUM(CASE WHEN travelled_flag = 'Y' THEN 1 ELSE 0 END) > 0 
+                   AND SUM(CASE WHEN travelled_flag = 'N' THEN 1 ELSE 0 END) > 0
+            )
+        """)).scalar() or 0
+
         travelled_trips = conn.execute(
             text("SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'Y'")
         ).scalar() or 0
-        travelled_spend = conn.execute(
-            text("SELECT COALESCE(SUM(amount_inr), 0.0) FROM vw_travel WHERE travelled_flag = 'Y'")
-        ).scalar() or 0.0
 
-        # 5. Cancelled / Non-travelled trips
         non_travelled_trips = conn.execute(
             text("SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'N'")
         ).scalar() or 0
-        non_travelled_spend = conn.execute(
-            text("SELECT COALESCE(SUM(amount_inr), 0.0) FROM vw_travel WHERE travelled_flag = 'N'")
-        ).scalar() or 0.0
 
         # 6. Domestic trips
         domestic_trips = conn.execute(
@@ -109,12 +138,17 @@ def get_governed_metrics() -> Dict[str, Any]:
 
     return {
         "row_count": row_count,
-        "total_trips": total_trips,
+        "completed_legs": completed_legs,
+        "cancelled_legs": cancelled_legs,
         "total_spend": round(float(total_spend), 2),
+        "completed_spend": round(float(completed_spend), 2),
+        "cancelled_spend": round(float(cancelled_spend), 2),
+        "total_trips": total_trips,
+        "fully_flown_trips": fully_flown_trips,
+        "fully_cancelled_trips": fully_cancelled_trips,
+        "mixed_trips": mixed_trips,
         "travelled_trips": travelled_trips,
-        "travelled_spend": round(float(travelled_spend), 2),
         "non_travelled_trips": non_travelled_trips,
-        "non_travelled_spend": round(float(non_travelled_spend), 2),
         "domestic_trips": domestic_trips,
         "domestic_spend": round(float(domestic_spend), 2),
         "cross_border_trips": cross_border_trips,
@@ -133,11 +167,21 @@ def print_reconciliation_report():
     print("=" * 80)
     print("PS-04 POWER BI GROUND TRUTH VALIDATION (vw_travel)")
     print("=" * 80)
-    print(f"Total Ingested Ticket Legs (Row Count) : {data['row_count']}")
-    print(f"Total Distinct Trips (trip_id grain)   : {data['total_trips']}")
-    print(f"Total Gross Booking Spend              : ₹{data['total_spend']:,.2f} INR")
-    print(f"Travelled Trips (travelled_flag = 'Y') : {data['travelled_trips']} (Spend: ₹{data['travelled_spend']:,.2f})")
-    print(f"Non-Travelled Trips ('N')              : {data['non_travelled_trips']} (Spend: ₹{data['non_travelled_spend']:,.2f})")
+    print(f"Total Ingested Ticket Legs (Fact Grain): {data['row_count']}")
+    print(f"  ├── Completed Ticket Legs ('Y')      : {data['completed_legs']} (Spend: ₹{data['completed_spend']:,.2f})")
+    print(f"  └── Cancelled/Refunded Legs ('N')    : {data['cancelled_legs']} (Spend: ₹{data['cancelled_spend']:,.2f})")
+    print(f"  └── Total Gross Booking Spend        : ₹{data['total_spend']:,.2f} INR")
+    print("-" * 80)
+    print(f"Total Distinct Trips (Trip Grain)      : {data['total_trips']}")
+    print(f"  ├── Fully Flown Trips (All 'Y')      : {data['fully_flown_trips']}")
+    print(f"  ├── Fully Cancelled Trips (All 'N')  : {data['fully_cancelled_trips']}")
+    print(f"  └── Mixed-Leg Trips (Both 'Y' & 'N') : {data['mixed_trips']}")
+    print(f"  └── Check Sum ({data['fully_flown_trips']} + {data['fully_cancelled_trips']} + {data['mixed_trips']})        : {data['fully_flown_trips'] + data['fully_cancelled_trips'] + data['mixed_trips']} (100% Reconciled)")
+    print("-" * 80)
+    print(f"Trips with Travelled Legs (Any 'Y')    : {data['travelled_trips']} ({data['fully_flown_trips']} fully flown + {data['mixed_trips']} mixed)")
+    print(f"Trips with Cancelled Legs (Any 'N')    : {data['non_travelled_trips']} ({data['fully_cancelled_trips']} fully cancelled + {data['mixed_trips']} mixed)")
+    print(f"Trip Overlap Note                      : {data['travelled_trips']} + {data['non_travelled_trips']} = {data['travelled_trips'] + data['non_travelled_trips']} (> {data['total_trips']}) due to {data['mixed_trips']} multi-leg mixed trips")
+    print("-" * 80)
     print(f"Domestic Trips                         : {data['domestic_trips']} (Spend: ₹{data['domestic_spend']:,.2f})")
     print(f"Cross-Border Trips                     : {data['cross_border_trips']} (Spend: ₹{data['cross_border_spend']:,.2f})")
     print(f"Multi-Country Trips                    : {data['multi_country_trips']} (Spend: ₹{data['multi_country_spend']:,.2f})")

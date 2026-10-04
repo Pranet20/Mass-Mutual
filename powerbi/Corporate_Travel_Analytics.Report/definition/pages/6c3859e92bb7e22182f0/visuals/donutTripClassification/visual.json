@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "donutTripClassification",
+  "position": {
+    "x": 800,
+    "y": 210,
+    "width": 740,
+    "height": 470,
+    "z": 103
+  },
+  "visual": {
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualConfiguration/2.0.0/schema.json",
+    "visualType": "pieChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "trip_classification"
+                }
+              },
+              "queryRef": "vw_travel.trip_classification",
+              "displayName": "Classification"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "amount_inr"
+                }
+              },
+              "queryRef": "Sum(vw_travel.amount_inr)",
+              "displayName": "Spend (INR)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

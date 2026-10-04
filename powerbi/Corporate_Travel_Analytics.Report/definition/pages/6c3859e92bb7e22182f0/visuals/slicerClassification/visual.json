@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "slicerClassification",
+  "position": {
+    "x": 1560,
+    "y": 520,
+    "width": 320,
+    "height": 160,
+    "z": 106
+  },
+  "visual": {
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualConfiguration/2.0.0/schema.json",
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vw_travel"
+                    }
+                  },
+                  "Property": "trip_classification"
+                }
+              },
+              "queryRef": "vw_travel.trip_classification",
+              "displayName": "Trip Type Filter"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -257,12 +257,24 @@ def run_all_checks():
     except Exception as e:
         record_check(17, "FastAPI Endpoints & Security", False, str(e))
 
-    # 18. Power BI Desktop PBIX Integrity & Core Visual Verification
+    # 18. Power BI Project (PBIP) and PBIX Artifact Integrity
     try:
+        # Check PBIP format
+        pbip_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.pbip"))
+        pbir_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.Report", "definition.pbir"))
+        pbism_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.SemanticModel", "definition.pbism"))
+        bim_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.SemanticModel", "model.bim"))
+        assert os.path.exists(pbip_path), f"PBIP missing: {pbip_path}"
+        assert os.path.exists(pbir_path), f"definition.pbir missing: {pbir_path}"
+        assert os.path.exists(pbism_path), f"definition.pbism missing: {pbism_path}"
+        assert os.path.exists(bim_path), f"model.bim missing: {bim_path}"
+
+        # Check PBIX format
         pbix_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.pbix"))
         assert os.path.exists(pbix_path), f"File not found: {pbix_path}"
         with zipfile.ZipFile(pbix_path, 'r') as z:
             namelist = z.namelist()
+            assert "Report/Layout" in namelist, "PBIX missing Report/Layout stream"
             assert "Report/definition/pages/pages.json" in namelist, "Report/definition/pages/pages.json missing"
             pages_data = json.loads(z.read("Report/definition/pages/pages.json").decode("utf-8"))
             page_order = pages_data.get("pageOrder", [])
@@ -274,9 +286,9 @@ def run_all_checks():
             assert "Report/definition/pages/page_business_groups/visuals/chartTripsByBusinessGroup/visual.json" in namelist, "PBIX Page 3 missing chartTripsByBusinessGroup visual"
             assert "Report/definition/pages/page_business_groups/visuals/slicerBusinessGroup/visual.json" in namelist, "PBIX Page 3 missing slicerBusinessGroup visual"
 
-        record_check(18, "Power BI Desktop PBIX Integrity", True, "Validated 5-page PBIR report with Trips by Month, Trips by Business Group, and Trips by Travel Summary.")
+        record_check(18, "Power BI PBIP & PBIX Dual-Asset Integrity", True, "Validated PBIP project, SemanticModel BIM/TMDL, PBIX Report/Layout stream, and 3 non-negotiable PS-04 visuals.")
     except Exception as e:
-        record_check(18, "Power BI Desktop PBIX Integrity", False, str(e))
+        record_check(18, "Power BI PBIP & PBIX Dual-Asset Integrity", False, str(e))
 
     # 19. Frontend Production Build
     try:
