@@ -1,5 +1,5 @@
 {
-  "name": "Fluent 2 (Preview)",
+  "name": "Fluent2-CY26SU09",
   "dataColors": [
     "#118DFF",
     "#12239E",
@@ -42,9 +42,7 @@
   "backgroundLight": "#C8C6C4",
   "backgroundNeutral": "#C7C7C7",
   "backgroundDark": "#E6E6E6",
-  "secondaryBackground": "#F5F5F5",
   "tableAccent": "#118DFF",
-  "accent": "#0A5599",
   "shapeStroke": "#D1D1D1",
   "disabledText": "#B3B3B3",
   "good": "#9FD89F",
@@ -541,7 +539,7 @@
         ],
         "title": [
           {
-            "show": true
+            "show": false
           }
         ],
         "subTitle": [
@@ -779,7 +777,7 @@
         ],
         "title": [
           {
-            "show": true
+            "show": false
           }
         ],
         "subTitle": [
@@ -1376,7 +1374,7 @@
             "backgroundShow": false,
             "backgroundColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             }
           }
@@ -1563,7 +1561,7 @@
         ],
         "title": [
           {
-            "show": true
+            "show": false
           }
         ],
         "subTitle": [
@@ -1668,7 +1666,7 @@
             "$id": "interaction:hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             }
           },
@@ -1817,7 +1815,7 @@
             "$id": "interaction:hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             },
             "transparency": 0
@@ -1834,7 +1832,14 @@
             "$id": "selection:selected",
             "fillColor": {
               "solid": {
-                "color": "accent"
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
+                }
               }
             },
             "show": false
@@ -3432,7 +3437,7 @@
             "$id": "hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             },
             "transparency": 0
@@ -3878,7 +3883,7 @@
             "$id": "hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             }
           },
@@ -4015,7 +4020,7 @@
             "$id": "hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             },
             "transparency": 0
@@ -4190,7 +4195,7 @@
             "$id": "hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             }
           },
@@ -4327,7 +4332,7 @@
             "$id": "hover",
             "fillColor": {
               "solid": {
-                "color": "secondaryBackground"
+                "color": "backgroundNeutral"
               }
             },
             "transparency": 0

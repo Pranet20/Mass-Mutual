@@ -84,12 +84,16 @@ python scripts/validate_powerbi_source.py
 ## 3. 15-Step Manual Acceptance Procedure
 
 ### STEP 1: Start the Required Database and Application Services
-1. Ensure the PostgreSQL container or local SQLite database is accessible:
+1. Ensure the PostgreSQL container or local PostgreSQL service is running:
    ```powershell
-   docker-compose up -d postgres
+   docker-compose up -d db
    ```
-   *(Or if evaluating against local SQLite, ensure `backend/database/travel_analytics.db` is present).*
-2. Verify backend services are active:
+2. Bootstrap and synchronize the PostgreSQL warehouse view (`vw_travel`):
+   ```powershell
+   python scripts/bootstrap_postgres.py
+   ```
+   *Expected Result*: `PostgreSQL validation passed with ZERO ERRORS` and confirms all 37 attributes in `public.vw_travel` including `business_group`.
+3. Verify backend services are active:
    ```powershell
    cd backend
    python main.py
@@ -105,14 +109,29 @@ pytest -q -k "test_38_powerbi_source_contract_vw_travel_schema"
 ```
 *Expected Result*: `1 passed` confirming all 37 attributes are physically present in `vw_travel`.
 
+To verify directly in PostgreSQL (via pgAdmin or psql):
+```sql
+SELECT
+    COUNT(*) AS total_rows,
+    COUNT(business_unit) AS business_unit_filled,
+    COUNT(business_group) AS business_group_filled
+FROM public.vw_travel;
+```
+*Expected Result*: Returns matching counts with zero nulls.
+
 ---
 
-### STEP 3: Verify Expected Row Count
-Execute SQL assertion to check the exact row count of `vw_travel`:
+### STEP 3: Verify Expected Row Count and Ground Truth Metrics
+Execute the source validation script to check ground truth metrics across both SQLite and PostgreSQL:
 ```powershell
-python -c "import sqlite3; conn=sqlite3.connect('backend/database/travel_analytics.db'); print('vw_travel rows:', conn.cursor().execute('SELECT COUNT(*) FROM vw_travel').fetchone()[0])"
+# For SQLite:
+python scripts/validate_powerbi_source.py
+
+# For PostgreSQL:
+$env:DATABASE_URL = "postgresql://postgres:root@127.0.0.1:5433/travel_analytics"
+python scripts/validate_powerbi_source.py
 ```
-*Expected Result*: Exactly `394` rows (or current ingested ticket legs count).
+*Expected Result*: Exactly `404` rows (or current ingested ticket legs count), `290` distinct trips, and 100% reconciled spend across all business groups.
 
 ---
 

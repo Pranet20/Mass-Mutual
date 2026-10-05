@@ -1,7 +1,12 @@
 {
-  "name": "Corporate_Travel_Analytics",
-  "compatibilityLevel": 1550,
+  "compatibilityLevel": 1606,
   "model": {
+    "annotations": [
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
     "culture": "en-US",
     "dataAccessOptions": {
       "legacyRedirects": true,
@@ -11,232 +16,392 @@
     "tables": [
       {
         "name": "vw_travel",
-        "description": "Governed analytical view representing travel ticket legs enriched with SCD Type 2 employee history, geographic master data, financial FX lineage, and audit compliance.",
         "columns": [
           {
             "name": "ticket_id",
             "dataType": "string",
-            "sourceColumn": "ticket_id",
-            "description": "Unique travel ticket number (Fact Grain Key)"
+            "description": "Unique travel ticket number (Fact Grain Key)",
+            "lineageTag": "4992ef94-116e-4192-84a9-bb91abbc667a",
+            "sourceColumn": "ticket_id"
           },
           {
             "name": "trip_id",
             "dataType": "string",
-            "sourceColumn": "trip_id",
-            "description": "Associated multi-leg itinerary identifier (Trip Grain Key)"
+            "description": "Associated multi-leg itinerary identifier (Trip Grain Key)",
+            "lineageTag": "67bcf61d-73d8-4588-84ab-f31af66bba3e",
+            "sourceColumn": "trip_id"
           },
           {
             "name": "batch_id",
             "dataType": "string",
-            "sourceColumn": "batch_id",
-            "description": "ETL Ingestion batch identifier"
+            "description": "ETL Ingestion batch identifier",
+            "lineageTag": "761c7212-3cfa-4c8b-ba0d-1c3faff33565",
+            "sourceColumn": "batch_id"
           },
           {
             "name": "employee_id",
             "dataType": "string",
-            "sourceColumn": "employee_id",
-            "description": "Corporate employee identifier"
+            "description": "Corporate employee identifier",
+            "lineageTag": "7b97dafc-97fb-4e29-9852-6d8f5e7251e2",
+            "sourceColumn": "employee_id"
           },
           {
             "name": "employee_name",
             "dataType": "string",
-            "sourceColumn": "employee_name",
-            "description": "Full name of the traveling employee"
+            "description": "Full name of the traveling employee",
+            "lineageTag": "05179dcb-6f58-40a3-9ffe-e0d3c45d3d8b",
+            "sourceColumn": "employee_name"
           },
           {
             "name": "business_unit",
             "dataType": "string",
-            "sourceColumn": "business_unit",
-            "description": "Operating Business Unit at travel date"
+            "description": "Operating Business Unit at travel date",
+            "lineageTag": "18eaca02-20fb-49bd-851e-da3e216bc904",
+            "sourceColumn": "business_unit"
           },
           {
             "name": "business_group",
             "dataType": "string",
-            "sourceColumn": "business_group",
-            "description": "Top-level Corporate Division / Business Group"
+            "description": "Top-level Corporate Division / Business Group",
+            "lineageTag": "77cd1f68-43f1-48ca-bf0f-544db74b6fc6",
+            "sourceColumn": "business_group"
           },
           {
             "name": "department",
             "dataType": "string",
-            "sourceColumn": "department",
-            "description": "Department at travel date"
+            "description": "Department at travel date",
+            "lineageTag": "0d398c14-5e7e-4f76-899a-1d87608d1511",
+            "sourceColumn": "department"
           },
           {
             "name": "issue_date",
             "dataType": "string",
-            "sourceColumn": "issue_date",
-            "description": "Date ticket was booked/issued (YYYY-MM-DD)"
+            "description": "Date ticket was booked/issued (YYYY-MM-DD)",
+            "lineageTag": "71ee7507-54e8-4ceb-b281-a193f14813cb",
+            "sourceColumn": "issue_date"
           },
           {
             "name": "travel_date",
             "dataType": "string",
-            "sourceColumn": "travel_date",
-            "description": "Departure travel date (YYYY-MM-DD)"
+            "description": "Departure travel date (YYYY-MM-DD)",
+            "lineageTag": "32be159f-c465-4ddf-9136-1c255fd969f9",
+            "sourceColumn": "travel_date"
           },
           {
             "name": "return_date",
             "dataType": "string",
-            "sourceColumn": "return_date",
-            "description": "Return arrival date (YYYY-MM-DD)"
+            "description": "Return arrival date (YYYY-MM-DD)",
+            "lineageTag": "f376a694-8313-4a43-91bc-9cfcbcaef386",
+            "sourceColumn": "return_date"
           },
           {
             "name": "origin_city",
             "dataType": "string",
-            "sourceColumn": "origin_city",
-            "description": "Departure city"
+            "description": "Departure city",
+            "lineageTag": "1812d681-80cc-4ba6-b67b-cc886bdbad21",
+            "sourceColumn": "origin_city"
           },
           {
             "name": "origin_country",
             "dataType": "string",
-            "sourceColumn": "origin_country",
-            "description": "Departure country name"
+            "description": "Departure country name",
+            "lineageTag": "91601180-2682-453c-99b2-888ea533626e",
+            "sourceColumn": "origin_country"
           },
           {
             "name": "dest_city",
             "dataType": "string",
-            "sourceColumn": "dest_city",
-            "description": "Arrival destination city"
+            "description": "Arrival destination city",
+            "lineageTag": "85c3e90c-2475-42eb-95f0-bbad52b6ad63",
+            "sourceColumn": "dest_city"
           },
           {
             "name": "dest_country",
             "dataType": "string",
-            "sourceColumn": "dest_country",
-            "description": "Arrival destination country name"
+            "description": "Arrival destination country name",
+            "lineageTag": "6c8cc90b-a6c4-4779-a9f8-8b5b83658509",
+            "sourceColumn": "dest_country"
           },
           {
             "name": "origin_iso",
             "dataType": "string",
-            "sourceColumn": "origin_iso",
-            "description": "ISO Alpha-2 code for origin"
+            "description": "ISO Alpha-2 code for origin",
+            "lineageTag": "7a3e95fe-30dd-472f-8fea-6f1f649b83cb",
+            "sourceColumn": "origin_iso"
           },
           {
             "name": "dest_iso",
             "dataType": "string",
-            "sourceColumn": "dest_iso",
-            "description": "ISO Alpha-2 code for destination"
+            "description": "ISO Alpha-2 code for destination",
+            "lineageTag": "865a5869-6226-42c2-85fa-39f3803c6047",
+            "sourceColumn": "dest_iso"
           },
           {
             "name": "ticket_status",
             "dataType": "string",
-            "sourceColumn": "ticket_status",
-            "description": "Booking state (ISSUED, CANCELLED, REFUNDED, EXCHANGED)"
+            "description": "Booking state (ISSUED, CANCELLED, REFUNDED, EXCHANGED)",
+            "lineageTag": "596049ca-f450-4fcc-a5e2-a9e08f2f3f69",
+            "sourceColumn": "ticket_status"
           },
           {
             "name": "amount_original",
             "dataType": "double",
-            "sourceColumn": "amount_original",
             "description": "Raw transaction amount in booking currency",
-            "formatString": "#,##0.00"
+            "formatString": "#,##0.00",
+            "lineageTag": "00fa582e-93bd-42c6-b409-d79a0d7d5128",
+            "sourceColumn": "amount_original"
           },
           {
             "name": "currency",
             "dataType": "string",
-            "sourceColumn": "currency",
-            "description": "Booking transaction currency code"
+            "description": "Booking transaction currency code",
+            "lineageTag": "f8113451-a6ca-4837-812e-dc467762a9b2",
+            "sourceColumn": "currency"
           },
           {
             "name": "fx_rate",
             "dataType": "double",
-            "sourceColumn": "fx_rate",
             "description": "Exchange rate to INR",
-            "formatString": "#,##0.0000"
+            "formatString": "#,##0.0000",
+            "lineageTag": "f1802ea6-2926-4593-843b-3292bf9e2029",
+            "sourceColumn": "fx_rate"
           },
           {
             "name": "amount_inr",
             "dataType": "double",
-            "sourceColumn": "amount_inr",
             "description": "Total spend converted to INR",
-            "formatString": "\u20b9#,##0.00"
+            "formatString": "₹#,##0.00",
+            "lineageTag": "bf87f8fe-19be-45fc-9e20-95b3bab2823c",
+            "sourceColumn": "amount_inr"
           },
           {
             "name": "fx_rate_date",
             "dataType": "string",
-            "sourceColumn": "fx_rate_date",
-            "description": "Effective date of FX conversion rate"
+            "description": "Effective date of FX conversion rate",
+            "lineageTag": "1d2f0e43-acac-43f8-b5cb-8fc5c04496e0",
+            "sourceColumn": "fx_rate_date"
           },
           {
             "name": "fx_source",
             "dataType": "string",
-            "sourceColumn": "fx_source",
-            "description": "Authoritative lineage source of FX conversion"
+            "description": "Authoritative lineage source of FX conversion",
+            "lineageTag": "106970ce-c450-499e-8c0c-29a4c5ba50f2",
+            "sourceColumn": "fx_source"
           },
           {
             "name": "booking_channel",
             "dataType": "string",
-            "sourceColumn": "booking_channel",
-            "description": "Booking channel (Amadeus GDS, Sabre GDS, Corporate Portal)"
+            "description": "Booking channel (Amadeus GDS, Sabre GDS, Corporate Portal)",
+            "lineageTag": "aedf4feb-a76c-4455-8f93-0e3544f0b7e9",
+            "sourceColumn": "booking_channel"
           },
           {
             "name": "cabin_class",
             "dataType": "string",
-            "sourceColumn": "cabin_class",
-            "description": "Travel class (Economy, Premium Economy, Business)"
+            "description": "Travel class (Economy, Premium Economy, Business)",
+            "lineageTag": "7629da18-5793-4da3-8740-33d262e58f78",
+            "sourceColumn": "cabin_class"
           },
           {
             "name": "travelled_flag",
             "dataType": "string",
-            "sourceColumn": "travelled_flag",
-            "description": "Y if flown, N if cancelled/refunded/exchanged"
+            "description": "Y if flown, N if cancelled/refunded/exchanged",
+            "lineageTag": "bd1a925f-c1db-46ef-bd78-ca611f7ca512",
+            "sourceColumn": "travelled_flag"
           },
           {
             "name": "trip_classification",
             "dataType": "string",
-            "sourceColumn": "trip_classification",
-            "description": "Domestic, Cross-Border, Multi-Country"
+            "description": "Domestic, Cross-Border, Multi-Country",
+            "lineageTag": "6f5e765b-433e-4833-bdcf-89ff522c3f8d",
+            "sourceColumn": "trip_classification"
           },
           {
             "name": "travel_summary",
             "dataType": "string",
-            "sourceColumn": "travel_summary",
-            "description": "Standardized route summary label"
+            "description": "Standardized route summary label",
+            "lineageTag": "2fac8bfb-c1b2-46f9-a292-0bef04715d0c",
+            "sourceColumn": "travel_summary"
           },
           {
             "name": "policy_compliance_status",
             "dataType": "string",
-            "sourceColumn": "policy_compliance_status",
-            "description": "Policy compliance flag (COMPLIANT, NON_COMPLIANT_CABIN)"
+            "description": "Policy compliance flag (COMPLIANT, NON_COMPLIANT_CABIN)",
+            "lineageTag": "7dd44002-9f04-4433-97d5-ef8060c8cf79",
+            "sourceColumn": "policy_compliance_status"
           },
           {
             "name": "policy_violation_reason",
             "dataType": "string",
-            "sourceColumn": "policy_violation_reason",
-            "description": "Reason for policy non-compliance"
+            "description": "Reason for policy non-compliance",
+            "lineageTag": "a1ecefa8-6045-44ea-9e2e-7c0ac77f2661",
+            "sourceColumn": "policy_violation_reason"
           },
           {
             "name": "approval_status",
             "dataType": "string",
-            "sourceColumn": "approval_status",
-            "description": "Manager approval state (APPROVED, REJECTED, PENDING_APPROVAL)"
+            "description": "Manager approval state (APPROVED, REJECTED, PENDING_APPROVAL)",
+            "lineageTag": "ea388bc7-4888-4f25-8c6d-e7a833c545b8",
+            "sourceColumn": "approval_status"
           },
           {
             "name": "rejection_reason",
             "dataType": "string",
-            "sourceColumn": "rejection_reason",
-            "description": "Reason for rejection"
+            "description": "Reason for rejection",
+            "lineageTag": "841f627f-00f5-487a-bef6-4dfe4b88bba3",
+            "sourceColumn": "rejection_reason"
           },
           {
             "name": "override_applied",
             "dataType": "int64",
-            "sourceColumn": "override_applied",
-            "description": "1 if manual override applied, 0 otherwise"
+            "description": "1 if manual override applied, 0 otherwise",
+            "lineageTag": "b11a39c8-479a-46b0-86e0-a19a753a292b",
+            "sourceColumn": "override_applied"
           },
           {
             "name": "record_hash",
             "dataType": "string",
-            "sourceColumn": "record_hash",
-            "description": "Canonical SHA-256 record hash"
+            "description": "Canonical SHA-256 record hash",
+            "lineageTag": "86e55b29-5615-4e19-85eb-06b8f0f6a62b",
+            "sourceColumn": "record_hash"
           },
           {
             "name": "source_file",
             "dataType": "string",
-            "sourceColumn": "source_file",
-            "description": "Source vendor CSV filename"
+            "description": "Source vendor CSV filename",
+            "lineageTag": "321cfae2-d30d-44e7-804c-b74dbbddc84a",
+            "sourceColumn": "source_file"
           },
           {
             "name": "updated_at",
             "dataType": "string",
-            "sourceColumn": "updated_at",
-            "description": "Timestamp of record update"
+            "description": "Timestamp of record update",
+            "lineageTag": "4e026a54-2dbe-4cf5-aa95-03fc6e1b6c3f",
+            "sourceColumn": "updated_at"
+          }
+        ],
+        "description": "Governed analytical view representing travel ticket legs enriched with SCD Type 2 employee history, geographic master data, financial FX lineage, and audit compliance.",
+        "lineageTag": "c42bb30e-1604-4899-8628-5c9171419a8c",
+        "measures": [
+          {
+            "name": "Total Spend",
+            "expression": "SUM(vw_travel[amount_inr])",
+            "formatString": "₹#,##0.00",
+            "lineageTag": "6e8fb441-a4d6-4c40-86b5-3b8bce5ff048"
+          },
+          {
+            "name": "Total Spend INR",
+            "expression": "SUM(vw_travel[amount_inr])",
+            "formatString": "₹#,##0.00",
+            "lineageTag": "b5ac07ba-3a7c-46f4-96a2-a876f03a01ac"
+          },
+          {
+            "name": "Total Completed Spend INR",
+            "expression": "CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = \"Y\")",
+            "formatString": "₹#,##0.00",
+            "lineageTag": "72c83a03-c8dd-4a46-a8d7-dd59e59f2294"
+          },
+          {
+            "name": "Total Cancelled Spend INR",
+            "expression": "CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = \"N\")",
+            "formatString": "₹#,##0.00",
+            "lineageTag": "d8b7470d-49d2-4d58-84db-79e9c0598ed1"
+          },
+          {
+            "name": "Total Trips",
+            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
+            "formatString": "#,##0",
+            "lineageTag": "ef658e67-818e-4d0a-b449-4a227d6df24d"
+          },
+          {
+            "name": "Trips with Travelled Legs",
+            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = \"Y\")",
+            "formatString": "#,##0",
+            "lineageTag": "8e3a0a6b-7209-4d32-9904-35a23a6c8300"
+          },
+          {
+            "name": "Trips with Cancelled Legs",
+            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = \"N\")",
+            "formatString": "#,##0",
+            "lineageTag": "c720ef69-6759-44c3-9506-5d81fb0cd79e"
+          },
+          {
+            "name": "Fully Flown Trips",
+            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), FILTER(VALUES(vw_travel[trip_id]), CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"N\") = 0))",
+            "formatString": "#,##0",
+            "lineageTag": "7a2d9c82-ef1a-4f59-bc52-ab5346deb63b"
+          },
+          {
+            "name": "Fully Cancelled Trips",
+            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), FILTER(VALUES(vw_travel[trip_id]), CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"Y\") = 0))",
+            "formatString": "#,##0",
+            "lineageTag": "be36df27-61bd-422e-be62-f9323f7778e3"
+          },
+          {
+            "name": "Partially Cancelled Trips",
+            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), FILTER(VALUES(vw_travel[trip_id]), CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"Y\") > 0 && CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"N\") > 0))",
+            "formatString": "#,##0",
+            "lineageTag": "4e879dd8-0a79-4a3d-81a6-2989f3b9d958"
+          },
+          {
+            "name": "Total Tickets",
+            "expression": "COUNTROWS(vw_travel)",
+            "formatString": "#,##0",
+            "lineageTag": "c2b175b9-243e-4c96-afc3-8ba1b5c17b90"
+          },
+          {
+            "name": "Completed Travel Tickets",
+            "expression": "CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"Y\")",
+            "formatString": "#,##0",
+            "lineageTag": "074396cd-0f6c-4175-b0e1-ab3b92d14e42"
+          },
+          {
+            "name": "Cancelled or Refunded Tickets",
+            "expression": "CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"N\")",
+            "formatString": "#,##0",
+            "lineageTag": "0a3cdfb7-0796-4bdf-b5b2-9615cfcf3545"
+          },
+          {
+            "name": "Trips by Month",
+            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
+            "formatString": "#,##0",
+            "lineageTag": "031b1c62-1742-4616-8f2e-6c6a38d94198"
+          },
+          {
+            "name": "Trips by Business Group",
+            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
+            "formatString": "#,##0",
+            "lineageTag": "c6fd1db5-e37d-4cdd-b4a0-46eb93bcf313"
+          },
+          {
+            "name": "Trips by Travel Summary",
+            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
+            "formatString": "#,##0",
+            "lineageTag": "5cbf0843-963d-47a1-91b9-6eb64829925d"
+          },
+          {
+            "name": "Spend by Business Group",
+            "expression": "SUM(vw_travel[amount_inr])",
+            "formatString": "₹#,##0.00",
+            "lineageTag": "76a5d0a6-0a02-4af9-830f-0dc2ab6e403d"
+          },
+          {
+            "name": "Avg Spend per Trip",
+            "expression": "DIVIDE([Total Completed Spend INR], [Trips with Travelled Legs], 0)",
+            "formatString": "₹#,##0.00",
+            "lineageTag": "abffab0c-88f1-460b-a0fd-b32afafbb321"
+          },
+          {
+            "name": "Policy Compliance Rate",
+            "expression": "DIVIDE(CALCULATE(COUNTROWS(vw_travel), vw_travel[policy_compliance_status] = \"COMPLIANT\"), COUNTROWS(vw_travel), 0)",
+            "formatString": "0.0%",
+            "lineageTag": "4722dfe5-7940-4af5-9dda-28069da3e3d8"
+          },
+          {
+            "name": "Policy Exceptions Count",
+            "expression": "CALCULATE(COUNTROWS(vw_travel), vw_travel[policy_compliance_status] <> \"COMPLIANT\")",
+            "formatString": "#,##0",
+            "lineageTag": "0651701a-443e-4c63-81db-a74c34037bb4"
           }
         ],
         "partitions": [
@@ -244,113 +409,28 @@
             "name": "vw_travel",
             "mode": "import",
             "source": {
-              "type": "m",
               "expression": [
-                "let\n    Source = PostgreSQL.Database(\"localhost:5432\", \"travel_warehouse\"),\n    public_vw_travel = Source{[Schema=\"public\",Item=\"vw_travel\"]}[Data],\n    #\"Changed Type\" = Table.TransformColumnTypes(public_vw_travel,{\n        {\"ticket_id\", type text}, {\"trip_id\", type text}, {\"batch_id\", type text}, {\"employee_id\", type text},\n        {\"employee_name\", type text}, {\"business_unit\", type text}, {\"business_group\", type text}, {\"department\", type text},\n        {\"issue_date\", type date}, {\"travel_date\", type date}, {\"return_date\", type date},\n        {\"origin_city\", type text}, {\"origin_country\", type text}, {\"dest_city\", type text}, {\"dest_country\", type text},\n        {\"origin_iso\", type text}, {\"dest_iso\", type text}, {\"ticket_status\", type text},\n        {\"amount_original\", type number}, {\"currency\", type text}, {\"fx_rate\", type number}, {\"amount_inr\", type number},\n        {\"fx_rate_date\", type date}, {\"fx_source\", type text}, {\"booking_channel\", type text}, {\"cabin_class\", type text},\n        {\"travelled_flag\", type text}, {\"trip_classification\", type text}, {\"travel_summary\", type text},\n        {\"policy_compliance_status\", type text}, {\"policy_violation_reason\", type text},\n        {\"approval_status\", type text}, {\"rejection_reason\", type text}, {\"override_applied\", Int64.Type},\n        {\"record_hash\", type text}, {\"source_file\", type text}, {\"updated_at\", type datetime}\n    })\nin\n    #\"Changed Type\""
-              ]
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5432\", \"travel_warehouse\"),",
+                "    public_vw_travel = Source{[Schema=\"public\",Item=\"vw_travel\"]}[Data],",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(public_vw_travel,{",
+                "        {\"ticket_id\", type text}, {\"trip_id\", type text}, {\"batch_id\", type text}, {\"employee_id\", type text},",
+                "        {\"employee_name\", type text}, {\"business_unit\", type text}, {\"business_group\", type text}, {\"department\", type text},",
+                "        {\"issue_date\", type date}, {\"travel_date\", type date}, {\"return_date\", type date},",
+                "        {\"origin_city\", type text}, {\"origin_country\", type text}, {\"dest_city\", type text}, {\"dest_country\", type text},",
+                "        {\"origin_iso\", type text}, {\"dest_iso\", type text}, {\"ticket_status\", type text},",
+                "        {\"amount_original\", type number}, {\"currency\", type text}, {\"fx_rate\", type number}, {\"amount_inr\", type number},",
+                "        {\"fx_rate_date\", type date}, {\"fx_source\", type text}, {\"booking_channel\", type text}, {\"cabin_class\", type text},",
+                "        {\"travelled_flag\", type text}, {\"trip_classification\", type text}, {\"travel_summary\", type text},",
+                "        {\"policy_compliance_status\", type text}, {\"policy_violation_reason\", type text},",
+                "        {\"approval_status\", type text}, {\"rejection_reason\", type text}, {\"override_applied\", Int64.Type},",
+                "        {\"record_hash\", type text}, {\"source_file\", type text}, {\"updated_at\", type datetime}",
+                "    })",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
             }
-          }
-        ],
-        "measures": [
-          {
-            "name": "Total Spend",
-            "expression": "SUM(vw_travel[amount_inr])",
-            "formatString": "\u20b9#,##0.00"
-          },
-          {
-            "name": "Total Spend INR",
-            "expression": "SUM(vw_travel[amount_inr])",
-            "formatString": "\u20b9#,##0.00"
-          },
-          {
-            "name": "Total Completed Spend INR",
-            "expression": "CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = \"Y\")",
-            "formatString": "\u20b9#,##0.00"
-          },
-          {
-            "name": "Total Cancelled Spend INR",
-            "expression": "CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = \"N\")",
-            "formatString": "\u20b9#,##0.00"
-          },
-          {
-            "name": "Total Trips",
-            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Trips with Travelled Legs",
-            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = \"Y\")",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Trips with Cancelled Legs",
-            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = \"N\")",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Fully Flown Trips",
-            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), FILTER(VALUES(vw_travel[trip_id]), CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"N\") = 0))",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Fully Cancelled Trips",
-            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), FILTER(VALUES(vw_travel[trip_id]), CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"Y\") = 0))",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Partially Cancelled Trips",
-            "expression": "CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), FILTER(VALUES(vw_travel[trip_id]), CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"Y\") > 0 && CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"N\") > 0))",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Total Tickets",
-            "expression": "COUNTROWS(vw_travel)",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Completed Travel Tickets",
-            "expression": "CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"Y\")",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Cancelled or Refunded Tickets",
-            "expression": "CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = \"N\")",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Trips by Month",
-            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Trips by Business Group",
-            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Trips by Travel Summary",
-            "expression": "DISTINCTCOUNT(vw_travel[trip_id])",
-            "formatString": "#,##0"
-          },
-          {
-            "name": "Spend by Business Group",
-            "expression": "SUM(vw_travel[amount_inr])",
-            "formatString": "\u20b9#,##0.00"
-          },
-          {
-            "name": "Avg Spend per Trip",
-            "expression": "DIVIDE([Total Completed Spend INR], [Trips with Travelled Legs], 0)",
-            "formatString": "\u20b9#,##0.00"
-          },
-          {
-            "name": "Policy Compliance Rate",
-            "expression": "DIVIDE(CALCULATE(COUNTROWS(vw_travel), vw_travel[policy_compliance_status] = \"COMPLIANT\"), COUNTROWS(vw_travel), 0)",
-            "formatString": "0.0%"
-          },
-          {
-            "name": "Policy Exceptions Count",
-            "expression": "CALCULATE(COUNTROWS(vw_travel), vw_travel[policy_compliance_status] <> \"COMPLIANT\")",
-            "formatString": "#,##0"
           }
         ]
       }

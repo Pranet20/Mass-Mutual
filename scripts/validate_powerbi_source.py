@@ -108,7 +108,7 @@ def get_governed_metrics() -> Dict[str, Any]:
             SELECT substr(travel_date, 1, 7) AS travel_month,
                    COUNT(DISTINCT trip_id) AS distinct_trips,
                    COUNT(*) AS ticket_legs,
-                   ROUND(SUM(amount_inr), 2) AS monthly_spend
+                   ROUND(CAST(SUM(amount_inr) AS NUMERIC), 2) AS monthly_spend
             FROM vw_travel
             GROUP BY travel_month
             ORDER BY travel_month
@@ -119,7 +119,7 @@ def get_governed_metrics() -> Dict[str, Any]:
             SELECT business_group,
                    COUNT(DISTINCT trip_id) AS distinct_trips,
                    COUNT(*) AS ticket_legs,
-                   ROUND(SUM(amount_inr), 2) AS group_spend
+                   ROUND(CAST(SUM(amount_inr) AS NUMERIC), 2) AS group_spend
             FROM vw_travel
             GROUP BY business_group
             ORDER BY distinct_trips DESC
@@ -130,7 +130,7 @@ def get_governed_metrics() -> Dict[str, Any]:
             SELECT travel_summary,
                    COUNT(DISTINCT trip_id) AS distinct_trips,
                    COUNT(*) AS ticket_legs,
-                   ROUND(SUM(amount_inr), 2) AS summary_spend
+                   ROUND(CAST(SUM(amount_inr) AS NUMERIC), 2) AS summary_spend
             FROM vw_travel
             GROUP BY travel_summary
             ORDER BY distinct_trips DESC

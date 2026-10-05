@@ -824,6 +824,7 @@ def create_ticket(req: CreateTicketRequest, current_user: User = Depends(get_cur
     emp = session.query(EmployeeMaster).filter_by(employee_id=req.employee_id).first()
     emp_name = emp.employee_name if emp else "Unknown Employee"
     bu = emp.business_unit if emp else "General"
+    bg = getattr(emp, "business_group", None) or bu
     dept = emp.department if emp else "General"
     
     is_cross = (req.origin_country.lower() != req.dest_country.lower())
@@ -840,6 +841,7 @@ def create_ticket(req: CreateTicketRequest, current_user: User = Depends(get_cur
         employee_id=req.employee_id,
         employee_name=emp_name,
         business_unit=bu,
+        business_group=bg,
         department=dept,
         issue_date=req.issue_date,
         travel_date=req.travel_date,

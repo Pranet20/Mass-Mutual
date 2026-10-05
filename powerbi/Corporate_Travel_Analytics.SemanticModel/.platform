@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Corporate_Travel_Analytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3f36f745-9ff8-4099-89d7-59a45c3b3c54"
+  }
+}
