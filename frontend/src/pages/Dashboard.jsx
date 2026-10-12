@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DollarSign, Ticket, Plane, Clock, Check, XCircle, CheckCircle2, Filter, Layers, Globe } from 'lucide-react';
+import { DollarSign, Ticket, Plane, Clock, Check, XCircle, CheckCircle2, Filter, Layers, Globe, BarChart3, ExternalLink } from 'lucide-react';
 
-export const Dashboard = () => {
+export const Dashboard = ({ onNavigateToPowerBI }) => {
   const { theme } = useTheme();
   const [rawData, setRawData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -195,6 +195,18 @@ export const Dashboard = () => {
               <option value="Sales & Marketing" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Sales & Marketing</option>
             </select>
           </div>
+
+          {/* 1-Click Open Power BI Analytics Button */}
+          {onNavigateToPowerBI && (
+            <button
+              onClick={onNavigateToPowerBI}
+              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 flex-shrink-0"
+              title="1-Click Launch Power BI Embedded Analytics Suite"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Open Power BI Analytics</span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -36,6 +36,7 @@ from services.export import (
     generate_executive_audit_package_pdf_bytes,
     generate_pbit_template
 )
+from services.powerbi_service import get_powerbi_embed_config
 from services.test_runner import execute_automated_system_tests
 
 def ensure_database_populated(session):
@@ -1072,6 +1073,14 @@ def get_audit_package_pdf(format: Optional[str] = Query(None, description="Forma
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=Executive_Travel_Audit_Package.pdf"}
     )
+
+@app.get("/api/powerbi/embed-config")
+def powerbi_embed_config(current_user: User = Depends(get_current_user)):
+    """
+    Returns secure Power BI embedding configuration metadata for the React client.
+    Never exposes client secrets or service principal passwords.
+    """
+    return get_powerbi_embed_config()
 
 @app.get("/api/powerbi/pbit")
 def download_pbit(current_user: User = Depends(get_current_user)):

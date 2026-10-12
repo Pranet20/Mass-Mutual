@@ -10,6 +10,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, LineChart, Line, PieChart, Pie, AreaChart, Area, Legend 
 } from 'recharts';
+import { PowerBIReportEmbed } from '../components/PowerBIReportEmbed';
 
 export const PowerBI = () => {
   const [activeReportPage, setActiveReportPage] = useState('executive'); // 'executive', 'divisional', 'routes', 'compliance', 'financial-audit'
@@ -494,6 +495,16 @@ export const PowerBI = () => {
           <button
             type="button"
             onClick={handleDownloadPBIX}
+            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            title="1-Click Launch Power BI Report"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Open Power BI Analytics</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadPBIX}
             className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             title="Download Corporate_Travel_Analytics.pbix master report"
           >
@@ -504,7 +515,7 @@ export const PowerBI = () => {
           <button
             type="button"
             onClick={handleDownloadAnalysisDocument}
-            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
             title="Download 2-Page Executive C-Suite Strategic Memo"
           >
             <Download className="w-3.5 h-3.5" />
@@ -523,6 +534,12 @@ export const PowerBI = () => {
         </div>
       </div>
 
+      {/* Genuine Microsoft Power BI Embedded Report Component */}
+      <PowerBIReportEmbed onSwitchToFallback={() => {
+        const el = document.getElementById('interactive-analytical-view');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }} />
+
       {/* Analytics Data Unavailable Notice */}
       {loadError && !liveAnalytics && (
         <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold text-center space-y-2">
@@ -533,7 +550,7 @@ export const PowerBI = () => {
       )}
 
       {/* Power BI Embedded Canvas Wrapper */}
-      <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+      <div id="interactive-analytical-view" className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
         {/* Interactive Slicer Control Bar */}
         <div className="p-4 bg-slate-950/80 border-b border-slate-800 flex flex-wrap items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5 text-amber-400 font-bold uppercase tracking-wider text-[11px] pr-2 border-r border-slate-800">
