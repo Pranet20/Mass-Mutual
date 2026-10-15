@@ -62,22 +62,38 @@ Before opening Power BI Desktop, execute the ground truth validation script to c
 python scripts/validate_powerbi_source.py
 ```
 
-### Authoritative Database Baseline (`vw_travel`):
+### A. Current Dynamic Ground Truth Baseline (PostgreSQL `vw_travel` / SQLite):
+*Calculated directly from `vw_travel` via `python scripts/validate_powerbi_source.py`:*
 
 | Metric Category | Dimension / Metric | Value | Audit Notes |
 | :--- | :--- | :--- | :--- |
-| **Fact Grain** | Total Ingested Ticket Legs | **394** | Row count of `vw_travel` |
-| | Completed Ticket Legs (`'Y'`) | **260** | Spend: `₹16,823,590.00` |
-| | Cancelled / Refunded Legs (`'N'`) | **134** | Spend: `₹8,058,920.00` |
-| | **Total Gross Booking Spend** | **₹24,882,510.00 INR** | Strictly partitioned: 260 + 134 = 394 |
-| **Trip Grain** | Total Distinct Trips (`trip_id`) | **280** | Primary PS-04 Trip Metric |
-| | Fully Flown Trips (All `'Y'`) | **164** | Multi-leg/single trips with 100% flown legs |
+| **Fact Grain** | Total Ingested Ticket Legs | **413** | Exact row count of `vw_travel` view |
+| | Completed Ticket Legs (`'Y'`) | **273** | Spend: `₹18,349,710.00` |
+| | Cancelled / Refunded Legs (`'N'`) | **140** | Spend: `₹9,131,180.00` |
+| | **Total Gross Booking Spend** | **₹27,480,890.00 INR** | Strictly partitioned: 273 + 140 = 413 legs |
+| **Trip Grain** | Total Distinct Trips (`trip_id`) | **299** | Primary PS-04 Trip Metric (`DISTINCTCOUNT(vw_travel[trip_id])`) |
+| | Fully Flown Trips (All `'Y'`) | **176** | Multi-leg/single trips with 100% flown legs |
 | | Fully Cancelled Trips (All `'N'`) | **60** | Trips where 100% of legs were cancelled |
-| | Mixed-Leg Trips (Both `'Y'` & `'N'`) | **56** | Connecting trips with rebooked/cancelled legs |
-| | **Trip Grain Check Sum** | **280** | **164 + 60 + 56 = 280 (100% Reconciled)** |
-| **Trip Overlap** | Trips with Travelled Legs (Any `'Y'`) | **220** | 164 fully flown + 56 mixed |
-| | Trips with Cancelled Legs (Any `'N'`) | **116** | 60 fully cancelled + 56 mixed |
-| | *Overlap Reconciliation Note* | *336* | `220 + 116 = 336 (> 280)` because 56 mixed trips have both `'Y'` and `'N'` ticket legs. |
+| | Mixed-Leg Trips (Both `'Y'` & `'N'`) | **63** | Connecting trips with rebooked/cancelled legs |
+| | **Trip Grain Check Sum** | **299** | **176 + 60 + 63 = 299 (100% Reconciled)** |
+| **Trip Overlap** | Trips with Travelled Legs (Any `'Y'`) | **239** | 176 fully flown + 63 mixed |
+| | Trips with Cancelled Legs (Any `'N'`) | **123** | 60 fully cancelled + 63 mixed |
+| | *Overlap Reconciliation Note* | *362* | `239 + 123 = 362 (> 299)` because 63 mixed trips have both `'Y'` and `'N'` legs |
+
+### B. Historical Baseline Snapshot (Initial Seed Reference):
+*(Archived historical figures preserved for audit lineage)*
+
+| Metric Category | Dimension / Metric | Value | Audit Notes |
+| :--- | :--- | :--- | :--- |
+| **Fact Grain** | Total Ingested Ticket Legs | 394 | Historical seed row count |
+| | Completed Ticket Legs (`'Y'`) | 260 | Spend: `₹16,823,590.00` |
+| | Cancelled / Refunded Legs (`'N'`) | 134 | Spend: `₹8,058,920.00` |
+| | Total Gross Booking Spend | ₹24,882,510.00 INR | 260 + 134 = 394 |
+| **Trip Grain** | Total Distinct Trips (`trip_id`) | 280 | Historical distinct trips |
+| | Fully Flown Trips (All `'Y'`) | 164 | Historical flown trips |
+| | Fully Cancelled Trips (All `'N'`) | 60 | Historical cancelled trips |
+| | Mixed-Leg Trips (Both `'Y'` & `'N'`) | 56 | Historical mixed trips |
+| | Trip Grain Check Sum | 280 | 164 + 60 + 56 = 280 (100% Reconciled) |
 
 ---
 

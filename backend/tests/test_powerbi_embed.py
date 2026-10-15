@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Add backend directory to sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pytest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
@@ -117,3 +123,79 @@ def test_embed_config_microsoft_auth_failure(auth_headers):
     powerbi_service.POWERBI_CLIENT_SECRET = ""
     powerbi_service.POWERBI_WORKSPACE_ID = ""
     powerbi_service.POWERBI_REPORT_ID = ""
+
+def test_pbix_download_unauthorized():
+    """Accessing /api/powerbi/pbix without credentials must return 401 Unauthorized."""
+    response = client.get("/api/powerbi/pbix")
+    assert response.status_code == 401
+
+def test_pbix_download_authorized(auth_headers):
+    """Authenticated request with Bearer header retrieves valid binary .pbix deliverable."""
+    response = client.get("/api/powerbi/pbix", headers=auth_headers)
+    assert response.status_code == 200
+    assert response.headers.get("content-type") == "application/octet-stream"
+    assert "Corporate_Travel_Analytics.pbix" in response.headers.get("content-disposition", "")
+    # PBIX is a ZIP-packaged OLE archive; begins with standard PK header bytes
+    assert response.content[:2] == b"PK"
+    assert len(response.content) > 50000
+
+def test_token_api_failure_handling():
+    """Testing with malformed or expired JWT Bearer token returns 401."""
+    bad_headers = {"Authorization": "Bearer invalid_expired_or_forged_token_xyz"}
+    response = client.get("/api/powerbi/embed-config", headers=bad_headers)
+    assert response.status_code == 401
+
+def test_distinct_trip_calculations_and_grain(auth_headers):
+    """Verify trip metrics strictly use distinct trip_id rather than row/leg counts."""
+    from database.models import SessionLocal, FactTravelTicket
+    from sqlalchemy import func
+
+    session = SessionLocal()
+    expected_total_tickets = session.query(FactTravelTicket).count()
+    expected_flown_tickets = session.query(FactTravelTicket).filter_by(travelled_flag='Y').count()
+    expected_distinct_trips = session.query(func.count(func.distinct(FactTravelTicket.trip_id))).scalar()
+    expected_flown_trips = session.query(func.count(func.distinct(FactTravelTicket.trip_id))).filter(FactTravelTicket.travelled_flag == 'Y').scalar()
+    session.close()
+
+    response = client.get("/api/powerbi/analytics", headers=auth_headers)
+    assert response.status_code == 200
+    data = response.json()
+    kpis = data["kpis"]
+    # Distinct trips must be less than or equal to total ticket legs
+    assert kpis["total_trips"] <= kpis["total_tickets"]
+    assert kpis["flown_trips"] <= kpis["flown_tickets"]
+    assert kpis["total_trips"] == expected_distinct_trips
+    assert kpis["total_tickets"] == expected_total_tickets
+    assert kpis["flown_trips"] == expected_flown_trips
+    assert kpis["flown_tickets"] == expected_flown_tickets
+
+    # Check dashboard stats endpoint grain
+    stats_resp = client.get("/api/dashboard/stats", headers=auth_headers)
+    assert stats_resp.status_code == 200
+    s_data = stats_resp.json()
+    assert s_data["kpis"]["total_trips"] == expected_distinct_trips
+    assert s_data["kpis"]["total_tickets"] == expected_total_tickets
+    assert s_data["kpis"]["active_trips"] == expected_flown_trips
+
+    # Verify by_business_group has both trip_count and leg_count, with trip_count <= leg_count
+    for bg in s_data["by_business_group"]:
+        assert bg["trip_count"] <= bg["leg_count"]
+
+    # Verify by_travel_summary has both count (distinct trips) and leg_count
+    for summary in s_data["by_travel_summary"]:
+        assert summary["count"] <= summary["leg_count"]
+
+def test_authoritative_fx_and_budget_integrity(auth_headers):
+    """Verify that fx_rates and allowances are returned authoritatively from the database without invented numbers."""
+    response = client.get("/api/powerbi/analytics", headers=auth_headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert "fx_rates" in data
+    assert len(data["fx_rates"]) > 0
+    # Every FX rate must have currency, rate, label, and effective_date
+    for fx in data["fx_rates"]:
+        assert fx["currency"] != "INR"
+        assert fx["rate"] > 0
+        assert "effective_date" in fx
+        assert "Corporate Treasury" in fx.get("source", "")
+

@@ -132,8 +132,11 @@ export const PowerBI = () => {
     return Object.entries(currMap).map(([name, value]) => ({ name, value: Math.round(value) }));
   }, [flownFiltered]);
 
-  // Approved Treasury FX Rates Data for Bar Chart (derived from governed feed records)
+  // Approved Treasury FX Rates Data for Bar Chart (derived from live database fx_rates or governed feed)
   const fxRatesChartData = React.useMemo(() => {
+    if (liveAnalytics?.fx_rates?.length) {
+      return liveAnalytics.fx_rates;
+    }
     const rateMap = {};
     feedRecords.forEach(r => {
       if (r.currency && r.currency !== 'INR' && r.fx_rate) {
@@ -149,15 +152,8 @@ export const PowerBI = () => {
         label: `${currency} = ₹${rate.toFixed(2)}`
       }));
     }
-    return [
-      { currency: 'GBP', rate: 108.00, label: '£1 = ₹108.00' },
-      { currency: 'EUR', rate: 92.00, label: '€1 = ₹92.00' },
-      { currency: 'USD', rate: 85.00, label: '$1 = ₹85.00' },
-      { currency: 'SGD', rate: 63.50, label: 'S$1 = ₹63.50' },
-      { currency: 'CAD', rate: 62.00, label: 'C$1 = ₹62.00' },
-      { currency: 'AED', rate: 23.15, label: 'AED 1 = ₹23.15' }
-    ];
-  }, [feedRecords]);
+    return []; // Explicit empty state: never invent unauthoritative FX rates
+  }, [liveAnalytics, feedRecords]);
 
   // FX Transactions Ledger
   const fxLedgerData = React.useMemo(() => {
@@ -380,22 +376,57 @@ export const PowerBI = () => {
   const [dbProbeResult, setDbProbeResult] = useState(null);
   const [testingProbe, setTestingProbe] = useState(false);
 
-  const handleDownloadAnalysisDocument = () => {
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const url = token ? `/api/reports/briefing-html?token=${encodeURIComponent(token)}` : '/api/reports/briefing-html';
-    window.open(url, '_blank');
+  const handleDownloadAnalysisDocument = async () => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get('/api/reports/briefing-html', { headers, responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'text/html' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to open executive briefing document:', err);
+      alert('Unable to load briefing document. Please verify your authentication.');
+    }
   };
 
-  const handleDownloadAuditPackage = () => {
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const url = token ? `/api/reports/audit-package-html?token=${encodeURIComponent(token)}` : '/api/reports/audit-package-html';
-    window.open(url, '_blank');
+  const handleDownloadAuditPackage = async () => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get('/api/reports/audit-package-html', { headers, responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'text/html' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to open audit package:', err);
+      alert('Unable to load audit package. Please verify your authentication.');
+    }
   };
 
-  const handleDownloadPBIX = () => {
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const url = token ? `/api/powerbi/pbix?token=${encodeURIComponent(token)}` : '/api/powerbi/pbix';
-    window.location.href = url;
+  const [downloadingPBIX, setDownloadingPBIX] = useState(false);
+
+  const handleDownloadPBIX = async () => {
+    try {
+      setDownloadingPBIX(true);
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get('/api/powerbi/pbix', { headers, responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/octet-stream' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'Corporate_Travel_Analytics.pbix';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Failed to download PBIX report:', err);
+      alert('Unable to download Power BI file. Please ensure you are logged in.');
+    } finally {
+      setDownloadingPBIX(false);
+    }
   };
 
   const handleCopyText = (text, fieldName) => {
@@ -549,13 +580,28 @@ export const PowerBI = () => {
         </div>
       )}
 
-      {/* Power BI Embedded Canvas Wrapper */}
+      {/* Native Web Analytics & Scenario Simulation (In-Browser Fallback) */}
       <div id="interactive-analytical-view" className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+        {/* Fallback Banner Header */}
+        <div className="px-5 py-3 bg-slate-950/90 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-extrabold text-[10px] uppercase tracking-wider border border-indigo-500/30">
+              Native Web Fallback
+            </span>
+            <span className="text-white font-bold text-xs">
+              Interactive In-Browser Telemetry &amp; What-If Scenario Simulator
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-400">
+            Direct PostgreSQL <code className="text-amber-300">vw_travel</code> feed • Independent of Power BI Desktop
+          </span>
+        </div>
+
         {/* Interactive Slicer Control Bar */}
-        <div className="p-4 bg-slate-950/80 border-b border-slate-800 flex flex-wrap items-center gap-3 text-xs">
+        <div className="p-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5 text-amber-400 font-bold uppercase tracking-wider text-[11px] pr-2 border-r border-slate-800">
             <Sliders className="w-3.5 h-3.5" />
-            <span>Slicers:</span>
+            <span>Web Slicers:</span>
           </div>
 
           {/* Business Unit Slicer */}

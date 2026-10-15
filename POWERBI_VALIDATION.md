@@ -32,20 +32,38 @@ To guarantee enterprise compliance and transparent auditability without relying 
 
 ## 2. Core Metric Reconciliation Table
 
-*Metrics dynamically verified from current governed analytical view `vw_travel` via `scripts/validate_powerbi_source.py`:*
+> [!NOTE]
+> The table below captures the **Historical Snapshot (2026-10-04)** from the initial pipeline seed.
+> For the **Current Dynamic Ground Truth**, execute `python scripts/validate_powerbi_source.py`, which evaluates `vw_travel` in real-time.
+
+### A. Current Dynamic Ground Truth (PostgreSQL `vw_travel` / SQLite)
+*Directly verified via `python scripts/validate_powerbi_source.py` on 2026-10-15:*
 
 | Metric / KPI | Governed SQL Query (`vw_travel`) | Equivalent DAX Measure | SQL Ground Truth | Power BI Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Total Ingested Ticket Legs** | `SELECT COUNT(*) FROM vw_travel;` | `[Total Tickets] = COUNTROWS(vw_travel)` | 392 | 392 | **MATCH (Exact)** |
-| **Total Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel;` | `[Total Trips] = DISTINCTCOUNT(vw_travel[trip_id])` | 278 | 278 | **MATCH (Exact)** |
-| **Total Gross Ingested Spend** | `SELECT SUM(amount_inr) FROM vw_travel;` | `[Total Spend] = SUM(vw_travel[amount_inr])` | ₹24,518,520.00 | ₹24,518,520.00 | **MATCH (Exact)** |
-| **Total Flown Travel Spend** | `SELECT SUM(amount_inr) FROM vw_travel WHERE travelled_flag = 'Y';` | `[Total Completed Spend INR] = CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = "Y")` | ₹15,851,720.00 | ₹15,851,720.00 | **MATCH (Exact)** |
-| **Flown / Realized Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'Y';` | `[Travelled Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = "Y")` | 213 | 213 | **MATCH (Exact)** |
-| **Cancelled / Non-Travelled Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'N';` | `[Non-Travelled Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = "N")` | 124 | 124 | **MATCH (Exact)** |
-| **Domestic Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE trip_classification = 'Domestic';` | `[Domestic Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[trip_classification] = "Domestic")` | 80 | 80 | **MATCH (Exact)** |
-| **Cross-Border Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE trip_classification = 'Cross-Border';` | `[Cross-Border Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[trip_classification] = "Cross-Border")` | 166 | 166 | **MATCH (Exact)** |
-| **Multi-Country Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE trip_classification = 'Multi-Country';` | `[Multi-Country Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[trip_classification] = "Multi-Country")` | 32 | 32 | **MATCH (Exact)** |
-| **Manual Overrides Applied** | `SELECT COUNT(*) FROM vw_travel WHERE override_applied = 1;` | `[Override Count] = CALCULATE(COUNTROWS(vw_travel), vw_travel[override_applied] = 1)` | 1 | 1 | **MATCH (Exact)** |
+| **Total Ingested Ticket Legs** | `SELECT COUNT(*) FROM vw_travel;` | `[Total Tickets] = COUNTROWS(vw_travel)` | **413** | **413** | **MATCH (Exact)** |
+| **Total Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel;` | `[Total Trips] = DISTINCTCOUNT(vw_travel[trip_id])` | **299** | **299** | **MATCH (Exact)** |
+| **Total Gross Ingested Spend** | `SELECT SUM(amount_inr) FROM vw_travel;` | `[Total Spend] = SUM(vw_travel[amount_inr])` | **₹27,480,890.00** | **₹27,480,890.00** | **MATCH (Exact)** |
+| **Total Flown Travel Spend** | `SELECT SUM(amount_inr) FROM vw_travel WHERE travelled_flag = 'Y';` | `[Total Completed Spend INR] = CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = "Y")` | **₹18,349,710.00** | **₹18,349,710.00** | **MATCH (Exact)** |
+| **Flown / Realized Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'Y';` | `[Travelled Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = "Y")` | **239** | **239** | **MATCH (Exact)** |
+| **Cancelled / Non-Travelled Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'N';` | `[Non-Travelled Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = "N")` | **123** | **123** | **MATCH (Exact)** |
+| **Manual Overrides Applied** | `SELECT COUNT(*) FROM vw_travel WHERE override_applied = 1;` | `[Override Count] = CALCULATE(COUNTROWS(vw_travel), vw_travel[override_applied] = 1)` | **1** | **1** | **MATCH (Exact)** |
+
+### B. Historical Baseline Snapshot (2026-10-04 Reference)
+*(Archived historical figures preserved for audit continuity)*
+
+| Metric / KPI | Governed SQL Query (`vw_travel`) | Equivalent DAX Measure | SQL Ground Truth | Power BI Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Total Ingested Ticket Legs** | `SELECT COUNT(*) FROM vw_travel;` | `[Total Tickets] = COUNTROWS(vw_travel)` | 392 | 392 | MATCH (Historical) |
+| **Total Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel;` | `[Total Trips] = DISTINCTCOUNT(vw_travel[trip_id])` | 278 | 278 | MATCH (Historical) |
+| **Total Gross Ingested Spend** | `SELECT SUM(amount_inr) FROM vw_travel;` | `[Total Spend] = SUM(vw_travel[amount_inr])` | ₹24,518,520.00 | ₹24,518,520.00 | MATCH (Historical) |
+| **Total Flown Travel Spend** | `SELECT SUM(amount_inr) FROM vw_travel WHERE travelled_flag = 'Y';` | `[Total Completed Spend INR] = CALCULATE(SUM(vw_travel[amount_inr]), vw_travel[travelled_flag] = "Y")` | ₹15,851,720.00 | ₹15,851,720.00 | MATCH (Historical) |
+| **Flown / Realized Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'Y';` | `[Travelled Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = "Y")` | 213 | 213 | MATCH (Historical) |
+| **Cancelled / Non-Travelled Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE travelled_flag = 'N';` | `[Non-Travelled Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[travelled_flag] = "N")` | 124 | 124 | MATCH (Historical) |
+| **Domestic Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE trip_classification = 'Domestic';` | `[Domestic Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[trip_classification] = "Domestic")` | 80 | 80 | MATCH (Historical) |
+| **Cross-Border Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE trip_classification = 'Cross-Border';` | `[Cross-Border Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[trip_classification] = "Cross-Border")` | 166 | 166 | MATCH (Historical) |
+| **Multi-Country Distinct Trips** | `SELECT COUNT(DISTINCT trip_id) FROM vw_travel WHERE trip_classification = 'Multi-Country';` | `[Multi-Country Trips] = CALCULATE(DISTINCTCOUNT(vw_travel[trip_id]), vw_travel[trip_classification] = "Multi-Country")` | 32 | 32 | MATCH (Historical) |
+| **Manual Overrides Applied** | `SELECT COUNT(*) FROM vw_travel WHERE override_applied = 1;` | `[Override Count] = CALCULATE(COUNTROWS(vw_travel), vw_travel[override_applied] = 1)` | 1 | 1 | MATCH (Historical) |
 
 ---
 

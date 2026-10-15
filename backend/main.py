@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from database.models import (
     init_db, SessionLocal, engine,
-    FactTravelTicket, EmployeeMaster, CountryReference,
+    FactTravelTicket, EmployeeMaster, CountryReference, FXRate,
     ManualOverride, ManualOverrideAudit, PipelineBatchAudit, QuarantinedRecord, User, Complaint
 )
 from pipeline.validation import run_end_to_end_pipeline
@@ -414,65 +414,105 @@ def get_dashboard_stats(
     cancelled_tickets = [t for t in filtered_tickets if t.travelled_flag == 'N']
     
     total_spend_inr = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
-    cross_border_count = sum(1 for t in filtered_tickets if t.trip_classification == 'Cross-Border')
-    domestic_count = sum(1 for t in filtered_tickets if t.trip_classification == 'Domestic')
-    multi_country_count = sum(1 for t in filtered_tickets if t.trip_classification == 'Multi-Country')
+    
+    # Distinct trip counts (Trip Grain) vs ticket leg counts (Fact Grain)
+    total_distinct_trips = len(set(t.trip_id for t in filtered_tickets if t.trip_id))
+    flown_distinct_trips = len(set(t.trip_id for t in flown_tickets if t.trip_id))
+    cancelled_distinct_trips = len(set(t.trip_id for t in cancelled_tickets if t.trip_id))
+    cross_border_trips = len(set(t.trip_id for t in filtered_tickets if t.trip_classification == 'Cross-Border' and t.trip_id))
+    domestic_trips = len(set(t.trip_id for t in filtered_tickets if t.trip_classification == 'Domestic' and t.trip_id))
+    multi_country_trips = len(set(t.trip_id for t in filtered_tickets if t.trip_classification == 'Multi-Country' and t.trip_id))
     cancelled_count = len(cancelled_tickets)
     pending_approvals_count = sum(1 for t in filtered_tickets if t.approval_status in ('PENDING', 'PENDING_APPROVAL'))
 
-    # Business Unit Aggregation
-    bu_buckets = {}
+    # Business Unit Aggregation (Trip Grain + Leg Count + Spend)
+    bu_trips = {}
+    bu_legs = {}
+    bu_spend = {}
     for t in flown_tickets:
         bu = t.business_unit or "Unknown"
-        if bu not in bu_buckets:
-            bu_buckets[bu] = {"trips": 0, "spend": 0.0}
-        bu_buckets[bu]["trips"] += 1
-        bu_buckets[bu]["spend"] += float(t.amount_inr or 0.0)
+        if bu not in bu_trips:
+            bu_trips[bu] = set()
+            bu_legs[bu] = 0
+            bu_spend[bu] = 0.0
+        bu_trips[bu].add(t.trip_id)
+        bu_legs[bu] += 1
+        bu_spend[bu] += float(t.amount_inr or 0.0)
 
     by_bu = [
-        {"business_unit": bu, "trip_count": data["trips"], "total_spend_inr": round(data["spend"], 2)}
-        for bu, data in sorted(bu_buckets.items(), key=lambda x: x[1]["spend"], reverse=True)
+        {
+            "business_unit": bu,
+            "trip_count": len(bu_trips[bu]),
+            "leg_count": bu_legs[bu],
+            "total_spend_inr": round(bu_spend[bu], 2)
+        }
+        for bu in sorted(bu_trips.keys(), key=lambda x: bu_spend[x], reverse=True)
     ]
 
-    # Travel Summary Aggregation (Core BI Requirement: Trips by Travel Summary)
-    summary_buckets = {}
+    # Travel Summary Aggregation (Core BI Requirement: Distinct Trips by Travel Summary)
+    summary_trips = {}
+    summary_legs = {}
     for t in filtered_tickets:
         lbl = t.travel_summary or "Other"
-        summary_buckets[lbl] = summary_buckets.get(lbl, 0) + 1
+        if lbl not in summary_trips:
+            summary_trips[lbl] = set()
+            summary_legs[lbl] = 0
+        summary_trips[lbl].add(t.trip_id)
+        summary_legs[lbl] += 1
 
     by_summary = [
-        {"label": lbl, "count": count}
-        for lbl, count in sorted(summary_buckets.items(), key=lambda x: x[1], reverse=True)
+        {"label": lbl, "count": len(summary_trips[lbl]), "leg_count": summary_legs[lbl]}
+        for lbl in sorted(summary_trips.keys(), key=lambda x: len(summary_trips[x]), reverse=True)
     ]
 
-    # Monthly Trend from filtered flown tickets (Core BI Requirement: Trips & Spend by Month)
-    month_buckets = {}
+    # Monthly Trend from filtered flown tickets (Distinct Trips & Spend by Month)
+    month_trips = {}
+    month_legs = {}
+    month_spend = {}
     for t in flown_tickets:
         t_date = t.travel_date
         m_key = t_date[:7] if (t_date and len(t_date) >= 7) else "2026-01"
-        if m_key not in month_buckets:
-            month_buckets[m_key] = {"trips": 0, "spend": 0.0}
-        month_buckets[m_key]["trips"] += 1
-        month_buckets[m_key]["spend"] += float(t.amount_inr or 0.0)
+        if m_key not in month_trips:
+            month_trips[m_key] = set()
+            month_legs[m_key] = 0
+            month_spend[m_key] = 0.0
+        month_trips[m_key].add(t.trip_id)
+        month_legs[m_key] += 1
+        month_spend[m_key] += float(t.amount_inr or 0.0)
 
-    sorted_months = sorted(month_buckets.keys())
+    sorted_months = sorted(month_trips.keys())
     monthly_data = [
-        {"month": m, "trips": month_buckets[m]["trips"], "spend_inr": round(month_buckets[m]["spend"], 2)}
+        {
+            "month": m,
+            "trips": len(month_trips[m]),
+            "leg_count": month_legs[m],
+            "spend_inr": round(month_spend[m], 2)
+        }
         for m in sorted_months
     ]
 
-    # Business Group Aggregation (Core PS-04 Reporting Dimension)
-    bg_buckets = {}
+    # Business Group Aggregation (Core PS-04 Reporting Dimension: Distinct Trips & Spend)
+    bg_trips = {}
+    bg_legs = {}
+    bg_spend = {}
     for t in flown_tickets:
         bg = t.business_group or "Unknown"
-        if bg not in bg_buckets:
-            bg_buckets[bg] = {"trips": 0, "spend": 0.0}
-        bg_buckets[bg]["trips"] += 1
-        bg_buckets[bg]["spend"] += float(t.amount_inr or 0.0)
+        if bg not in bg_trips:
+            bg_trips[bg] = set()
+            bg_legs[bg] = 0
+            bg_spend[bg] = 0.0
+        bg_trips[bg].add(t.trip_id)
+        bg_legs[bg] += 1
+        bg_spend[bg] += float(t.amount_inr or 0.0)
 
     by_bg = [
-        {"business_group": bg, "trip_count": data["trips"], "total_spend_inr": round(data["spend"], 2)}
-        for bg, data in sorted(bg_buckets.items(), key=lambda x: x[1]["spend"], reverse=True)
+        {
+            "business_group": bg,
+            "trip_count": len(bg_trips[bg]),
+            "leg_count": bg_legs[bg],
+            "total_spend_inr": round(bg_spend[bg], 2)
+        }
+        for bg in sorted(bg_trips.keys(), key=lambda x: bg_spend[x], reverse=True)
     ]
 
     session.close()
@@ -481,11 +521,14 @@ def get_dashboard_stats(
         "kpis": {
             "total_spend_inr": round(total_spend_inr, 2),
             "total_tickets": total_tickets,
-            "active_trips": total_tickets - cancelled_count,
-            "cross_border_trips": cross_border_count,
-            "domestic_trips": domestic_count,
-            "multi_country_trips": multi_country_count,
-            "cancelled_refunded_trips": cancelled_count,
+            "total_trips": total_distinct_trips,
+            "active_trips": flown_distinct_trips,
+            "flown_legs": len(flown_tickets),
+            "cancelled_legs": cancelled_count,
+            "cross_border_trips": cross_border_trips,
+            "domestic_trips": domestic_trips,
+            "multi_country_trips": multi_country_trips,
+            "cancelled_refunded_trips": cancelled_distinct_trips,
             "pending_approvals": pending_approvals_count
         },
         "by_business_group": by_bg,
@@ -1128,33 +1171,43 @@ def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
         employees = session.query(EmployeeMaster).all()
         quarantined_count = session.query(QuarantinedRecord).count()
         
-        # Budgets by BU
+        # Budgets by BU: authoritative allowances only (never invent defaults)
         bu_budgets = {}
         for emp in employees:
             bu = emp.business_unit or "General"
-            bu_budgets[bu] = bu_budgets.get(bu, 0.0) + float(emp.quarterly_allowance_inr or 150000.0)
+            allowance = float(emp.quarterly_allowance_inr) if emp.quarterly_allowance_inr is not None else 0.0
+            bu_budgets[bu] = bu_budgets.get(bu, 0.0) + allowance
             
         total_budget = sum(bu_budgets.values())
         
         flown_tickets = [t for t in tickets if t.travelled_flag == 'Y']
         total_spend = sum(float(t.amount_inr or 0.0) for t in flown_tickets)
-        total_flown = len(flown_tickets)
+        total_flown_legs = len(flown_tickets)
         total_tickets = len(tickets)
+        distinct_flown_trips = len(set(t.trip_id for t in flown_tickets if t.trip_id))
+        total_distinct_trips = len(set(t.trip_id for t in tickets if t.trip_id))
         budget_variance = total_budget - total_spend
         variance_pct = (budget_variance / total_budget * 100) if total_budget > 0 else 0.0
-        avg_fare = round(total_spend / total_flown) if total_flown > 0 else 0
+        avg_fare = round(total_spend / distinct_flown_trips) if distinct_flown_trips > 0 else 0
         
-        # Divisional aggregates
+        # Divisional aggregates (Trip Grain + Leg Count)
         bu_groups = {}
+        bu_trips_map = {}
         for bu, b in bu_budgets.items():
-            bu_groups[bu] = {"name": bu, "budget": round(b, 2), "spend": 0.0, "trips": 0}
+            bu_groups[bu] = {"name": bu, "budget": round(b, 2), "spend": 0.0, "trips": 0, "legs": 0}
+            bu_trips_map[bu] = set()
             
         for t in flown_tickets:
             bu = t.business_unit or "Other"
             if bu not in bu_groups:
-                bu_groups[bu] = {"name": bu, "budget": 0.0, "spend": 0.0, "trips": 0}
+                bu_groups[bu] = {"name": bu, "budget": 0.0, "spend": 0.0, "trips": 0, "legs": 0}
+                bu_trips_map[bu] = set()
             bu_groups[bu]["spend"] += float(t.amount_inr or 0.0)
-            bu_groups[bu]["trips"] += 1
+            bu_groups[bu]["legs"] += 1
+            bu_trips_map[bu].add(t.trip_id)
+
+        for bu, d in bu_groups.items():
+            d["trips"] = len(bu_trips_map.get(bu, set()))
             
         bu_matrix = []
         for bu, d in sorted(bu_groups.items(), key=lambda x: x[1]["spend"], reverse=True):
@@ -1169,11 +1222,13 @@ def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
                 "variance": round(v, 2),
                 "utilization_pct": round(u, 1),
                 "trips": d["trips"],
+                "legs": d["legs"],
                 "status": "Under Cap" if u < 85 else "High Utilization"
             })
             
-        # Route Corridors & Volumes
+        # Route Corridors & Volumes (Distinct Trips & Legs)
         route_buckets = {}
+        route_trips_map = {}
         for t in flown_tickets:
             orig = t.origin_city or "Unknown"
             dest = t.dest_city or "Unknown"
@@ -1186,10 +1241,16 @@ def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
                     "class": t.trip_classification or "Domestic",
                     "cabin": t.cabin_class or "Economy",
                     "spend": 0.0,
-                    "trips": 0
+                    "trips": 0,
+                    "legs": 0
                 }
+                route_trips_map[r_key] = set()
             route_buckets[r_key]["spend"] += float(t.amount_inr or 0.0)
-            route_buckets[r_key]["trips"] += 1
+            route_buckets[r_key]["legs"] += 1
+            route_trips_map[r_key].add(t.trip_id)
+            
+        for r_key, r in route_buckets.items():
+            r["trips"] = len(route_trips_map[r_key])
             
         sorted_routes = sorted(route_buckets.values(), key=lambda x: x["spend"], reverse=True)[:15]
         for r in sorted_routes:
@@ -1230,6 +1291,20 @@ def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
         dom_spend = sum(float(t.amount_inr or 0.0) for t in dom_flown)
         cb_spend = sum(float(t.amount_inr or 0.0) for t in flown_tickets if t.trip_classification == "Cross-Border")
         mc_spend = sum(float(t.amount_inr or 0.0) for t in flown_tickets if t.trip_classification == "Multi-Country")
+
+        # Authoritative FX Rates from fx_rates table
+        fx_rates_db = session.query(FXRate).all()
+        fx_rates_list = [
+            {
+                "currency": r.currency_code,
+                "rate": float(r.rate_to_inr),
+                "label": f"{r.currency_code} = ₹{float(r.rate_to_inr):.2f}",
+                "effective_date": str(r.effective_date),
+                "source": str(r.source)
+            }
+            for r in fx_rates_db
+            if r.currency_code != "INR"
+        ]
         
         dax_measures = [
             {
@@ -1241,102 +1316,104 @@ def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
             },
             {
                 "id": 2,
-                "name": "Total Flown Bookings",
+                "name": "Total Flown Bookings (Fact Grain)",
                 "formula": 'Total Flown Bookings = CALCULATE(COUNTROWS(vw_travel), vw_travel[travelled_flag] = "Y")',
                 "description": "Counts all flown passenger flight legs excluding cancellations and refunds.",
-                "output": f"{total_flown} Tickets"
+                "output": f"{total_flown_legs} Ticket Legs"
             },
             {
                 "id": 3,
+                "name": "Total Trips (Trip Grain)",
+                "formula": "Total Trips = DISTINCTCOUNT(vw_travel[trip_id])",
+                "description": "Counts distinct corporate trip itineraries across single and multi-leg journeys.",
+                "output": f"{total_distinct_trips} Distinct Trips"
+            },
+            {
+                "id": 4,
                 "name": "Total Allocated Budget",
                 "formula": "Total Allocated Budget = SUM(vw_travel[quarterly_allowance_inr])",
                 "description": "Aggregates quarterly expenditure allowance caps allocated across business divisions.",
                 "output": f"₹{total_budget:,.2f} INR"
             },
             {
-                "id": 4,
+                "id": 5,
                 "name": "Spend Budget Variance",
                 "formula": "Spend Budget Variance = [Total Allocated Budget] - [Total Flown Spend]",
                 "description": "Positive indicates under-budget savings balance; negative flags over-budget overrun.",
                 "output": f"₹{budget_variance:,.2f} INR"
             },
             {
-                "id": 5,
+                "id": 6,
                 "name": "Budget Variance %",
                 "formula": "Budget Variance % = DIVIDE([Spend Budget Variance], [Total Allocated Budget], 0)",
                 "description": "Percentage variance between budget limit and actual flown spend.",
                 "output": f"{variance_pct:.1f}%"
             },
             {
-                "id": 6,
-                "name": "Avg Fare per Ticket",
-                "formula": "Avg Fare per Ticket = DIVIDE([Total Flown Spend], [Total Flown Bookings], 0)",
-                "description": "Blended average fare across domestic, regional, and long-haul intercontinental routes.",
+                "id": 7,
+                "name": "Avg Fare per Trip",
+                "formula": "Avg Fare per Trip = DIVIDE([Total Flown Spend], [Travelled Trips], 0)",
+                "description": "Blended average fare per travelled trip across domestic, regional, and long-haul intercontinental routes.",
                 "output": f"₹{avg_fare:,.2f} INR"
             },
             {
-                "id": 7,
+                "id": 8,
                 "name": "Domestic Flight Spend",
                 "formula": 'Domestic Flight Spend = CALCULATE([Total Flown Spend], vw_travel[trip_classification] = "Domestic")',
                 "description": "Total spend for point-to-point flights within Indian airport corridors.",
                 "output": f"₹{dom_spend:,.2f} INR"
             },
             {
-                "id": 8,
+                "id": 9,
                 "name": "Cross-Border Spend",
                 "formula": 'Cross-Border Spend = CALCULATE([Total Flown Spend], vw_travel[trip_classification] = "Cross-Border")',
                 "description": "Total international point-to-point flight expenditure.",
                 "output": f"₹{cb_spend:,.2f} INR"
             },
             {
-                "id": 9,
+                "id": 10,
                 "name": "Multi-Country Spend",
                 "formula": 'Multi-Country Spend = CALCULATE([Total Flown Spend], vw_travel[trip_classification] = "Multi-Country")',
                 "description": "Complex multi-stop executive travel spanning 3 or more sovereign nations.",
                 "output": f"₹{mc_spend:,.2f} INR"
             },
             {
-                "id": 10,
+                "id": 11,
                 "name": "Domestic Economy Compliance Rate %",
                 "formula": 'Domestic Economy Compliance Rate % = DIVIDE(CALCULATE([Total Flown Bookings], vw_travel[trip_classification] = "Domestic", vw_travel[cabin_class] = "Economy"), CALCULATE([Total Flown Bookings], vw_travel[trip_classification] = "Domestic"), 1.0)',
                 "description": "Enforces 100% compliance target for domestic flights under 6 hours.",
                 "output": f"{dom_compliance_pct}%"
             },
             {
-                "id": 11,
+                "id": 12,
                 "name": "International Business Utilization %",
                 "formula": 'International Business Utilization % = DIVIDE(CALCULATE([Total Flown Bookings], vw_travel[trip_classification] = "Cross-Border", vw_travel[cabin_class] = "Business"), CALCULATE([Total Flown Bookings], vw_travel[trip_classification] = "Cross-Border"), 0)',
                 "description": "Tracks adoption of Business Class for long-haul routes >6 hours.",
                 "output": f"{cb_biz_util_pct}%"
             },
             {
-                "id": 12,
+                "id": 13,
                 "name": "Quarantined Rejection Count",
                 "formula": "Quarantined Rejection Count = COUNTROWS(quarantined_records)",
                 "description": "Tracks corrupt or invalid vendor records isolated by our ETL quarantine tier.",
                 "output": f"{quarantined_count} Records (Zero-Error Pipeline)"
             },
             {
-                "id": 13,
+                "id": 14,
                 "name": "Active Traveling Employees",
                 "formula": "Active Traveling Employees = DISTINCTCOUNT(vw_travel[employee_id])",
                 "description": "Count of unique active employees with recorded travel itineraries.",
                 "output": f"{active_employees} Employees"
-            },
-            {
-                "id": 14,
-                "name": "QoQ Spend Forecast Projection",
-                "formula": "QoQ Spend Forecast Projection = [Total Flown Spend] * (1 + 0.124)",
-                "description": "Linear regression predictive time-series projection for next operating quarter.",
-                "output": f"₹{round(total_spend * 1.124):,.2f} INR"
             }
         ]
         
         return {
             "kpis": {
                 "total_spend": round(total_spend, 2),
-                "total_trips": total_flown,
+                "total_trips": total_distinct_trips,
+                "flown_trips": distinct_flown_trips,
                 "total_tickets": total_tickets,
+                "flown_tickets": total_flown_legs,
                 "total_budget": round(total_budget, 2),
                 "budget_variance": round(budget_variance, 2),
                 "budget_variance_pct": round(variance_pct, 1),
@@ -1357,7 +1434,8 @@ def get_powerbi_analytics(current_user: User = Depends(get_current_user)):
                 "quarantined_count": quarantined_count,
                 "active_employees": active_employees
             },
-            "dax_measures": dax_measures
+            "dax_measures": dax_measures,
+            "fx_rates": fx_rates_list
         }
     finally:
         session.close()

@@ -411,7 +411,7 @@
             "source": {
               "expression": [
                 "let",
-                "    Source = PostgreSQL.Database(\"localhost:5432\", \"travel_warehouse\"),",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"travel_analytics\"),",
                 "    public_vw_travel = Source{[Schema=\"public\",Item=\"vw_travel\"]}[Data],",
                 "    #\"Changed Type\" = Table.TransformColumnTypes(public_vw_travel,{",
                 "        {\"ticket_id\", type text}, {\"trip_id\", type text}, {\"batch_id\", type text}, {\"employee_id\", type text},",

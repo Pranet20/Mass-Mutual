@@ -56,10 +56,32 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
     }
   };
 
-  const handleDownloadPBIX = () => {
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const url = token ? `/api/powerbi/pbix?token=${encodeURIComponent(token)}` : '/api/powerbi/pbix';
-    window.location.href = url;
+  const [downloadingPBIX, setDownloadingPBIX] = useState(false);
+
+  const handleDownloadPBIX = async () => {
+    try {
+      setDownloadingPBIX(true);
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get('/api/powerbi/pbix', {
+        headers,
+        responseType: 'blob'
+      });
+      const blob = new Blob([res.data], { type: 'application/octet-stream' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'Corporate_Travel_Analytics.pbix';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Failed to securely download PBIX report:', err);
+      alert('Unable to download Power BI file. Please verify you are logged in.');
+    } finally {
+      setDownloadingPBIX(false);
+    }
   };
 
   // 1. Loading State
@@ -193,7 +215,7 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
             MassMutual PS-04: Corporate Travel Analytics BI Suite
           </h4>
           <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
-            The authoritative reporting model connects directly to the PostgreSQL warehouse view <code className="text-amber-300">public.vw_travel</code> (37 governed columns, 407 reconciled ticket legs, 293 distinct trips).
+            The authoritative reporting model connects directly to the PostgreSQL warehouse view <code className="text-amber-300">public.vw_travel</code> (37 governed columns, 411 reconciled ticket legs, 297 distinct trips, ₹25,929,330 spend).
           </p>
         </div>
 
@@ -210,19 +232,21 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
           ) : (
             <button
               onClick={handleDownloadPBIX}
-              className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              disabled={downloadingPBIX}
+              className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
             >
               <Laptop className="w-4 h-4" />
-              <span>Open in Power BI Desktop (.pbix)</span>
+              <span>{downloadingPBIX ? 'Downloading...' : 'Download & Open in Desktop (.pbix)'}</span>
             </button>
           )}
 
           <button
             onClick={handleDownloadPBIX}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            disabled={downloadingPBIX}
+            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <FileSpreadsheet className="w-4 h-4 text-amber-300" />
-            <span>Download .pbix Report</span>
+            <span>Download .pbix File</span>
           </button>
         </div>
       </div>
