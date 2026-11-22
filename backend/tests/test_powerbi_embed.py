@@ -199,3 +199,67 @@ def test_authoritative_fx_and_budget_integrity(auth_headers):
         assert "effective_date" in fx
         assert "Corporate Treasury" in fx.get("source", "")
 
+def test_test_connection_endpoint(auth_headers):
+    """Test the /api/powerbi/test-connection endpoint with missing and mock parameters."""
+    # When empty payload is sent without credentials configured
+    resp = client.post("/api/powerbi/test-connection", json={}, headers=auth_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["success"] is False
+    assert data["step_failed"] == "configuration_validation"
+    assert "Missing required parameter" in data["error_detail"]
+
+    # When mock parameters are tested with mocked requests
+    mock_auth = MagicMock(status_code=200)
+    mock_auth.json.return_value = {"access_token": "token_abc"}
+    mock_report = MagicMock(status_code=200)
+    mock_report.json.return_value = {"embedUrl": "https://app.powerbi.com/embed", "datasetId": "ds1", "name": "Report"}
+    mock_token = MagicMock(status_code=200)
+    mock_token.json.return_value = {"token": "embed_tok_1", "tokenId": "tid1", "expiration": "2026-12-31T00:00:00Z"}
+
+    with patch("services.powerbi_service.requests.post") as mock_post, \
+         patch("services.powerbi_service.requests.get") as mock_get:
+        mock_post.side_effect = [mock_auth, mock_token]
+        mock_get.return_value = mock_report
+
+        resp = client.post("/api/powerbi/test-connection", json={
+            "tenant_id": "t1",
+            "client_id": "c1",
+            "client_secret": "s1",
+            "workspace_id": "w1",
+            "report_id": "r1"
+        }, headers=auth_headers)
+
+        assert resp.status_code == 200
+        diag = resp.json()
+        assert diag["success"] is True
+        assert diag["steps"]["azure_ad_auth"]["status"] == "passed"
+        assert diag["steps"]["workspace_access"]["status"] == "passed"
+        assert diag["steps"]["embed_token_generation"]["status"] == "passed"
+
+def test_configure_and_launch_desktop_endpoints(auth_headers):
+    """Verify runtime configuration and desktop launch endpoint functionality."""
+    # Test configure
+    cfg_resp = client.post("/api/powerbi/configure", json={
+        "tenant_id": "test_tenant",
+        "client_id": "test_client"
+    }, headers=auth_headers)
+    assert cfg_resp.status_code == 200
+    cfg_data = cfg_resp.json()
+    assert cfg_data["has_tenant_id"] is True
+    assert cfg_data["has_client_id"] is True
+
+    # Reset
+    from services import powerbi_service
+    powerbi_service.POWERBI_TENANT_ID = ""
+    powerbi_service.POWERBI_CLIENT_ID = ""
+
+    # Test launch desktop
+    launch_resp = client.post("/api/powerbi/launch-desktop", headers=auth_headers)
+    assert launch_resp.status_code == 200
+    l_data = launch_resp.json()
+    assert "acceptance_guide" in l_data
+    assert l_data["expected_rows"] == 414
+    assert l_data["expected_trips"] == 300
+
+

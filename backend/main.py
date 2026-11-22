@@ -36,7 +36,11 @@ from services.export import (
     generate_executive_audit_package_pdf_bytes,
     generate_pbit_template
 )
-from services.powerbi_service import get_powerbi_embed_config
+from services.powerbi_service import (
+    get_powerbi_embed_config,
+    test_azure_powerbi_connection,
+    update_powerbi_runtime_config
+)
 from services.test_runner import execute_automated_system_tests
 
 def ensure_database_populated(session):
@@ -257,6 +261,22 @@ class OverrideRequest(BaseModel):
     override_summary: str
     override_reason: str
     created_by: str
+
+class PowerBITestConnectionRequest(BaseModel):
+    tenant_id: Optional[str] = None
+    client_id: Optional[str] = None
+    client_secret: Optional[str] = None
+    workspace_id: Optional[str] = None
+    report_id: Optional[str] = None
+
+class PowerBIConfigureRequest(BaseModel):
+    tenant_id: Optional[str] = None
+    client_id: Optional[str] = None
+    client_secret: Optional[str] = None
+    workspace_id: Optional[str] = None
+    report_id: Optional[str] = None
+    web_report_url: Optional[str] = None
+    embed_type: Optional[str] = "app_owns_data"
 
 def validate_uploaded_csv(file: UploadFile, max_size_mb: int = 10) -> bytes:
     if not file.filename.lower().endswith(".csv"):
@@ -1124,6 +1144,57 @@ def powerbi_embed_config(current_user: User = Depends(get_current_user)):
     Never exposes client secrets or service principal passwords.
     """
     return get_powerbi_embed_config()
+
+@app.post("/api/powerbi/test-connection")
+def test_powerbi_connection(req: Optional[PowerBITestConnectionRequest] = None, current_user: User = Depends(get_current_user)):
+    """
+    Tests connectivity to Microsoft Entra ID authority and Power BI REST API.
+    Optionally accepts ad-hoc credentials to test prior to saving.
+    """
+    payload = req.model_dump(exclude_none=True) if req else {}
+    return test_azure_powerbi_connection(payload)
+
+@app.post("/api/powerbi/configure")
+def configure_powerbi(req: PowerBIConfigureRequest, current_user: User = Depends(require_role(["manager", "admin"]))):
+    """
+    Updates runtime Power BI service principal configuration and returns validated status.
+    """
+    payload = req.model_dump(exclude_none=True)
+    return update_powerbi_runtime_config(payload)
+
+@app.post("/api/powerbi/launch-desktop")
+def launch_powerbi_desktop(current_user: User = Depends(get_current_user)):
+    """
+    Triggers Windows desktop launch of Corporate_Travel_Analytics.pbip / .pbix.
+    Returns status and acceptance testing checklist.
+    """
+    import sys
+    pbip_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "powerbi", "Corporate_Travel_Analytics.pbip"))
+    pbix_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "powerbi", "Corporate_Travel_Analytics.pbix"))
+
+    target_file = pbip_path if os.path.exists(pbip_path) else pbix_path
+
+    launched = False
+    message = ""
+    if sys.platform == "win32":
+        try:
+            os.startfile(target_file)
+            launched = True
+            message = f"Successfully launched {os.path.basename(target_file)} in Windows Power BI Desktop."
+        except Exception as e:
+            message = f"Could not launch automatically: {str(e)}. Please open manually."
+    else:
+        message = "Power BI Desktop requires Windows. File available for download."
+
+    return {
+        "launched": launched,
+        "target_file": target_file,
+        "message": message,
+        "acceptance_guide": "docs/POWERBI_DESKTOP_ACCEPTANCE_TEST.md",
+        "expected_rows": 414,
+        "expected_trips": 300,
+        "expected_spend_inr": 26913710.00
+    }
 
 @app.get("/api/powerbi/pbit")
 def download_pbit(current_user: User = Depends(get_current_user)):
