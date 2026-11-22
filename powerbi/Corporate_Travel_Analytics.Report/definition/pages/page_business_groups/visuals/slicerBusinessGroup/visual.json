@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "slicerBusinessGroup",
   "position": {
     "x": 1560,
     "y": 210,
-    "width": 320,
+    "z": 304,
     "height": 230,
-    "z": 304
+    "width": 320
   },
   "visual": {
     "visualType": "slicer",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.business_group",
+              "active": true,
               "displayName": "Business Group Filter"
             }
           ]

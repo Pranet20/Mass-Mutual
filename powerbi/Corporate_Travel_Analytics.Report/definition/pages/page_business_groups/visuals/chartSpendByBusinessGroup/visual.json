@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "chartSpendByBusinessGroup",
   "position": {
     "x": 800,
     "y": 210,
-    "width": 740,
+    "z": 303,
     "height": 470,
-    "z": 303
+    "width": 740
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.business_group",
+              "active": true,
               "displayName": "Business Group"
             }
           ]

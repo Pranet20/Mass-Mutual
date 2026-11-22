@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "slicerCurrency",
   "position": {
     "x": 1560,
     "y": 210,
-    "width": 320,
+    "z": 504,
     "height": 470,
-    "z": 504
+    "width": 320
   },
   "visual": {
     "visualType": "slicer",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.currency",
+              "active": true,
               "displayName": "Currency Filter"
             }
           ]

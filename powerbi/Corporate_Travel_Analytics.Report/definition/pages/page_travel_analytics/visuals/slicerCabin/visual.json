@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "slicerCabin",
   "position": {
     "x": 1560,
     "y": 460,
-    "width": 320,
+    "z": 205,
     "height": 220,
-    "z": 205
+    "width": 320
   },
   "visual": {
     "visualType": "slicer",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.cabin_class",
+              "active": true,
               "displayName": "Cabin Class"
             }
           ]

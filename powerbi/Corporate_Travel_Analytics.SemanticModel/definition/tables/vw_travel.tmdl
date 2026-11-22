@@ -83,50 +83,6 @@ table vw_travel
 		lineageTag: 0651701a-443e-4c63-81db-a74c34037bb4
 
 	/// Unique travel ticket number (Fact Grain Key)
-	measure 'Active Employees' = DISTINCTCOUNT(vw_travel[employee_id])
-		formatString: #,##0
-		lineageTag: 1c2cb982-643c-4656-8491-7fd2ad832a2a
-
-	measure 'Avg Spend per Employee' = DIVIDE([Total Spend INR], DISTINCTCOUNT(vw_travel[employee_id]), 0)
-		formatString: ₹#,##0.00
-		lineageTag: 637f8718-feea-45d5-9786-a972d4af9d7b
-
-	measure 'Avg Ticket Cost' = AVERAGE(vw_travel[amount_inr])
-		formatString: ₹#,##0.00
-		lineageTag: 7679f06b-a1fd-4318-af7d-3aa3c8f7a009
-
-	measure 'Active Currencies Count' = DISTINCTCOUNT(vw_travel[currency])
-		formatString: #,##0
-		lineageTag: 1c985d94-a898-47bd-b792-cfbcec6a40ec
-
-	measure 'Avg FX Rate' = AVERAGE(vw_travel[fx_rate])
-		formatString: #,##0.0000
-		lineageTag: 4d2104b8-6651-4fa8-9e54-f4872724e24d
-
-	measure 'Manual Overrides Applied' = CALCULATE(COUNTROWS(vw_travel), vw_travel[override_applied] = 1)
-		formatString: #,##0
-		lineageTag: 45302e18-10fc-496a-a759-1f5928a0545b
-
-	measure 'Spend by Currency' = SUM(vw_travel[amount_inr])
-		formatString: ₹#,##0.00
-		lineageTag: ec16e481-a9fe-4f17-b46e-a9bf2f8a104e
-
-	measure 'Spend by Channel' = SUM(vw_travel[amount_inr])
-		formatString: ₹#,##0.00
-		lineageTag: 7e9ce83a-6baf-4805-97b6-5fca0bac531a
-
-	measure 'Spend by Approval' = SUM(vw_travel[amount_inr])
-		formatString: ₹#,##0.00
-		lineageTag: ebf30419-eed5-46b4-ae55-40747c869dca
-
-	measure 'Spend by Policy Status' = SUM(vw_travel[amount_inr])
-		formatString: ₹#,##0.00
-		lineageTag: 8d4f3b5d-72f8-4638-a531-e77efe6b471a
-
-	measure 'Spend by Classification' = SUM(vw_travel[amount_inr])
-		formatString: ₹#,##0.00
-		lineageTag: 23a747ab-02af-444f-90ef-0d55d0e16181
-
 	column ticket_id
 		dataType: string
 		lineageTag: 4992ef94-116e-4192-84a9-bb91abbc667a

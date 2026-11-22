@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "chartBookingChannelMix",
   "position": {
     "x": 800,
     "y": 210,
-    "width": 740,
+    "z": 203,
     "height": 470,
-    "z": 203
+    "width": 740
   },
   "visual": {
     "visualType": "pieChart",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.booking_channel",
+              "active": true,
               "displayName": "Booking Channel"
             }
           ]

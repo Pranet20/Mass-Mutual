@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "donutApprovalStatus",
   "position": {
     "x": 980,
     "y": 210,
-    "width": 560,
+    "z": 403,
     "height": 470,
-    "z": 403
+    "width": 560
   },
   "visual": {
     "visualType": "pieChart",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.approval_status",
+              "active": true,
               "displayName": "Approval Status"
             }
           ]

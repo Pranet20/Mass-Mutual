@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "slicerClassification",
   "position": {
     "x": 1560,
     "y": 520,
-    "width": 320,
+    "z": 106,
     "height": 160,
-    "z": 106
+    "width": 320
   },
   "visual": {
     "visualType": "slicer",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.trip_classification",
+              "active": true,
               "displayName": "Trip Type Filter"
             }
           ]

@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "chartFXRates",
   "position": {
     "x": 780,
     "y": 210,
-    "width": 760,
+    "z": 503,
     "height": 470,
-    "z": 503
+    "width": 760
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -26,6 +26,7 @@
                 }
               },
               "queryRef": "vw_travel.currency",
+              "active": true,
               "displayName": "Currency"
             }
           ]
