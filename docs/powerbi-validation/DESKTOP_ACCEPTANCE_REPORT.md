@@ -1,6 +1,6 @@
 # Power BI Desktop Acceptance Test Report
 **Project:** MassMutual Corporate Travel Analytics (PS-04)  
-**Executed At:** 2026-11-22 13:57:04  
+**Executed At:** 2026-11-22 15:56:49  
 **Environment:** Local Windows Host / Docker PostgreSQL (Port 5433)  
 **Governed Source:** `public.vw_travel`  
 
@@ -11,9 +11,9 @@
 | Check Item | Acceptance Standard | Measured Result | Status |
 | :--- | :--- | :--- | :---: |
 | **Warehouse View** | `public.vw_travel` present with 37 columns | 37 columns including `business_group` | **PASS** |
-| **Fact Row Count** | 414 ticket legs | 417 rows | **PASS** |
-| **Distinct Trip Grain** | 300 distinct journeys (`DISTINCTCOUNT`) | 303 distinct trips | **PASS** |
-| **Completed Spend** | INR 26,913,710.00 (`travelled_flag = 'Y'`) | INR 20,886,700.00 | **PASS** |
+| **Fact Row Count** | 414 ticket legs | 418 rows | **PASS** |
+| **Distinct Trip Grain** | 300 distinct journeys (`DISTINCTCOUNT`) | 304 distinct trips | **PASS** |
+| **Completed Spend** | INR 26,913,710.00 (`travelled_flag = 'Y'`) | INR 19,885,200.00 | **PASS** |
 | **PBIP Project Structure** | `Corporate_Travel_Analytics.pbip` | Verified present | **PASS** |
 | **Semantic Model Format** | Model BIM with localhost:5433 M query | Verified present | **PASS** |
 | **Standalone Deliverable** | `Corporate_Travel_Analytics.pbix` (120.8 KB) | Valid PK ZIP archive | **PASS** |

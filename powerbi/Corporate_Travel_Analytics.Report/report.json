@@ -19,14 +19,402 @@
   ],
   "sections": [
     {
-      "config": "{}",
-      "displayName": "Page 1",
-      "displayOption": 1,
+      "id": 0,
+      "name": "6c3859e92bb7e22182f0",
+      "displayName": "Executive Spend Overview",
       "filters": "[]",
-      "height": 1080.00,
-      "name": "91d814c6b50210d58506",
-      "visualContainers": [],
-      "width": 1920.00
+      "ordinal": 0,
+      "visualContainers": [
+        {
+          "x": 40,
+          "y": 210,
+          "z": 102,
+          "width": 740,
+          "height": 470,
+          "config": "{\"name\":\"chartTripsByMonth\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":210,\"z\":102,\"width\":740,\"height\":470}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.travel_date\"}],\"Y\":[{\"queryRef\":\"DistinctCount(vw_travel.trip_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 800,
+          "y": 210,
+          "z": 103,
+          "width": 740,
+          "height": 470,
+          "config": "{\"name\":\"donutTripClassification\",\"layouts\":[{\"id\":0,\"position\":{\"x\":800,\"y\":210,\"z\":103,\"width\":740,\"height\":470}}],\"singleVisual\":{\"visualType\":\"pieChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.trip_classification\"}],\"Y\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1420,
+          "y": 40,
+          "z": 108,
+          "width": 460,
+          "height": 140,
+          "config": "{\"name\":\"kpiAvgSpend\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1420,\"y\":40,\"z\":108,\"width\":460,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Average(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 960,
+          "y": 40,
+          "z": 107,
+          "width": 440,
+          "height": 140,
+          "config": "{\"name\":\"kpiCompletedTrips\",\"layouts\":[{\"id\":0,\"position\":{\"x\":960,\"y\":40,\"z\":107,\"width\":440,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Count(vw_travel.ticket_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 500,
+          "y": 40,
+          "z": 101,
+          "width": 440,
+          "height": 140,
+          "config": "{\"name\":\"kpiTotalSpend\",\"layouts\":[{\"id\":0,\"position\":{\"x\":500,\"y\":40,\"z\":101,\"width\":440,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 40,
+          "z": 100,
+          "width": 440,
+          "height": 140,
+          "config": "{\"name\":\"kpiTotalTrips\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":40,\"z\":100,\"width\":440,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"DistinctCount(vw_travel.trip_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 210,
+          "z": 104,
+          "width": 320,
+          "height": 145,
+          "config": "{\"name\":\"slicerBusinessGroup\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":210,\"z\":104,\"width\":320,\"height\":145}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.business_group\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 365,
+          "z": 105,
+          "width": 320,
+          "height": 145,
+          "config": "{\"name\":\"slicerBusinessUnit\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":365,\"z\":105,\"width\":320,\"height\":145}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.business_unit\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 520,
+          "z": 106,
+          "width": 320,
+          "height": 160,
+          "config": "{\"name\":\"slicerClassification\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":520,\"z\":106,\"width\":320,\"height\":160}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.trip_classification\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 700,
+          "z": 109,
+          "width": 1840,
+          "height": 340,
+          "config": "{\"name\":\"tableMasterLedger\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":700,\"z\":109,\"width\":1840,\"height\":340}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.ticket_id\"},{\"queryRef\":\"vw_travel.trip_id\"},{\"queryRef\":\"vw_travel.employee_name\"},{\"queryRef\":\"vw_travel.business_group\"},{\"queryRef\":\"vw_travel.business_unit\"},{\"queryRef\":\"vw_travel.origin_city\"},{\"queryRef\":\"vw_travel.dest_city\"},{\"queryRef\":\"vw_travel.trip_classification\"},{\"queryRef\":\"vw_travel.amount_inr\"}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{\"name\":\"6c3859e92bb7e22182f0\",\"layouts\":[{\"id\":0,\"position\":{\"width\":1920,\"height\":1080}}]}",
+      "width": 1920,
+      "height": 1080,
+      "displayOption": 1
+    },
+    {
+      "id": 1,
+      "name": "page_travel_analytics",
+      "displayName": "Travel & Route Analytics",
+      "filters": "[]",
+      "ordinal": 1,
+      "visualContainers": [
+        {
+          "x": 800,
+          "y": 210,
+          "z": 203,
+          "width": 740,
+          "height": 470,
+          "config": "{\"name\":\"chartBookingChannelMix\",\"layouts\":[{\"id\":0,\"position\":{\"x\":800,\"y\":210,\"z\":203,\"width\":740,\"height\":470}}],\"singleVisual\":{\"visualType\":\"pieChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.booking_channel\"}],\"Y\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 210,
+          "z": 202,
+          "width": 740,
+          "height": 470,
+          "config": "{\"name\":\"chartTripsByTravelSummary\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":210,\"z\":202,\"width\":740,\"height\":470}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.travel_summary\"}],\"Y\":[{\"queryRef\":\"DistinctCount(vw_travel.trip_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 400,
+          "y": 40,
+          "z": 201,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiSpendP2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":400,\"y\":40,\"z\":201,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 40,
+          "z": 200,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiTripsP2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":40,\"z\":200,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"DistinctCount(vw_travel.trip_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 460,
+          "z": 205,
+          "width": 320,
+          "height": 220,
+          "config": "{\"name\":\"slicerCabin\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":460,\"z\":205,\"width\":320,\"height\":220}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.cabin_class\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 210,
+          "z": 204,
+          "width": 320,
+          "height": 230,
+          "config": "{\"name\":\"slicerTravelSummary\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":210,\"z\":204,\"width\":320,\"height\":230}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.travel_summary\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 700,
+          "z": 206,
+          "width": 1840,
+          "height": 340,
+          "config": "{\"name\":\"tableRouteLedger\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":700,\"z\":206,\"width\":1840,\"height\":340}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.ticket_id\"},{\"queryRef\":\"vw_travel.employee_name\"},{\"queryRef\":\"vw_travel.travel_date\"},{\"queryRef\":\"vw_travel.origin_city\"},{\"queryRef\":\"vw_travel.dest_city\"},{\"queryRef\":\"vw_travel.travel_summary\"},{\"queryRef\":\"vw_travel.booking_channel\"},{\"queryRef\":\"vw_travel.amount_inr\"}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{\"name\":\"page_travel_analytics\",\"layouts\":[{\"id\":0,\"position\":{\"width\":1920,\"height\":1080}}]}",
+      "width": 1920,
+      "height": 1080,
+      "displayOption": 1
+    },
+    {
+      "id": 2,
+      "name": "page_business_groups",
+      "displayName": "Business Group Analytics",
+      "filters": "[]",
+      "ordinal": 2,
+      "visualContainers": [
+        {
+          "x": 800,
+          "y": 210,
+          "z": 303,
+          "width": 740,
+          "height": 470,
+          "config": "{\"name\":\"chartSpendByBusinessGroup\",\"layouts\":[{\"id\":0,\"position\":{\"x\":800,\"y\":210,\"z\":303,\"width\":740,\"height\":470}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.business_group\"}],\"Y\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 210,
+          "z": 302,
+          "width": 740,
+          "height": 470,
+          "config": "{\"name\":\"chartTripsByBusinessGroup\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":210,\"z\":302,\"width\":740,\"height\":470}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.business_group\"}],\"Y\":[{\"queryRef\":\"DistinctCount(vw_travel.trip_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 40,
+          "z": 300,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiActiveEmps\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":40,\"z\":300,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"DistinctCount(vw_travel.employee_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 400,
+          "y": 40,
+          "z": 301,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiAvgSpendPerEmp\",\"layouts\":[{\"id\":0,\"position\":{\"x\":400,\"y\":40,\"z\":301,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Average(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 460,
+          "z": 305,
+          "width": 320,
+          "height": 220,
+          "config": "{\"name\":\"slicerBU3\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":460,\"z\":305,\"width\":320,\"height\":220}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.business_unit\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 210,
+          "z": 304,
+          "width": 320,
+          "height": 230,
+          "config": "{\"name\":\"slicerBusinessGroup\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":210,\"z\":304,\"width\":320,\"height\":230}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.business_group\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 700,
+          "z": 306,
+          "width": 1840,
+          "height": 340,
+          "config": "{\"name\":\"tableEmployeeSpendLedger\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":700,\"z\":306,\"width\":1840,\"height\":340}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.employee_id\"},{\"queryRef\":\"vw_travel.employee_name\"},{\"queryRef\":\"vw_travel.business_group\"},{\"queryRef\":\"vw_travel.business_unit\"},{\"queryRef\":\"vw_travel.department\"},{\"queryRef\":\"vw_travel.dest_city\"},{\"queryRef\":\"vw_travel.trip_classification\"},{\"queryRef\":\"vw_travel.amount_inr\"}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{\"name\":\"page_business_groups\",\"layouts\":[{\"id\":0,\"position\":{\"width\":1920,\"height\":1080}}]}",
+      "width": 1920,
+      "height": 1080,
+      "displayOption": 1
+    },
+    {
+      "id": 3,
+      "name": "page_data_governance",
+      "displayName": "Policy Compliance & Governance",
+      "filters": "[]",
+      "ordinal": 3,
+      "visualContainers": [
+        {
+          "x": 40,
+          "y": 210,
+          "z": 402,
+          "width": 920,
+          "height": 470,
+          "config": "{\"name\":\"chartPolicyStatusBreakdown\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":210,\"z\":402,\"width\":920,\"height\":470}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.policy_compliance_status\"}],\"Y\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 980,
+          "y": 210,
+          "z": 403,
+          "width": 560,
+          "height": 470,
+          "config": "{\"name\":\"donutApprovalStatus\",\"layouts\":[{\"id\":0,\"position\":{\"x\":980,\"y\":210,\"z\":403,\"width\":560,\"height\":470}}],\"singleVisual\":{\"visualType\":\"pieChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.approval_status\"}],\"Y\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 40,
+          "z": 400,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiCompliance\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":40,\"z\":400,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Count(vw_travel.ticket_id)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 400,
+          "y": 40,
+          "z": 401,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiExceptions\",\"layouts\":[{\"id\":0,\"position\":{\"x\":400,\"y\":40,\"z\":401,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(vw_travel.override_applied)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 460,
+          "z": 405,
+          "width": 320,
+          "height": 220,
+          "config": "{\"name\":\"slicerApproval\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":460,\"z\":405,\"width\":320,\"height\":220}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.approval_status\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 210,
+          "z": 404,
+          "width": 320,
+          "height": 230,
+          "config": "{\"name\":\"slicerPolicy\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":210,\"z\":404,\"width\":320,\"height\":230}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.policy_compliance_status\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 700,
+          "z": 406,
+          "width": 1840,
+          "height": 340,
+          "config": "{\"name\":\"tableGovernanceAudit\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":700,\"z\":406,\"width\":1840,\"height\":340}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.ticket_id\"},{\"queryRef\":\"vw_travel.employee_name\"},{\"queryRef\":\"vw_travel.policy_compliance_status\"},{\"queryRef\":\"vw_travel.policy_violation_reason\"},{\"queryRef\":\"vw_travel.approval_status\"},{\"queryRef\":\"vw_travel.override_applied\"},{\"queryRef\":\"vw_travel.amount_inr\"}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{\"name\":\"page_data_governance\",\"layouts\":[{\"id\":0,\"position\":{\"width\":1920,\"height\":1080}}]}",
+      "width": 1920,
+      "height": 1080,
+      "displayOption": 1
+    },
+    {
+      "id": 4,
+      "name": "page_fx_financial_audit",
+      "displayName": "FX & Financial Audit",
+      "filters": "[]",
+      "ordinal": 4,
+      "visualContainers": [
+        {
+          "x": 780,
+          "y": 210,
+          "z": 503,
+          "width": 760,
+          "height": 470,
+          "config": "{\"name\":\"chartFXRates\",\"layouts\":[{\"id\":0,\"position\":{\"x\":780,\"y\":210,\"z\":503,\"width\":760,\"height\":470}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.currency\"}],\"Y\":[{\"queryRef\":\"Average(vw_travel.fx_rate)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 210,
+          "z": 502,
+          "width": 720,
+          "height": 470,
+          "config": "{\"name\":\"chartSpendByCurrency\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":210,\"z\":502,\"width\":720,\"height\":470}}],\"singleVisual\":{\"visualType\":\"pieChart\",\"projections\":{\"Category\":[{\"queryRef\":\"vw_travel.currency\"}],\"Y\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 400,
+          "y": 40,
+          "z": 501,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiCurrencies\",\"layouts\":[{\"id\":0,\"position\":{\"x\":400,\"y\":40,\"z\":501,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"DistinctCount(vw_travel.currency)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 40,
+          "z": 500,
+          "width": 340,
+          "height": 140,
+          "config": "{\"name\":\"kpiTotalINR\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":40,\"z\":500,\"width\":340,\"height\":140}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(vw_travel.amount_inr)\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1560,
+          "y": 210,
+          "z": 504,
+          "width": 320,
+          "height": 470,
+          "config": "{\"name\":\"slicerCurrency\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1560,\"y\":210,\"z\":504,\"width\":320,\"height\":470}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.currency\"}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 40,
+          "y": 700,
+          "z": 505,
+          "width": 1840,
+          "height": 340,
+          "config": "{\"name\":\"tableFXReconciliation\",\"layouts\":[{\"id\":0,\"position\":{\"x\":40,\"y\":700,\"z\":505,\"width\":1840,\"height\":340}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"vw_travel.ticket_id\"},{\"queryRef\":\"vw_travel.employee_name\"},{\"queryRef\":\"vw_travel.amount_original\"},{\"queryRef\":\"vw_travel.currency\"},{\"queryRef\":\"vw_travel.fx_rate\"},{\"queryRef\":\"vw_travel.amount_inr\"},{\"queryRef\":\"vw_travel.fx_rate_date\"},{\"queryRef\":\"vw_travel.fx_source\"}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{\"name\":\"page_fx_financial_audit\",\"layouts\":[{\"id\":0,\"position\":{\"width\":1920,\"height\":1080}}]}",
+      "width": 1920,
+      "height": 1080,
+      "displayOption": 1
     }
   ]
 }
