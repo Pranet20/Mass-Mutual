@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Power BI Desktop Acceptance Verification & Launcher
-MassMutual Corporate Travel Analytics (PS-04)
+Enterprise Corporate Travel Analytics (PS-04)
 
 Verifies:
 1. PostgreSQL warehouse connectivity (port 5433, database travel_analytics).
@@ -28,7 +28,7 @@ DOCS_DIR = os.path.join(PROJECT_ROOT, "docs", "powerbi-validation")
 
 def print_banner():
     print("=" * 80)
-    print(" MASSMUTUAL PS-04: POWER BI DESKTOP ACCEPTANCE TEST RUNNER")
+    print(" ENTERPRISE PS-04: POWER BI DESKTOP ACCEPTANCE TEST RUNNER")
     print("=" * 80)
 
 def verify_warehouse():
@@ -184,7 +184,7 @@ def generate_report(db_res, asset_res, visual_res):
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     content = f"""# Power BI Desktop Acceptance Test Report
-**Project:** MassMutual Corporate Travel Analytics (PS-04)  
+**Project:** Enterprise Corporate Travel Analytics (PS-04)  
 **Executed At:** {now}  
 **Environment:** Local Windows Host / Docker PostgreSQL (Port 5433)  
 **Governed Source:** `public.vw_travel`  

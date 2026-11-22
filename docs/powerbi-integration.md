@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Architecture Overview
 
-The MassMutual PS-04 Corporate Travel Analytics platform integrates Microsoft Power BI reports directly into the web application (React + Vite) with backend support from FastAPI and the PostgreSQL warehouse view (`public.vw_travel`).
+The Enterprise PS-04 Corporate Travel Analytics platform integrates Microsoft Power BI reports directly into the web application (React + Vite) with backend support from FastAPI and the PostgreSQL warehouse view (`public.vw_travel`).
 
 ### End-to-End Architectural Flow
 
@@ -46,7 +46,7 @@ The MassMutual PS-04 Corporate Travel Analytics platform integrates Microsoft Po
 | **UX & Single Sign-On** | Disruptive login modals, multi-factor prompts inside embedded frames. | Seamless, 1-click zero-friction embedded analytical dashboard within portal. |
 | **Security Control** | Client browser talks directly to Entra ID with delegation tokens. | Centralized backend service controls token minting, row-level security, and audit. |
 
-**Rationale**: For the MassMutual PS-04 Corporate Travel Analytics portal, **Option B (App Owns Data)** was chosen as primary to provide immediate, friction-free analytical access across executive, manager, and auditor roles while preventing per-seat licensing blockers.
+**Rationale**: For the Enterprise PS-04 Corporate Travel Analytics portal, **Option B (App Owns Data)** was chosen as primary to provide immediate, friction-free analytical access across executive, manager, and auditor roles while preventing per-seat licensing blockers.
 
 ---
 
@@ -56,7 +56,7 @@ To connect to a live Power BI Service tenant:
 
 ### Step 1: Azure App Registration (Service Principal)
 1. Go to **Azure Portal** (`portal.azure.com`) → **Microsoft Entra ID** → **App registrations** → **New registration**.
-2. Name: `MassMutual-PowerBI-Embedded`.
+2. Name: `Enterprise Corporate Travel-PowerBI-Embedded`.
 3. Account types: *Accounts in this organizational directory only*.
 4. Note the **Application (client) ID** and **Directory (tenant) ID**.
 5. Navigate to **Certificates & secrets** → **New client secret** → Save value securely.

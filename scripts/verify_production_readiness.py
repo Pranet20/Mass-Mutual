@@ -1,6 +1,6 @@
 """
 Corporate Travel Analytics Pipeline — Master Production Readiness Verification Runner
-MassMutual PS-04 Architectural Verification Standard (Section 75)
+Enterprise PS-04 Architectural Verification Standard (Section 75)
 
 Executes the definitive 20-point verification checklist to guarantee zero discrepancies,
 complete audit lineage, single source of analytical truth (vw_travel), and end-to-end
@@ -44,7 +44,7 @@ def record_check(number: int, name: str, passed: bool, details: str):
 
 def run_all_checks():
     print("=" * 80)
-    print("MASSMUTUAL PS-04: MASTER 20-POINT PRODUCTION READINESS VERIFICATION RUNNER")
+    print("ENTERPRISE PS-04: MASTER 20-POINT PRODUCTION READINESS VERIFICATION RUNNER")
     print(f"Root Directory: {ROOT_DIR}")
     print(f"Backend Directory: {BACKEND_DIR}")
     print("=" * 80)

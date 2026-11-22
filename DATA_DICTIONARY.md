@@ -1,6 +1,6 @@
-# MassMutual Corporate Travel Analytics — Data Dictionary (PS-04)
+# Enterprise Corporate Travel Analytics — Data Dictionary (PS-04)
 
-This data dictionary defines all governed entities, tables, views, columns, types, and business semantics in the MassMutual Corporate Travel Analytics Warehouse.
+This data dictionary defines all governed entities, tables, views, columns, types, and business semantics in the Enterprise Corporate Travel Analytics Warehouse.
 
 ---
 

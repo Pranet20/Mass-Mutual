@@ -1,4 +1,4 @@
-# MassMutual Corporate Travel Analytics — Business Rules Specification (PS-04)
+# Enterprise Corporate Travel Analytics — Business Rules Specification (PS-04)
 
 This document formalizes all business rules, derivation algorithms, compliance thresholds, and financial logic implemented across the automated pipeline.
 

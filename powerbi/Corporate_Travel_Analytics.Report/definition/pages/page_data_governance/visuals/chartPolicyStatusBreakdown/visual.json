@@ -34,17 +34,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Spend by Policy Status"
                 }
               },
-              "queryRef": "Sum(vw_travel.amount_inr)",
-              "displayName": "Impacted Spend"
+              "queryRef": "vw_travel.Spend by Policy Status",
+              "displayName": "Impacted Spend (INR)"
             }
           ]
         }

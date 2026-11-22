@@ -1,4 +1,4 @@
-# MassMutual Corporate Travel Analytics — Security & Governance Architecture (PS-04)
+# Enterprise Corporate Travel Analytics — Security & Governance Architecture (PS-04)
 
 This document details the security posture, authentication protocols, Role-Based Access Control (RBAC), and audit governance enforced across the platform.
 

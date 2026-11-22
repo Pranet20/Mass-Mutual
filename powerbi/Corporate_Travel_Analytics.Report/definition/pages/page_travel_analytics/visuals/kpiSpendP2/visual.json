@@ -16,17 +16,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Total Spend INR"
                 }
               },
-              "queryRef": "Sum(vw_travel.amount_inr)",
-              "displayName": "Total Flown Spend"
+              "queryRef": "vw_travel.Total Spend INR",
+              "displayName": "Total Flown Spend (INR)"
             }
           ]
         }

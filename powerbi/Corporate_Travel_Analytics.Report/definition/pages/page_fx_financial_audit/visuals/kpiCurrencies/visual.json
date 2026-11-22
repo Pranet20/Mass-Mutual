@@ -16,16 +16,16 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "currency"
+                  "Property": "Active Currencies Count"
                 }
               },
-              "queryRef": "DistinctCount(vw_travel.currency)",
+              "queryRef": "vw_travel.Active Currencies Count",
               "displayName": "Distinct Currencies"
             }
           ]

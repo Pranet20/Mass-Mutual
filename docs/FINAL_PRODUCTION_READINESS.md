@@ -1,4 +1,4 @@
-# MassMutual PS-04 Corporate Travel Analytics Pipeline
+# Enterprise PS-04 Corporate Travel Analytics Pipeline
 ## Final Production Readiness & Enterprise Deliverable Audit Report
 
 **Project**: End-to-End Corporate Travel Analytics Pipeline (Raw Tickets → Warehouse View → Dashboard)  
@@ -6,7 +6,7 @@
 - Official Power BI Project Format: `powerbi/Corporate_Travel_Analytics.pbip`
 - Packaged Power BI Report Format: `powerbi/Corporate_Travel_Analytics.pbix`
 - FastAPI & React Production Stack
-**Client Panel**: MassMutual Financial Group  
+**Client Panel**: Enterprise Travel Operations & Treasury  
 **Architecture Standard**: PS-04 Specification  
 **Audit Date**: 2026-10-04  
 **Deliverable Status**: **`PRODUCTION READY — DESKTOP ACCEPTANCE PENDING`**  
@@ -16,7 +16,7 @@
 
 ## 1. Executive Summary
 
-This deliverable establishes a fully automated, auditable, and mathematically reconciled Corporate Travel Analytics platform for MassMutual. Raw travel agency CSV extracts are automatically ingested, quarantined, cleansed, enriched with point-in-time temporal employee history (SCD Type-2) and corporate treasury foreign exchange rates, evaluated against enterprise travel compliance rules, modified via audited manual overrides, and published to the authoritative warehouse view `vw_travel`.
+This deliverable establishes a fully automated, auditable, and mathematically reconciled Corporate Travel Analytics platform for Enterprise Corporate Travel. Raw travel agency CSV extracts are automatically ingested, quarantined, cleansed, enriched with point-in-time temporal employee history (SCD Type-2) and corporate treasury foreign exchange rates, evaluated against enterprise travel compliance rules, modified via audited manual overrides, and published to the authoritative warehouse view `vw_travel`.
 
 The **primary BI deliverable** is delivered in dual enterprise formats:
 1. **The Official Modern Power BI Project (`.pbip`)**: `powerbi/Corporate_Travel_Analytics.pbip` with modular Enhanced Report definitions (`.Report/`) and Semantic Model (`.SemanticModel/` with `model.bim` and TMDL definitions).

@@ -1,5 +1,5 @@
 # Power BI Desktop Manual Acceptance Testing Standard
-## MassMutual PS-04: Corporate Travel Analytics (`Corporate_Travel_Analytics.pbip` & `.pbix`)
+## Enterprise PS-04: Corporate Travel Analytics (`Corporate_Travel_Analytics.pbip` & `.pbix`)
 
 **Project**: End-to-End Corporate Travel Analytics Pipeline (Raw Tickets → Warehouse View → Dashboard)  
 **Governed Contract**: `vw_travel` (PostgreSQL / SQLite View — 37 Governed Attributes)  

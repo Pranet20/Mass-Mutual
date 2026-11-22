@@ -1,7 +1,7 @@
 // =========================================================================
 // Corporate Travel Analytics — Power Query (M) Script
 // Governed Entity: vw_travel (Authoritative 37-Column Enterprise Schema)
-// Client: MassMutual Financial Group (PS-04 Specification)
+// Client: Enterprise Travel Operations & Treasury (PS-04 Specification)
 // =========================================================================
 
 // OPTION 1: PostgreSQL DirectQuery / Import Connector

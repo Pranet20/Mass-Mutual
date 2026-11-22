@@ -34,16 +34,16 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Spend by Business Group"
                 }
               },
-              "queryRef": "Sum(vw_travel.amount_inr)",
+              "queryRef": "vw_travel.Spend by Business Group",
               "displayName": "Spend by Business Group (INR)"
             }
           ]

@@ -16,17 +16,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "override_applied"
+                  "Property": "Policy Exceptions Count"
                 }
               },
-              "queryRef": "Sum(vw_travel.override_applied)",
-              "displayName": "Manual Overrides Applied"
+              "queryRef": "vw_travel.Policy Exceptions Count",
+              "displayName": "Policy Exceptions Count"
             }
           ]
         }

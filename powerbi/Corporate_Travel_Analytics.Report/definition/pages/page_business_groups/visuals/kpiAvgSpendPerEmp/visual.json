@@ -16,17 +16,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Avg Spend per Employee"
                 }
               },
-              "queryRef": "Average(vw_travel.amount_inr)",
-              "displayName": "Average Ticket Cost"
+              "queryRef": "vw_travel.Avg Spend per Employee",
+              "displayName": "Avg Spend per Employee (INR)"
             }
           ]
         }

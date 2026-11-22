@@ -1,4 +1,4 @@
-# MassMutual Corporate Travel Analytics — End-to-End Data Lineage Architecture (PS-04)
+# Enterprise Corporate Travel Analytics — End-to-End Data Lineage Architecture (PS-04)
 
 This document traces the complete technical and data lineage of the Corporate Travel Analytics Pipeline from vendor CSV ingestion to the final analytical view (`vw_travel`), FastAPI backend, React dashboard, and Power BI report.
 

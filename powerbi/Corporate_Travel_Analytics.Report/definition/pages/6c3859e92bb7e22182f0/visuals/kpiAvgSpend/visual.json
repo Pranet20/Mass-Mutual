@@ -16,17 +16,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Avg Spend per Trip"
                 }
               },
-              "queryRef": "Average(vw_travel.amount_inr)",
-              "displayName": "Average Ticket Cost (INR)"
+              "queryRef": "vw_travel.Avg Spend per Trip",
+              "displayName": "Avg Spend per Trip (INR)"
             }
           ]
         }

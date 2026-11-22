@@ -1,4 +1,4 @@
-# MassMutual Corporate Travel Analytics — Power BI Desktop Setup & Specification (PS-04)
+# Enterprise Corporate Travel Analytics — Power BI Desktop Setup & Specification (PS-04)
 
 This guide provides instructions for connecting Power BI Desktop to the Corporate Travel Analytics warehouse and details the 5 pre-built reporting pages and 14 enterprise DAX measures.
 

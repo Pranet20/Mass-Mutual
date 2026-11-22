@@ -434,7 +434,7 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
             <span className="text-xs text-slate-400">• Governed Analytical Contract</span>
           </div>
           <h4 className="text-lg font-black text-white">
-            MassMutual PS-04: Corporate Travel Analytics BI Suite
+            Enterprise PS-04: Corporate Travel Analytics BI Suite
           </h4>
           <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
             The authoritative reporting model connects directly to PostgreSQL warehouse view <code className="text-amber-300">public.vw_travel</code> (37 governed columns, 414 reconciled ticket legs, 300 distinct trips, ₹26,913,710 spend).

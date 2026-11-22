@@ -1,5 +1,5 @@
 -- ============================================================================
--- MassMutual PS-04: Governed Multi-Tier Warehouse DDL & Schema Initialization
+-- Enterprise PS-04: Governed Multi-Tier Warehouse DDL & Schema Initialization
 -- Single Source of Analytical Truth: public.vw_travel (37 Governed Columns)
 -- ============================================================================
 

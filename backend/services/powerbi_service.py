@@ -1,5 +1,5 @@
 """
-Power BI Integration Service for MassMutual Corporate Travel Analytics.
+Power BI Integration Service for Enterprise Corporate Travel Analytics.
 
 Supports:
 - Option B (Embed for customers / App owns data) via Microsoft Entra Service Principal & Power BI REST API.
@@ -317,7 +317,7 @@ def get_powerbi_embed_config() -> Dict[str, Any]:
     config_status = validate_powerbi_config()
 
     report_metadata = {
-        "report_name": "MassMutual Corporate Travel Analytics",
+        "report_name": "Enterprise Corporate Travel Analytics",
         "governed_source": "public.vw_travel",
         "required_pages": [
             "Executive Spend Overview",

@@ -16,17 +16,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "ticket_id"
+                  "Property": "Policy Compliance Rate"
                 }
               },
-              "queryRef": "Count(vw_travel.ticket_id)",
-              "displayName": "Total Ingested Records"
+              "queryRef": "vw_travel.Policy Compliance Rate",
+              "displayName": "Policy Compliance Rate"
             }
           ]
         }

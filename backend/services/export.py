@@ -1529,7 +1529,7 @@ def generate_csuite_briefing_html() -> str:
 
     <div class="no-print-toolbar">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-weight: 900; font-size: 15px; color: #38bdf8;">MassMutual</span>
+            <span style="font-weight: 900; font-size: 15px; color: #38bdf8;">Enterprise Corporate Travel</span>
             <span style="font-size: 13px; color: #94a3b8;">| 2-Page Executive C-Suite Strategic Travel Briefing</span>
         </div>
         <div style="display: flex; gap: 10px;">
@@ -1550,7 +1550,7 @@ def generate_csuite_briefing_html() -> str:
                 <div class="page-header">
                     <div>
                         <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
-                        <div class="brand-sub">MassMutual Financial Group • Enterprise Travel Intelligence & Treasury Governance</div>
+                        <div class="brand-sub">Enterprise Travel Intelligence & Treasury Governance</div>
                     </div>
                     <div class="page-badge">
                         <div>EXECUTIVE STRATEGIC BRIEFING</div>
@@ -1627,7 +1627,7 @@ def generate_csuite_briefing_html() -> str:
             </div>
 
             <div class="page-footer">
-                <div>MassMutual Enterprise Travel Governance | Authoritative Analytical Contract: <code>vw_travel</code></div>
+                <div>Enterprise Travel Governance | Authoritative Analytical Contract: <code>vw_travel</code></div>
                 <div>Executive Strategic Briefing | Page 1 of 2</div>
             </div>
         </div>
@@ -1637,7 +1637,7 @@ def generate_csuite_briefing_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">MassMutual Financial Group</div>
+                        <div class="brand-title">Enterprise Travel Operations & Treasury</div>
                         <div class="brand-sub">Executive Sensitivity Projections & Governance Directives</div>
                     </div>
                     <div class="page-badge">
@@ -1711,7 +1711,7 @@ def generate_csuite_briefing_html() -> str:
             </div>
 
             <div class="page-footer">
-                <div>MassMutual Enterprise Travel Governance | Authoritative Analytical Contract: <code>vw_travel</code></div>
+                <div>Enterprise Travel Governance | Authoritative Analytical Contract: <code>vw_travel</code></div>
                 <div>Executive Strategic Briefing | Page 2 of 2</div>
             </div>
         </div>
@@ -1848,7 +1848,7 @@ def generate_executive_audit_package_pdf_bytes() -> bytes:
 
         # --- COVER / HEADER ---
         elements.append(Paragraph("CORPORATE TRAVEL & EXPENSE AUDIT PACKAGE", title_style))
-        elements.append(Paragraph(f"MassMutual PS-04 Governed Pipeline & Analytical Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
+        elements.append(Paragraph(f"Corporate Travel Analytics Governed Pipeline & Analytical Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
         elements.append(Spacer(1, 14))
 
         # --- EXECUTIVE KPI TABLE ---

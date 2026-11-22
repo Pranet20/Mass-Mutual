@@ -16,17 +16,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "ticket_id"
+                  "Property": "Completed Travel Tickets"
                 }
               },
-              "queryRef": "Count(vw_travel.ticket_id)",
-              "displayName": "Total Ingested Tickets"
+              "queryRef": "vw_travel.Completed Travel Tickets",
+              "displayName": "Completed Flown Tickets"
             }
           ]
         }

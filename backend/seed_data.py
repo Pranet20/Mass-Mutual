@@ -379,13 +379,13 @@ def generate_all_data():
             override_reason="Analyst verified employee boarded replacement charter flight despite status flag",
             created_by="analyst@travelintelligence.com",
             status="APPROVED",
-            approved_by="manager@massmutual.com",
+            approved_by="manager@travelanalytics.internal",
             approved_at=datetime.now()
         ))
         session.commit()
     else:
         existing_override.status = "APPROVED"
-        existing_override.approved_by = "manager@massmutual.com"
+        existing_override.approved_by = "manager@travelanalytics.internal"
         existing_override.approved_at = datetime.now()
         session.commit()
 

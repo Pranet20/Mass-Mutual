@@ -34,16 +34,16 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Spend by Channel"
                 }
               },
-              "queryRef": "Sum(vw_travel.amount_inr)",
+              "queryRef": "vw_travel.Spend by Channel",
               "displayName": "Channel Spend (INR)"
             }
           ]

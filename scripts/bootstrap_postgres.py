@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PostgreSQL Bootstrap & Synchronizer for MassMutual PS-04 Travel Analytics
+PostgreSQL Bootstrap & Synchronizer for Enterprise PS-04 Travel Analytics
 Applies DDL updates, ensures all 37 columns exist in vw_travel (including business_group),
 and synchronizes governed data from SQLite or seeds the database.
 """

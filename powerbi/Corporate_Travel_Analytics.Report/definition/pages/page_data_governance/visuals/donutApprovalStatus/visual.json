@@ -34,17 +34,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "amount_inr"
+                  "Property": "Spend by Approval"
                 }
               },
-              "queryRef": "Sum(vw_travel.amount_inr)",
-              "displayName": "Spend by Approval"
+              "queryRef": "vw_travel.Spend by Approval",
+              "displayName": "Spend by Approval (INR)"
             }
           ]
         }

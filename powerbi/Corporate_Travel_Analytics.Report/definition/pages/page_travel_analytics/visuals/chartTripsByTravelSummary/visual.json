@@ -34,17 +34,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "vw_travel"
                     }
                   },
-                  "Property": "trip_id"
+                  "Property": "Trips by Travel Summary"
                 }
               },
-              "queryRef": "DistinctCount(vw_travel.trip_id)",
-              "displayName": "Trips by Travel Summary"
+              "queryRef": "vw_travel.Trips by Travel Summary",
+              "displayName": "Trips by Route Summary"
             }
           ]
         }

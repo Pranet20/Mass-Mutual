@@ -1,6 +1,6 @@
 # Corporate Travel & Expense Intelligence Platform (PS-04)
 
-[![CI Pipeline](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml)
+[![CI Pipeline](https://github.com/Pranet20/Corporate-Travel-Analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Corporate-Travel-Analytics/actions/workflows/ci.yml)
 [![Tests: 50 Passed](https://img.shields.io/badge/Tests-50%20Passed-brightgreen)](TEST_CASES.md)
 [![Verification: 20/20 Checks](https://img.shields.io/badge/Verification-20%2F20%20Checks%20Passed-brightgreen)](scripts/verify_production_readiness.py)
 [![FastAPI](https://img.shields.io/badge/FastAPI-2.1.0-009688.svg)](https://fastapi.tiangolo.com)
@@ -58,8 +58,8 @@ For complete technical documentation:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Pranet20/Mass-Mutual.git
-cd Mass-Mutual
+git clone https://github.com/Pranet20/Corporate-Travel-Analytics.git
+cd Corporate-Travel-Analytics
 ```
 
 ### 2. Configure Environment Variables
