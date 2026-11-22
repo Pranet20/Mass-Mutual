@@ -10,7 +10,6 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, LineChart, Line, PieChart, Pie, AreaChart, Area, Legend 
 } from 'recharts';
-import { PowerBIReportEmbed } from '../components/PowerBIReportEmbed';
 
 export const PowerBI = () => {
   const [activeReportPage, setActiveReportPage] = useState('executive'); // 'executive', 'divisional', 'routes', 'compliance', 'financial-audit'
@@ -497,16 +496,16 @@ export const PowerBI = () => {
         </div>
       )}
 
-      {/* Power BI Top Ribbon Header */}
+      {/* Power BI Executive Header Ribbon */}
       <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/70 text-white shadow-xl border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-base shadow-lg shadow-amber-500/20">
             PBI
           </div>
           <div>
-            <h3 className="font-black text-lg tracking-wide">Enterprise Power BI Analytics Suite</h3>
+            <h3 className="font-black text-lg tracking-wide">Enterprise Corporate Travel Analytics</h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live DirectQuery to PostgreSQL <code>vw_travel</code> contract • 5 Analytical Report Pages • Certified Corporate Auditing
+              Authoritative Warehouse View <code className="text-amber-300">public.vw_travel</code> • 5 Core Report Pages &amp; Live Scenario Simulator
             </p>
           </div>
         </div>
@@ -515,32 +514,13 @@ export const PowerBI = () => {
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            onClick={handleRefreshDataset}
-            className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
-            title="Refresh Live Data Connection"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-
-          <button
-            type="button"
             onClick={handleDownloadPBIX}
-            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-            title="1-Click Launch Power BI Report"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>Open Power BI Analytics</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDownloadPBIX}
-            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            disabled={downloadingPBIX}
+            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             title="Download Corporate_Travel_Analytics.pbix master report"
           >
             <Laptop className="w-3.5 h-3.5 text-amber-300" />
-            <span>Download .pbix</span>
+            <span>{downloadingPBIX ? 'Downloading...' : 'Download .pbix'}</span>
           </button>
 
           <button
@@ -549,8 +529,8 @@ export const PowerBI = () => {
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
             title="Download 2-Page Executive C-Suite Strategic Memo"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>C-Suite Briefing (2-Page Memo)</span>
+            <Download className="w-3.5 h-3.5 text-slate-300" />
+            <span>C-Suite Memo (PDF)</span>
           </button>
 
           <button
@@ -560,16 +540,20 @@ export const PowerBI = () => {
             title="Download certified 7-Page Executive PDF Audit Package"
           >
             <FileText className="w-3.5 h-3.5 text-emerald-200" />
-            <span>1-Click PDF Audit Package (7-Page)</span>
+            <span>Audit Package (PDF)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRefreshDataset}
+            className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
+            title="Refresh Live Data Connection"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
         </div>
       </div>
-
-      {/* Genuine Microsoft Power BI Embedded Report Component */}
-      <PowerBIReportEmbed onSwitchToFallback={() => {
-        const el = document.getElementById('interactive-analytical-view');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }} />
 
       {/* Analytics Data Unavailable Notice */}
       {loadError && !liveAnalytics && (
@@ -580,20 +564,21 @@ export const PowerBI = () => {
         </div>
       )}
 
-      {/* Native Web Analytics & Scenario Simulation (In-Browser Fallback) */}
+      {/* Main Interactive Analytical Workspace */}
       <div id="interactive-analytical-view" className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
-        {/* Fallback Banner Header */}
-        <div className="px-5 py-3 bg-slate-950/90 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-extrabold text-[10px] uppercase tracking-wider border border-indigo-500/30">
-              Native Web Fallback
+        {/* Workspace Title Bar */}
+        <div className="px-5 py-3.5 bg-slate-950/90 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-white font-bold text-xs">
-              Interactive In-Browser Telemetry &amp; What-If Scenario Simulator
+            <span className="text-white font-extrabold text-sm tracking-wide">
+              Interactive Analytical Suite &amp; Scenario Simulator
             </span>
           </div>
-          <span className="text-[11px] text-slate-400">
-            Direct PostgreSQL <code className="text-amber-300">vw_travel</code> feed • Independent of Power BI Desktop
+          <span className="text-[11px] text-slate-400 font-medium">
+            PostgreSQL <code className="text-amber-300 font-mono font-bold">vw_travel</code> Live Feed • 37 Governed Columns • Reconciled
           </span>
         </div>
 
