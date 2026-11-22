@@ -1,0 +1,25 @@
+relationship e3aad6e2-d490-401d-b85f-85cf8f840dbc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: vw_travel.issue_date
+	toColumn: LocalDateTable_b28034cf-7265-4979-8359-d202e7f4e94e.Date
+
+relationship f6fc0f3d-d176-411e-8bf9-fd8b02088a25
+	joinOnDateBehavior: datePartOnly
+	fromColumn: vw_travel.travel_date
+	toColumn: LocalDateTable_42aa46c8-b23e-4536-a2f7-8c5e8ce42642.Date
+
+relationship 550463e2-1a3b-487f-a6f5-051e9b2c7276
+	joinOnDateBehavior: datePartOnly
+	fromColumn: vw_travel.return_date
+	toColumn: LocalDateTable_89b2512c-9c17-49c8-9e7e-007a620b6812.Date
+
+relationship 1af18486-e9ac-4c9d-bcc6-d044d6ea6a55
+	joinOnDateBehavior: datePartOnly
+	fromColumn: vw_travel.fx_rate_date
+	toColumn: LocalDateTable_cabbe215-105d-43e5-afc5-3422c432200e.Date
+
+relationship b3e5c4da-82f9-4ec4-8f29-a501b0be8aaf
+	joinOnDateBehavior: datePartOnly
+	fromColumn: vw_travel.updated_at
+	toColumn: LocalDateTable_8cbadfb0-2e56-4711-946e-4d225018a485.Date
+

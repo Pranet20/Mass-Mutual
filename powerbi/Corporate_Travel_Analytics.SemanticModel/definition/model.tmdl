@@ -1,0 +1,22 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["vw_travel"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+ref table vw_travel
+ref table DateTableTemplate_439cca0f-8055-4734-95bf-27b2b2177c51
+ref table LocalDateTable_b28034cf-7265-4979-8359-d202e7f4e94e
+ref table LocalDateTable_42aa46c8-b23e-4536-a2f7-8c5e8ce42642
+ref table LocalDateTable_89b2512c-9c17-49c8-9e7e-007a620b6812
+ref table LocalDateTable_cabbe215-105d-43e5-afc5-3422c432200e
+ref table LocalDateTable_8cbadfb0-2e56-4711-946e-4d225018a485
+

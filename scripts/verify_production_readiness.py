@@ -263,11 +263,12 @@ def run_all_checks():
         pbip_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.pbip"))
         pbir_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.Report", "definition.pbir"))
         pbism_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.SemanticModel", "definition.pbism"))
+        tmdl_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.SemanticModel", "definition", "model.tmdl"))
         bim_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.SemanticModel", "model.bim"))
         assert os.path.exists(pbip_path), f"PBIP missing: {pbip_path}"
         assert os.path.exists(pbir_path), f"definition.pbir missing: {pbir_path}"
         assert os.path.exists(pbism_path), f"definition.pbism missing: {pbism_path}"
-        assert os.path.exists(bim_path), f"model.bim missing: {bim_path}"
+        assert os.path.exists(tmdl_path) or os.path.exists(bim_path), "Neither TMDL definition nor model.bim found"
 
         # Check PBIX format
         pbix_path = os.path.abspath(os.path.join(ROOT_DIR, "powerbi", "Corporate_Travel_Analytics.pbix"))
