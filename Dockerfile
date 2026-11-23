@@ -29,9 +29,10 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 ENV PORT=8000
 ENV ENV=production
+ENV JWT_SECRET_KEY=corporate_travel_analytics_secure_jwt_secret_key_production_2026_enterprise
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+  CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
 CMD ["python", "backend/main.py"]
