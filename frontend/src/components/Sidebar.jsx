@@ -4,7 +4,6 @@ import {
   LayoutDashboard, 
   Users, 
   Database, 
-  FileText, 
   TrendingUp, 
   BarChart3, 
   LogOut
@@ -14,7 +13,6 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'employees', label: 'Employees', icon: Users },
   { id: 'pipeline', label: 'Pipeline', icon: Database },
-  { id: 'reports', label: 'Reports', icon: FileText },
   { id: 'forecasting', label: 'Forecasting', icon: TrendingUp },
   { id: 'powerbi', label: 'PowerBI', icon: BarChart3 },
 ];

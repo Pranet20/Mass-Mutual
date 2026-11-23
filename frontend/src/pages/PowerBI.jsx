@@ -4,7 +4,7 @@ import {
   Download, BarChart3, Database, Filter, Layers, PieChart as PieIcon, 
   Table, FileText, Play, Sliders, CheckCircle2, Sparkles, RefreshCw, 
   ChevronRight, ExternalLink, ShieldCheck, TrendingUp, AlertTriangle, 
-  Compass, Code, Laptop, Server, Globe, Coins, DollarSign
+  Compass, Code, Laptop, Globe, Coins, DollarSign
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -371,9 +371,6 @@ export const PowerBI = () => {
     ];
   }, [isFiltered, liveAnalytics, flownFiltered, totalSpend, totalTrips, totalBudget, budgetVariance, avgFare, complianceStats]);
 
-  const [copiedField, setCopiedField] = useState('');
-  const [dbProbeResult, setDbProbeResult] = useState(null);
-  const [testingProbe, setTestingProbe] = useState(false);
 
   const handleDownloadAnalysisDocument = async () => {
     try {
@@ -426,32 +423,6 @@ export const PowerBI = () => {
     } finally {
       setDownloadingPBIX(false);
     }
-  };
-
-  const handleCopyText = (text, fieldName) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(''), 2000);
-  };
-
-  const testConnectionProbe = () => {
-    setTestingProbe(true);
-    axios.get('/ready')
-      .then(res => {
-        setDbProbeResult({
-          status: 'SUCCESS',
-          message: `PostgreSQL Live: ${res.data.records_loaded?.fact_travel_tickets || 1200}+ tickets & ${res.data.records_loaded?.employee_master || 100} employees connected. vw_travel active.`,
-          timestamp: new Date().toLocaleTimeString()
-        });
-      })
-      .catch(err => {
-        setDbProbeResult({
-          status: 'ERROR',
-          message: `Connection error: ${err.message}`,
-          timestamp: new Date().toLocaleTimeString()
-        });
-      })
-      .finally(() => setTestingProbe(false));
   };
 
   const [refreshToast, setRefreshToast] = useState('');
@@ -722,19 +693,6 @@ export const PowerBI = () => {
           >
             <Coins className="w-3.5 h-3.5" />
             <span>Page 5: FX & Financial Audit</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveReportPage('desktop-integration')}
-            className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all flex items-center gap-2 ${
-              activeReportPage === 'desktop-integration'
-                ? 'bg-slate-900 text-amber-400 border-t-2 border-amber-400 shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <Laptop className="w-3.5 h-3.5" />
-            <span>Page 6: Desktop Integration Hub</span>
           </button>
         </div>
 
@@ -1032,31 +990,9 @@ export const PowerBI = () => {
         {/* PAGE 2: DIVISIONAL SPEND & BUDGET VARIANCE MATRIX */}
         {activeReportPage === 'divisional' && (
           <div className="p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-black text-sm text-white">Divisional Spend & Budget Variance Matrix</h4>
-                <p className="text-xs text-slate-400">Multi-dimensional matrix evaluating allocated budget against verified ticket expenditure</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleDownloadAnalysisDocument}
-                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
-                  title="Download full 5-page analytical briefing"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>5-Page Briefing</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDownloadAuditPackage}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
-                  title="1-Click download: 5-page report + 36-column data dictionary + batch audit history into a certified 7-page PDF"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>1-Click PDF Audit Package</span>
-                </button>
-              </div>
+            <div>
+              <h4 className="font-black text-sm text-white">Divisional Spend & Budget Variance Matrix</h4>
+              <p className="text-xs text-slate-400">Multi-dimensional matrix evaluating allocated budget against verified ticket expenditure</p>
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-950/60">
@@ -1427,212 +1363,6 @@ export const PowerBI = () => {
                 <Download className="w-4 h-4" />
                 <span>Download Executive PDF Package (7-Page)</span>
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* PAGE 6: POWER BI DESKTOP BRIDGE & MASTER INTEGRATION HUB */}
-        {activeReportPage === 'desktop-integration' && (
-          <div className="p-6 space-y-6">
-            {/* Header / Intro */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-              <div>
-                <h4 className="font-black text-base text-white flex items-center gap-2">
-                  <Laptop className="w-5 h-5 text-amber-400" />
-                  <span>Power BI Desktop Master Integration Center</span>
-                </h4>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Seamless bridge between this web portal and your local/corporate Power BI Desktop for 360° deep-dive analytics.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={testConnectionProbe}
-                  disabled={testingProbe}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs flex items-center gap-2 border border-slate-700 cursor-pointer shadow-sm"
-                >
-                  <Server className={`w-4 h-4 ${testingProbe ? 'animate-spin' : ''}`} />
-                  <span>{testingProbe ? 'Testing Connection...' : 'Test Database Connection'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDownloadPBIX}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download Master .pbix</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Diagnostic Probe Output (if tested) */}
-            {dbProbeResult && (
-              <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center justify-between border ${
-                dbProbeResult.status === 'SUCCESS'
-                  ? 'bg-emerald-950/50 border-emerald-500/40 text-emerald-300'
-                  : 'bg-rose-950/50 border-rose-500/40 text-rose-300'
-              }`}>
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>{dbProbeResult.message}</span>
-                </div>
-                <span className="text-[10px] text-slate-400 font-mono">Tested at {dbProbeResult.timestamp}</span>
-              </div>
-            )}
-
-            {/* 3 Integration Methods Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Method 1: Ready-To-Run PBIX */}
-              <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold text-[10px] uppercase">
-                      Method 1 • Instant
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono">96 KB</span>
-                  </div>
-                  <h5 className="font-bold text-sm text-white">Pre-Configured Master Report</h5>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Download the pre-authored <code className="text-amber-300">Corporate_Travel_Analytics.pbix</code> file. Double-click to open in Power BI Desktop with all 5 report pages, star schema model, and 14 DAX measures pre-built!
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleDownloadPBIX}
-                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download .pbix File</span>
-                </button>
-              </div>
-
-              {/* Method 2: Live DirectQuery Connection */}
-              <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 font-bold text-[10px] uppercase">
-                      Method 2 • DirectQuery
-                    </span>
-                    <span className="text-[10px] text-emerald-400 font-bold">Zero Latency</span>
-                  </div>
-                  <h5 className="font-bold text-sm text-white">PostgreSQL DirectQuery</h5>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Connect Power BI Desktop directly to our live warehouse engine. Live SQL queries are dispatched on every slicer change with zero data replication lag.
-                  </p>
-
-                  <div className="space-y-1.5 font-mono text-[11px] pt-1">
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center">
-                      <span className="text-slate-400">Server:</span>
-                      <button
-                        onClick={() => handleCopyText('localhost:5433', 'server')}
-                        className="text-amber-400 font-bold hover:underline cursor-pointer"
-                      >
-                        localhost:5433 {copiedField === 'server' && '✓'}
-                      </button>
-                    </div>
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center">
-                      <span className="text-slate-400">Database:</span>
-                      <button
-                        onClick={() => handleCopyText('travel_analytics', 'db')}
-                        className="text-indigo-400 font-bold hover:underline cursor-pointer"
-                      >
-                        travel_analytics {copiedField === 'db' && '✓'}
-                      </button>
-                    </div>
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center">
-                      <span className="text-slate-400">View:</span>
-                      <button
-                        onClick={() => handleCopyText('public.vw_travel', 'view')}
-                        className="text-emerald-400 font-bold hover:underline cursor-pointer"
-                      >
-                        vw_travel {copiedField === 'view' && '✓'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Method 3: Web / REST API Feed */}
-              <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4 flex flex-col justify-between">
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-[10px] uppercase">
-                      Method 3 • Web Connector
-                    </span>
-                    <span className="text-[10px] text-slate-400">Zero Drivers</span>
-                  </div>
-                  <h5 className="font-bold text-sm text-white">Live Web / OData Feed</h5>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Connect Power BI Desktop via native Web Feed. Works out of the box on any Windows PC without needing PostgreSQL ODBC drivers installed.
-                  </p>
-
-                  <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 font-mono text-[11px] flex items-center justify-between">
-                    <span className="text-slate-400 truncate max-w-[170px]">/api/powerbi/feed</span>
-                    <button
-                      onClick={() => handleCopyText(`${window.location.origin}/api/powerbi/feed`, 'feed')}
-                      className="text-amber-400 font-bold hover:underline cursor-pointer flex-shrink-0"
-                    >
-                      {copiedField === 'feed' ? 'Copied URL!' : 'Copy Feed URL'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="text-[11px] text-slate-400">
-                  Power BI: <strong>Get Data &gt; Web &gt; Paste URL &gt; OK</strong>
-                </div>
-              </div>
-            </div>
-
-            {/* Manager Step-by-Step Walkthrough to Deep Dive Analysis */}
-            <div className="p-5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-4">
-              <h5 className="font-bold text-xs text-amber-400 uppercase tracking-wider">
-                Manager Guide: How to View Full Deep-Dive Master Analysis in Power BI Desktop
-              </h5>
-
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
-                  <div className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-                    1
-                  </div>
-                  <h6 className="font-bold text-white">Launch Desktop</h6>
-                  <p className="text-slate-400 text-[11px]">
-                    Install & launch Microsoft Power BI Desktop on your workstation (free from Microsoft Store).
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
-                  <div className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-                    2
-                  </div>
-                  <h6 className="font-bold text-white">Open .pbix or Connect</h6>
-                  <p className="text-slate-400 text-[11px]">
-                    Double-click <code className="text-amber-300">Corporate_Travel_Analytics.pbix</code> or choose Get Data &gt; PostgreSQL (<code className="text-amber-300">localhost:5433</code>).
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
-                  <div className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-                    3
-                  </div>
-                  <h6 className="font-bold text-white">Explore Deep Dive</h6>
-                  <p className="text-slate-400 text-[11px]">
-                    Interact with all 14 DAX measures, Decomposition Trees, Q&A NLP, and multi-page cross-filtering.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
-                  <div className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-                    4
-                  </div>
-                  <h6 className="font-bold text-white">Publish to Service</h6>
-                  <p className="text-slate-400 text-[11px]">
-                    Click "Publish" in the ribbon to deploy to Power BI Service (Cloud) for C-Suite web and mobile access.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         )}

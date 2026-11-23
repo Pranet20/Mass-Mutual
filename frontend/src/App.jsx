@@ -8,7 +8,6 @@ import { EmployeePortal } from './pages/EmployeePortal';
 import { Dashboard } from './pages/Dashboard';
 import { Employees } from './pages/Employees';
 import { Pipeline } from './pages/Pipeline';
-import { Reports } from './pages/Reports';
 import { Forecasting } from './pages/Forecasting';
 import { PowerBI } from './pages/PowerBI';
 
@@ -36,7 +35,7 @@ const MainLayout = () => {
       case 'pipeline':
         return <Pipeline />;
       case 'reports':
-        return <Reports />;
+        return <PowerBI />;
       case 'forecasting':
         return <Forecasting />;
       case 'powerbi':
