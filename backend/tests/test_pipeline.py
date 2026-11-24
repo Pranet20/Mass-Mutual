@@ -142,7 +142,7 @@ def test_18_ai_assistant_service():
 
 def test_19_export_service():
     html = generate_csuite_briefing_html()
-    assert "CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE" in html
+    assert "CORPORATE TRAVEL INTELLIGENCE" in html
     assert "Total Spend" in html
 
 def test_20_fx_rate_auditable_conversion():

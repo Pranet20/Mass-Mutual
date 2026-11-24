@@ -283,36 +283,36 @@ def generate_executive_audit_package_html() -> str:
         """
 
     # --- 5. DATA QUALITY & ETL CONTROL ROOM FOR PAGE 5 ---
-    batches_raw = session.query(PipelineBatchAudit).order_by(desc(PipelineBatchAudit.started_at)).limit(6).all()
+    batches_raw = session.query(PipelineBatchAudit).order_by(desc(PipelineBatchAudit.started_at)).limit(4).all()
     batch_rows_html = ""
     for b in batches_raw:
-        b_time = format_to_ist(b.started_at, "%Y-%m-%d %I:%M %p IST")
+        b_time = format_to_ist(b.started_at, "%Y-%m-%d %I:%M %p")
         h_short = (b.source_file_hash[:12] + "...") if b.source_file_hash else "SHA256_VERIFIED"
         batch_rows_html += f"""
         <tr>
             <td style="font-family: monospace; font-weight: 700; color: #2563eb;">{b.batch_id}</td>
-            <td style="font-size: 12px;">{b.source_file}</td>
-            <td style="font-family: monospace; font-size: 11px; color: #64748b;">{h_short}</td>
+            <td style="font-size: 11px;">{b.source_file}</td>
+            <td style="font-family: monospace; font-size: 10px; color: #64748b;">{h_short}</td>
             <td style="text-align: center;">{b.records_received}</td>
             <td style="text-align: center; color: #166534; font-weight: bold;">{b.records_cleaned}</td>
             <td style="text-align: center; color: #b91c1c;">{b.records_quarantined}</td>
-            <td style="text-align: center;"><span style="padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #dcfce7; color: #166534;">{b.status}</span></td>
-            <td style="font-size: 11px; color: #64748b;">{b_time}</td>
+            <td style="text-align: center;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #dcfce7; color: #166534;">{b.status}</span></td>
+            <td style="font-size: 10.5px; color: #64748b;">{b_time}</td>
         </tr>
         """
 
     quarantine_total = session.query(func.count(QuarantinedRecord.id)).scalar() or 0
-    quarantine_raw = session.query(QuarantinedRecord).order_by(desc(QuarantinedRecord.quarantined_at)).limit(5).all()
+    quarantine_raw = session.query(QuarantinedRecord).order_by(desc(QuarantinedRecord.quarantined_at)).limit(3).all()
     quarantine_rows_html = ""
     for q in quarantine_raw:
-        q_time = format_to_ist(q.quarantined_at, "%Y-%m-%d %I:%M %p IST")
+        q_time = format_to_ist(q.quarantined_at, "%Y-%m-%d %I:%M %p")
         quarantine_rows_html += f"""
         <tr>
             <td style="font-family: monospace; font-weight: 600; color: #b91c1c;">{q.error_type}</td>
             <td style="font-family: monospace;">{q.ticket_id or 'NULL'}</td>
-            <td style="font-size: 12px;">{q.error_message}</td>
-            <td style="font-size: 11px;">{q.source_file}</td>
-            <td style="font-size: 11px; color: #64748b;">{q_time}</td>
+            <td style="font-size: 11px;">{q.error_message}</td>
+            <td style="font-size: 10.5px;">{q.source_file}</td>
+            <td style="font-size: 10.5px; color: #64748b;">{q_time}</td>
         </tr>
         """
 
@@ -348,7 +348,7 @@ def generate_executive_audit_package_html() -> str:
             </tr>
             """
             
-        all_batches = session.query(PipelineBatchAudit).order_by(desc(PipelineBatchAudit.started_at)).limit(20).all()
+        all_batches = session.query(PipelineBatchAudit).order_by(desc(PipelineBatchAudit.started_at)).limit(6).all()
         full_batch_rows_html = ""
         for b in all_batches:
             b_start = format_to_ist(b.started_at, "%Y-%m-%d %I:%M %p")
@@ -368,7 +368,7 @@ def generate_executive_audit_package_html() -> str:
             </tr>
             """
             
-        all_quarantine = session.query(QuarantinedRecord).order_by(desc(QuarantinedRecord.quarantined_at)).limit(15).all()
+        all_quarantine = session.query(QuarantinedRecord).order_by(desc(QuarantinedRecord.quarantined_at)).limit(5).all()
         full_quarantine_rows_html = ""
         for q in all_quarantine:
             q_time = format_to_ist(q.quarantined_at, "%Y-%m-%d %I:%M %p")
@@ -390,7 +390,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Authoritative 36-Column Data Dictionary (vw_travel) | Page 6 of 7</div>
                     </div>
                     <div class="page-badge">
@@ -448,7 +448,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Pipeline Batch Processing Ledger & Corporate Attestation | Page 7 of 7</div>
                     </div>
                     <div class="page-badge">
@@ -511,21 +511,21 @@ def generate_executive_audit_package_html() -> str:
                     </tbody>
                 </table>
 
-                <div style="margin-top: 18px; padding: 16px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: #f8fafc;">
-                    <div style="font-size: 13px; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">Tri-Party Corporate Attestation & Regulatory Sign-Off</div>
-                    <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                <div style="margin-top: 12px; padding: 10px 14px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: #f8fafc;">
+                    <div style="font-size: 12px; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">Tri-Party Corporate Attestation & Regulatory Sign-Off</div>
+                    <div style="font-size: 10.5px; color: #475569; margin-top: 3px; line-height: 1.4;">
                         This document certifies that the Corporate Travel & Expense Analytics pipeline has been executed in full compliance with corporate travel policies, treasury foreign exchange standards, and slowly changing dimensional temporal integrity. All calculations derive directly from the authoritative warehouse view <code>vw_travel</code>.
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 24px; font-size: 12px; font-weight: 700; color: #334155;">
-                        <div>_______________________________<br><span style="font-weight: normal; font-size: 11px; color: #64748b;">Head of Corporate Travel & Expense</span></div>
-                        <div>_______________________________<br><span style="font-weight: normal; font-size: 11px; color: #64748b;">Chief Financial Officer (CFO)</span></div>
-                        <div>_______________________________<br><span style="font-weight: normal; font-size: 11px; color: #64748b;">Director of Data Governance & BI</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 11px; font-weight: 700; color: #334155;">
+                        <div>__________________________<br><span style="font-weight: normal; font-size: 10px; color: #64748b;">Head of Corporate Travel & Expense</span></div>
+                        <div>__________________________<br><span style="font-weight: normal; font-size: 10px; color: #64748b;">Chief Financial Officer (CFO)</span></div>
+                        <div>__________________________<br><span style="font-weight: normal; font-size: 10px; color: #64748b;">Director of Data Governance & BI</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="page-footer">
-                <div>Certified End-to-End Analytics Architecture: Raw CSV → Staging → Cleansing → Fact → vw_travel → Power BI</div>
+                <div>Single Source of Truth: PostgreSQL Governed View <code>vw_travel</code></div>
                 <div>Executive Audit Package | Page 7 of 7</div>
             </div>
         </div>
@@ -599,8 +599,9 @@ def generate_executive_audit_package_html() -> str:
         .report-page {{
             background: #ffffff;
             width: 100%;
-            min-height: 1120px;
-            padding: 32px 36px;
+            min-height: 1080px;
+            box-sizing: border-box;
+            padding: 24px 32px;
             margin-bottom: 24px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -620,17 +621,17 @@ def generate_executive_audit_package_html() -> str:
             justify-content: space-between;
             align-items: flex-start;
             border-bottom: 2.5px solid #1e3a8a;
-            padding-bottom: 14px;
-            margin-bottom: 18px;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
         }}
         .brand-title {{
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 800;
             color: #1e3a8a;
             letter-spacing: -0.3px;
         }}
         .brand-sub {{
-            font-size: 12px;
+            font-size: 11.5px;
             color: #475569;
             font-weight: 600;
             margin-top: 2px;
@@ -648,7 +649,7 @@ def generate_executive_audit_package_html() -> str:
         .page-footer {{
             border-top: 1px solid #e2e8f0;
             padding-top: 10px;
-            margin-top: 18px;
+            margin-top: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -659,44 +660,44 @@ def generate_executive_audit_package_html() -> str:
         .kpi-grid-4 {{
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 10px;
+            margin-bottom: 14px;
         }}
         .kpi-grid-3 {{
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 10px;
+            margin-bottom: 14px;
         }}
         .kpi-card {{
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px 12px;
             text-align: center;
         }}
         .kpi-label {{
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 700;
             text-transform: uppercase;
             color: #64748b;
             letter-spacing: 0.5px;
         }}
         .kpi-val {{
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 800;
             color: #1e3a8a;
-            margin-top: 4px;
+            margin-top: 3px;
             font-family: monospace;
         }}
         
         h4.section-title {{
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #0f172a;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin: 16px 0 8px 0;
+            margin: 12px 0 6px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -707,22 +708,22 @@ def generate_executive_audit_package_html() -> str:
         table.gov-table {{
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            margin-bottom: 14px;
+            font-size: 11.5px;
+            margin-bottom: 10px;
         }}
         table.gov-table th {{
             background: #f1f5f9;
             color: #334155;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 11px;
-            padding: 8px 10px;
+            font-size: 10.5px;
+            padding: 6px 8px;
             border-top: 1px solid #cbd5e1;
             border-bottom: 2px solid #94a3b8;
             text-align: left;
         }}
         table.gov-table td {{
-            padding: 7px 10px;
+            padding: 5px 8px;
             border-bottom: 1px solid #e2e8f0;
             color: #334155;
         }}
@@ -732,11 +733,11 @@ def generate_executive_audit_package_html() -> str:
         .callout-box {{
             background: #f8fafc;
             border-left: 4px solid #0284c7;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 0 6px 6px 0;
-            font-size: 12px;
+            font-size: 11.5px;
             color: #334155;
-            margin: 12px 0;
+            margin: 10px 0;
         }}
         
         @media print {{
@@ -750,15 +751,18 @@ def generate_executive_audit_package_html() -> str:
             .page-container {{
                 max-width: 100% !important;
                 margin: 0 !important;
+                padding: 0 !important;
             }}
             .report-page {{
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: 16px 20px !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
-                min-height: 98vh !important;
+                min-height: 96vh !important;
                 page-break-after: always !important;
                 break-after: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }}
         }}
     </style>
@@ -784,7 +788,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Executive Travel & Spend Intelligence Summary | Page 1 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -861,7 +865,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Departmental Budget & Employee Mobility Hub | Page 2 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -933,7 +937,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Policy Governance, Approvals & Compliance Audit | Page 3 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -1020,7 +1024,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Treasury FX Exposure & Multi-Currency Lineage | Page 4 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -1095,7 +1099,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Data Quality, ETL Lineage & Control Room Certification | Page 5 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -1158,21 +1162,21 @@ def generate_executive_audit_package_html() -> str:
                     </tbody>
                 </table>
 
-                <div style="margin-top: 24px; padding: 16px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: #f8fafc;">
-                    <div style="font-size: 13px; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">Executive Sign-Off & Data Quality Attestation</div>
-                    <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                <div style="margin-top: 12px; padding: 10px 14px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: #f8fafc;">
+                    <div style="font-size: 12px; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">Executive Sign-Off & Data Quality Attestation</div>
+                    <div style="font-size: 10.5px; color: #475569; margin-top: 3px; line-height: 1.4;">
                         This document is certified to have been produced by the Governed Corporate Travel Analytics Pipeline. All calculations derive directly from the authoritative warehouse view <code>vw_travel</code>.
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 24px; font-size: 12px; font-weight: 700; color: #334155;">
-                        <div>_______________________________<br><span style="font-weight: normal; font-size: 11px; color: #64748b;">Head of Corporate Travel & Expense</span></div>
-                        <div>_______________________________<br><span style="font-weight: normal; font-size: 11px; color: #64748b;">Chief Financial Officer (CFO)</span></div>
-                        <div>_______________________________<br><span style="font-weight: normal; font-size: 11px; color: #64748b;">Director of Data Governance & BI</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 11px; font-weight: 700; color: #334155;">
+                        <div>__________________________<br><span style="font-weight: normal; font-size: 10px; color: #64748b;">Head of Corporate Travel & Expense</span></div>
+                        <div>__________________________<br><span style="font-weight: normal; font-size: 10px; color: #64748b;">Chief Financial Officer (CFO)</span></div>
+                        <div>__________________________<br><span style="font-weight: normal; font-size: 10px; color: #64748b;">Director of Data Governance & BI</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="page-footer">
-                <div>Certified End-to-End Analytics Architecture: Raw CSV → Staging → Cleansing → Fact → vw_travel → Power BI</div>
+                <div>Single Source of Truth: PostgreSQL Governed View <code>vw_travel</code></div>
                 <div>{doc_label} | Page 5 of {total_pages}</div>
             </div>
         </div>
@@ -1334,8 +1338,9 @@ def generate_csuite_briefing_html() -> str:
         .report-page {{
             background: #ffffff;
             width: 100%;
-            min-height: 1120px;
-            padding: 32px 36px;
+            min-height: 1080px;
+            box-sizing: border-box;
+            padding: 24px 32px;
             margin-bottom: 24px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -1549,7 +1554,7 @@ def generate_csuite_briefing_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL ANALYTICS CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Enterprise Travel Intelligence & Treasury Governance</div>
                     </div>
                     <div class="page-badge">
