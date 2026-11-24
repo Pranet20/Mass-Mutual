@@ -1,36 +1,14 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "kpiCurrencies",
   "position": {
     "x": 400,
     "y": 40,
-    "width": 340,
+    "z": 501,
     "height": 140,
-    "z": 501
+    "width": 340
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Active Currencies Count"
-                }
-              },
-              "queryRef": "vw_travel.Active Currencies Count",
-              "displayName": "Distinct Currencies"
-            }
-          ]
-        }
-      }
-    }
+    "visualType": "card"
   }
 }

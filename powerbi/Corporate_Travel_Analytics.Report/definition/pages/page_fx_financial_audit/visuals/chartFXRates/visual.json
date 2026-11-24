@@ -32,24 +32,27 @@
           ]
         },
         "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Avg FX Rate"
-                }
-              },
-              "queryRef": "vw_travel.Avg FX Rate",
-              "displayName": "Exchange Rate Applied"
-            }
-          ]
+          "projections": []
         }
       }
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "5bc6c52445ab44ac544c",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "vw_travel"
+              }
+            },
+            "Property": "currency"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

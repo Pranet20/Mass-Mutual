@@ -32,24 +32,27 @@
           ]
         },
         "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Spend by Approval"
-                }
-              },
-              "queryRef": "vw_travel.Spend by Approval",
-              "displayName": "Spend by Approval (INR)"
-            }
-          ]
+          "projections": []
         }
       }
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "54e549fecd7370ec23e6",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "vw_travel"
+              }
+            },
+            "Property": "approval_status"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

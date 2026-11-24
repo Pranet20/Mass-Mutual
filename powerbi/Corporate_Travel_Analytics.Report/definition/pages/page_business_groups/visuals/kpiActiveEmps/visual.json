@@ -1,36 +1,14 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "kpiActiveEmps",
   "position": {
     "x": 40,
     "y": 40,
-    "width": 340,
+    "z": 300,
     "height": 140,
-    "z": 300
+    "width": 340
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Active Employees"
-                }
-              },
-              "queryRef": "vw_travel.Active Employees",
-              "displayName": "Active Traveling Employees"
-            }
-          ]
-        }
-      }
-    }
+    "visualType": "card"
   }
 }

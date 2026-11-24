@@ -32,24 +32,27 @@
           ]
         },
         "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Spend by Policy Status"
-                }
-              },
-              "queryRef": "vw_travel.Spend by Policy Status",
-              "displayName": "Impacted Spend (INR)"
-            }
-          ]
+          "projections": []
         }
       }
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "79a10e062267264b0afa",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "vw_travel"
+              }
+            },
+            "Property": "policy_compliance_status"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

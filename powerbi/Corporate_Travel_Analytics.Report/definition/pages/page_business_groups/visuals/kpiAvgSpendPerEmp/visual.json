@@ -1,36 +1,14 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "kpiAvgSpendPerEmp",
   "position": {
     "x": 400,
     "y": 40,
-    "width": 340,
+    "z": 301,
     "height": 140,
-    "z": 301
+    "width": 340
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Avg Spend per Employee"
-                }
-              },
-              "queryRef": "vw_travel.Avg Spend per Employee",
-              "displayName": "Avg Spend per Employee (INR)"
-            }
-          ]
-        }
-      }
-    }
+    "visualType": "card"
   }
 }

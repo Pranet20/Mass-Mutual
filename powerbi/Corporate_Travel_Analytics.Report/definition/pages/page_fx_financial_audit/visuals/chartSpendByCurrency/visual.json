@@ -32,24 +32,27 @@
           ]
         },
         "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Spend by Currency"
-                }
-              },
-              "queryRef": "vw_travel.Spend by Currency",
-              "displayName": "Spend (INR Converted)"
-            }
-          ]
+          "projections": []
         }
       }
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "9b74ec4db139d5ce464b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "vw_travel"
+              }
+            },
+            "Property": "currency"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

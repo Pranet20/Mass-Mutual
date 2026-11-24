@@ -32,24 +32,27 @@
           ]
         },
         "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Spend by Channel"
-                }
-              },
-              "queryRef": "vw_travel.Spend by Channel",
-              "displayName": "Channel Spend (INR)"
-            }
-          ]
+          "projections": []
         }
       }
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "57b9b4d273a8da99e734",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "vw_travel"
+              }
+            },
+            "Property": "booking_channel"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

@@ -32,24 +32,27 @@
           ]
         },
         "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "vw_travel"
-                    }
-                  },
-                  "Property": "Spend by Classification"
-                }
-              },
-              "queryRef": "vw_travel.Spend by Classification",
-              "displayName": "Spend (INR)"
-            }
-          ]
+          "projections": []
         }
       }
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "315587815f967635fd78",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "vw_travel"
+              }
+            },
+            "Property": "trip_classification"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

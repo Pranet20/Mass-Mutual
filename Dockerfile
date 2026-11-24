@@ -22,8 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend codebase
+# Copy backend codebase and CSV datasets
 COPY backend/ ./backend/
+COPY *.csv ./
 # Copy frontend production build to dist
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
