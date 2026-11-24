@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Search, UserPlus, Trash2, Eye, Upload, CheckCircle2, AlertCircle, FileSpreadsheet, User, ShieldAlert, Filter, Layers, Users } from 'lucide-react';
 import { EmployeeDetailModal } from '../components/EmployeeDetailModal';
+import { TableSkeleton } from '../components/LoadingSkeleton';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 export const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('ALL'); // 'ALL', 'ALLOCATED', 'NULL'
   const [selectedEmpId, setSelectedEmpId] = useState(null);
@@ -29,12 +32,17 @@ export const Employees = () => {
 
   const fetchEmployees = () => {
     setLoading(true);
+    setFetchError(null);
     axios.get('/api/employees')
       .then(res => {
         setEmployees(res.data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Failed to load employees:', err);
+        setFetchError('Unable to load employee directory from database.');
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -245,7 +253,19 @@ export const Employees = () => {
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {loading ? (
-                <tr><td colSpan={7} className="p-8 text-center text-slate-500">Loading Directory...</td></tr>
+                Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="p-3.5"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32 mb-1"></div><div className="h-2.5 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
+                    <td className="p-3.5"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
+                    <td className="p-3.5"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-28"></div></td>
+                    <td className="p-3.5 text-right"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20 ml-auto"></div></td>
+                    <td className="p-3.5 text-right"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20 ml-auto"></div></td>
+                    <td className="p-3.5 text-center"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-10 mx-auto"></div></td>
+                    <td className="p-3.5 text-center"><div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-16 mx-auto"></div></td>
+                  </tr>
+                ))
+              ) : fetchError ? (
+                <tr><td colSpan={7} className="p-6"><ErrorAlert message={fetchError} onRetry={fetchEmployees} /></td></tr>
               ) : filteredEmployees.map((e) => (
                 <tr key={e.employee_id} className={`hover:bg-slate-50 dark:hover:bg-slate-700/50 ${e.is_allowance_null ? 'bg-amber-50/40 dark:bg-amber-950/20' : ''}`}>
                   <td className="p-3.5">

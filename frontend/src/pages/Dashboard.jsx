@@ -3,11 +3,14 @@ import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DollarSign, Ticket, Plane, Clock, Check, XCircle, CheckCircle2, Filter, Layers, Globe, BarChart3, ExternalLink } from 'lucide-react';
+import { StatCardSkeleton, ChartSkeleton } from '../components/LoadingSkeleton';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 export const Dashboard = ({ onNavigateToPowerBI }) => {
   const { theme } = useTheme();
   const [rawData, setRawData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [approvals, setApprovals] = useState([]);
   const [actionMsg, setActionMsg] = useState('');
 
@@ -28,6 +31,7 @@ export const Dashboard = ({ onNavigateToPowerBI }) => {
 
   const fetchDashboard = (q = quarterFilter, bu = buFilter) => {
     setLoading(true);
+    setFetchError(null);
     axios.get('/api/dashboard/stats', {
       params: {
         quarter: q,
@@ -38,7 +42,11 @@ export const Dashboard = ({ onNavigateToPowerBI }) => {
         setRawData(res.data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Failed to load dashboard stats:', err);
+        setFetchError(err.response?.data?.message || 'Unable to connect to the analytics database.');
+        setLoading(false);
+      });
 
     axios.get('/api/manager/approvals')
       .then(res => setApprovals(res.data))
@@ -63,40 +71,28 @@ export const Dashboard = ({ onNavigateToPowerBI }) => {
 
   if (loading && !rawData) {
     return (
-      <div className="p-12 text-center">
-        <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p className="text-xs text-slate-500 font-medium">Loading Governed Executive Analytics...</p>
+      <div className="p-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartSkeleton />
+          <ChartSkeleton />
+        </div>
       </div>
     );
   }
 
   if (!rawData) {
     return (
-      <div className="p-8 max-w-lg mx-auto mt-12 text-center bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700">
-        <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mx-auto mb-4">
-          <Clock className="w-6 h-6" />
-        </div>
-        <h3 className="text-base font-bold text-slate-800 dark:text-white mb-2">Session Expired or Server Reconnected</h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-          Your credentials require re-authentication. Click below to reconnect your session.
-        </p>
-        <div className="flex justify-center gap-3">
-          <button
-            onClick={() => fetchDashboard(quarterFilter, buFilter)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
-          >
-            Retry Connection
-          </button>
-          <button
-            onClick={() => {
-              localStorage.clear();
-              window.location.reload();
-            }}
-            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition-all"
-          >
-            Log In Again
-          </button>
-        </div>
+      <div className="p-8 max-w-xl mx-auto mt-12 space-y-4">
+        <ErrorAlert
+          message={fetchError || "Unable to connect to the analytics database. Please check your network or credentials."}
+          onRetry={() => fetchDashboard(quarterFilter, buFilter)}
+        />
       </div>
     );
   }

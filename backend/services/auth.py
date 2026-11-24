@@ -169,3 +169,34 @@ def register_user(email: str, password: str, name: str, role: str = "employee", 
     session.close()
     
     return new_user, "User registered successfully."
+
+def delete_user_account(email: str, password: str) -> tuple:
+    """
+    Secure self-service account deletion.
+    Verifies user password, deletes authentication credentials, and anonymizes
+    employee PII in accordance with GDPR/privacy principles while maintaining
+    financial audit lineage integrity for historical travel tickets.
+    """
+    session = SessionLocal()
+    user = session.query(User).filter_by(email=email.strip()).first()
+    if not user:
+        session.close()
+        return False, "User account not found."
+        
+    if not verify_password(password, user.password_hash):
+        session.close()
+        return False, "Incorrect password. Account deletion requires valid password authentication."
+        
+    emp_id = user.employee_id
+    if emp_id:
+        emp = session.query(EmployeeMaster).filter_by(employee_id=emp_id).first()
+        if emp:
+            emp.employee_name = f"Deactivated ({emp_id})"
+            emp.email = f"anonymized_{emp_id}@travelintelligence.internal"
+            emp.designation = "Deactivated"
+            emp.is_current = 0
+            
+    session.delete(user)
+    session.commit()
+    session.close()
+    return True, "Your account has been deleted and employee PII anonymized successfully."

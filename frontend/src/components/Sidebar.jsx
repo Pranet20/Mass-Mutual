@@ -17,7 +17,7 @@ const navItems = [
   { id: 'powerbi', label: 'PowerBI', icon: BarChart3 },
 ];
 
-export const Sidebar = ({ activeTab, setActiveTab }) => {
+export const Sidebar = ({ activeTab, setActiveTab, onOpenPrivacyPolicy, onOpenAccountDeletion }) => {
   const { user, logout } = useAuth();
 
   return (
@@ -57,10 +57,19 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
         </nav>
       </div>
 
-      {/* Clean Bottom Sidebar Footer with Log Out Button */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-3">
-        <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
-          {user?.email || 'manager@travelintelligence.com'}
+      {/* Clean Bottom Sidebar Footer with Privacy Policy & Log Out Button */}
+      <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-2.5">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <span className="truncate max-w-[140px]">{user?.email || 'manager@travelintelligence.com'}</span>
+          {onOpenPrivacyPolicy && (
+            <button
+              type="button"
+              onClick={onOpenPrivacyPolicy}
+              className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+            >
+              Privacy
+            </button>
+          )}
         </div>
         <button
           onClick={logout}

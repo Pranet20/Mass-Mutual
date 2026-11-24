@@ -3,10 +3,10 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { 
-  User, DollarSign, Plane, Ticket, Send, Bot, Mail, CheckCircle2, PlusCircle, LayoutDashboard, History, LogOut, ChevronRight, Wallet, PieChart, Copy, Sun, Moon, ShieldCheck, ShieldAlert, Calculator, FileCheck, AlertTriangle, LifeBuoy, Clock, ExternalLink
+  User, DollarSign, Plane, Ticket, Send, Bot, Mail, CheckCircle2, PlusCircle, LayoutDashboard, History, LogOut, ChevronRight, Wallet, PieChart, Copy, Sun, Moon, ShieldCheck, ShieldAlert, Calculator, FileCheck, AlertTriangle, LifeBuoy, Clock, ExternalLink, Trash2, Shield
 } from 'lucide-react';
 
-export const EmployeePortal = () => {
+export const EmployeePortal = ({ onOpenPrivacyPolicy, onOpenAccountDeletion }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('emp-dashboard');
@@ -284,8 +284,36 @@ export const EmployeePortal = () => {
             </button>
           </div>
 
-          {/* Footer Left Sign Out Button */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 mt-4">
+          {/* Footer Left Actions */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 mt-4 space-y-2">
+            {onOpenPrivacyPolicy && (
+              <button
+                type="button"
+                onClick={onOpenPrivacyPolicy}
+                className="w-full px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Privacy Policy</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+              </button>
+            )}
+
+            {onOpenAccountDeletion && (
+              <button
+                type="button"
+                onClick={onOpenAccountDeletion}
+                className="w-full px-3 py-2 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold text-xs transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Account</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+              </button>
+            )}
+
             <button
               onClick={logout}
               className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 text-slate-700 dark:text-slate-300 font-bold text-xs transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700"

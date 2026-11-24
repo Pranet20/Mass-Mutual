@@ -1,0 +1,20 @@
+# Existing Feature Inventory: Corporate Travel Analytics
+
+## 1. Feature Map & Verification Status
+
+| Feature ID | Module | User Persona | Capability & Endpoint | Verification Evidence | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FEAT-001** | Executive Dashboard | Manager / Executive | Dynamic spend aggregation, time-series spend volume, divisional breakdown, cross-border metrics (`GET /api/dashboard/stats`). | Reconciles against `vw_travel` with ₹0 variance. Slicers update charts dynamically. | **Operational** |
+| **FEAT-002** | Manager Approvals | Manager | Pending expense claims approval/rejection desk (`GET /api/manager/approvals`, `POST /api/manager/approvals/action`). | Persists decisions and recalculates divisional budget utilization. | **Operational** |
+| **FEAT-003** | Employee Portal | Employee | Personal travel directory, quarterly allowance balance, booking history, new travel claim submission (`GET /api/employee/me`, `POST /api/employee/book-ticket`). | Enforces employee data isolation; employees only see their own tickets. | **Operational** |
+| **FEAT-004** | Employee Directory | Manager | 360° employee master directory, SCD Type-2 historical timeline, quarterly allowance management, CSV import (`GET /api/employees`, `POST /api/employees/adjust-allowance`). | Validates allowance updates and renders temporal assignment timeline. | **Operational** |
+| **FEAT-005** | Ingestion Pipeline | Manager / Data Eng | Continuous CSV ingestion, batch cryptographic hash audit, quarantine desk, manual analyst override layer (`POST /api/pipeline/run`, `POST /api/pipeline/override`). | Idempotent SHA-256 batch processing verified; manual overrides respected. | **Operational** |
+| **FEAT-006** | Spend Forecasting | Manager / Treasury | Multi-quarter predictive spend trajectory, inflation scenarios, and variance projections (`GET /api/forecasting`). | Computes baseline, high, and low projections with adjustable sliders. | **Operational** |
+| **FEAT-007** | Power BI Master Suite | Executive / Analyst | 5-page governed analytics suite, Power BI Desktop PBIX download, official React embed token generation (`GET /api/powerbi/embed-config`, `GET /api/powerbi/pbix`). | Verified with dual assets: Master PBIX and PBIP source control project. | **Operational** |
+| **FEAT-008** | Executive PDF Package | C-Suite / Auditor | 7-page executive audit package & 2-page C-suite memo (`GET /api/reports/audit-package-html`, `GET /api/reports/csuite-briefing-html`). | Verified clean A4 layout, zero spill/overflow, and single source of truth footer. | **Operational** |
+| **FEAT-009** | AI Travel Assistant | All Users | Contextual NLP assistant answering corporate travel queries and policy FAQs (`POST /api/ai/query`). | Answers spend, flight, and policy inquiries derived from warehouse view. | **Operational** |
+| **FEAT-010** | Telemetry & Analytics | System | Client behavior and performance monitoring (`POST /api/analytics/track`, `POST /api/analytics/batch`, `GET /api/analytics/summary`). | Captures page views, feature clicks, and web vitals with session correlation. | **Operational** |
+| **FEAT-011** | Crash Diagnostics | System | React ErrorBoundary unhandled exception capture (`POST /api/analytics/crash-report`, `GET /api/analytics/crashes`). | Generates unique Incident IDs and preserves component stack traces. | **Operational** |
+| **FEAT-012** | Privacy Policy | All Users | Corporate data governance, GDPR compliance, and statutory retention policy (`GET /api/legal/privacy-policy`). | Interactive modal accessible from sidebar, navbar, and login modal. | **Operational** |
+| **FEAT-013** | Account Deletion | Employee / Manager | Self-service account deletion under GDPR right-to-erasure (`DELETE /api/users/me`). | Requires password verification; anonymizes PII while preserving financial facts. | **Operational** |
+| **FEAT-014** | APM Monitoring | DevOps / SRE | System health, database connection pool, request throughput, and p95 latency (`GET /health`, `GET /api/metrics`). | Middleware measures execution latency and tracks 2xx/4xx/5xx status rates. | **Operational** |

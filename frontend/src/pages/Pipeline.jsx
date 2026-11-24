@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Play, Upload, CheckCircle2, ShieldCheck, Edit2, Save, FileSpreadsheet, Activity, Clock, AlertTriangle, Database, RefreshCw, Link as LinkIcon, AlertCircle, ShieldAlert } from 'lucide-react';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 export const Pipeline = () => {
   const [running, setRunning] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [logs, setLogs] = useState(null);
   const [uploadFile, setUploadFile] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -22,13 +25,22 @@ export const Pipeline = () => {
   ]);
 
   const fetchPipelineData = () => {
-    axios.get('/api/pipeline/audit')
-      .then(res => setAuditLogs(res.data))
-      .catch(() => {});
-
-    axios.get('/api/pipeline/quarantine')
-      .then(res => setQuarantineRecords(res.data))
-      .catch(() => {});
+    setLoading(true);
+    setFetchError(null);
+    Promise.all([
+      axios.get('/api/pipeline/audit'),
+      axios.get('/api/pipeline/quarantine')
+    ])
+      .then(([auditRes, quarRes]) => {
+        setAuditLogs(auditRes.data || []);
+        setQuarantineRecords(quarRes.data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to load pipeline audit:', err);
+        setFetchError('Unable to load pipeline audit logs from the database.');
+        setLoading(false);
+      });
   };
 
   const handleResyncAudit = () => {
@@ -101,6 +113,12 @@ export const Pipeline = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {fetchError && (
+        <ErrorAlert
+          message={fetchError}
+          onRetry={fetchPipelineData}
+        />
+      )}
       {/* Top Banner & File Upload Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Run Pipeline & CSV Ingestion */}

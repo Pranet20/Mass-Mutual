@@ -3,11 +3,14 @@ import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Filter, Calendar } from 'lucide-react';
+import { ChartSkeleton } from '../components/LoadingSkeleton';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 export const Forecasting = () => {
   const { theme } = useTheme();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   // Quarterly & Date Range Filters
   const [quarterFilter, setQuarterFilter] = useState('ALL');
@@ -18,17 +21,43 @@ export const Forecasting = () => {
   const gridColor = isDark ? '#334155' : '#e2e8f0';
   const textColor = isDark ? '#94a3b8' : '#64748b';
 
-  useEffect(() => {
+  const fetchForecast = () => {
+    setLoading(true);
+    setErrorMsg(null);
     axios.get('/api/forecasting')
       .then(res => {
         setData(res.data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Failed to load forecasting:', err);
+        setErrorMsg('Unable to retrieve predictive forecasting projections.');
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchForecast();
   }, []);
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Loading Dynamic Spend Forecasting...</div>;
-  if (!data) return null;
+  if (loading) {
+    return (
+      <div className="p-8 space-y-6">
+        <ChartSkeleton />
+      </div>
+    );
+  }
+
+  if (errorMsg || !data) {
+    return (
+      <div className="p-8 max-w-xl mx-auto mt-12">
+        <ErrorAlert
+          message={errorMsg || 'Unable to compute spend forecasting projections from the database.'}
+          onRetry={fetchForecast}
+        />
+      </div>
+    );
+  }
 
   // Dynamic Date Range & Quarter Scaling Factor
   const calculateDynamicFactor = () => {

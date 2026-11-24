@@ -4,10 +4,11 @@ import io
 import csv
 import json
 import uuid
+import time
 import datetime
 from contextlib import asynccontextmanager
-from typing import Optional, List
-from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File, Depends, Query, status
+from typing import Optional, List, Dict, Any
+from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File, Depends, Query, Header, status
 from fastapi.responses import JSONResponse, StreamingResponse, FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,12 +21,23 @@ sys.path.insert(0, os.path.dirname(__file__))
 from database.models import (
     init_db, SessionLocal, engine,
     FactTravelTicket, EmployeeMaster, CountryReference, FXRate,
-    ManualOverride, ManualOverrideAudit, PipelineBatchAudit, QuarantinedRecord, User, Complaint
+    ManualOverride, ManualOverrideAudit, PipelineBatchAudit, QuarantinedRecord, User, Complaint,
+    UserAnalyticsEvent, AppCrashLog
 )
 from pipeline.validation import run_end_to_end_pipeline
 from services.auth import (
     authenticate_user, register_user, create_access_token,
-    get_current_user, require_role, check_login_rate_limit
+    get_current_user, require_role, check_login_rate_limit,
+    delete_user_account
+)
+from services.telemetry import (
+    record_http_request_metric,
+    record_user_event,
+    record_events_batch,
+    log_client_crash,
+    get_analytics_summary,
+    get_system_health_metrics,
+    get_privacy_policy_contract
 )
 from services.forecasting import get_spend_forecasting
 from services.ai_assistant import process_ai_query, submit_complaint
@@ -103,10 +115,14 @@ app.add_middleware(
 # Security & Traceability Middleware
 @app.middleware("http")
 async def add_security_and_logging_headers(request: Request, call_next):
+    start_time = time.time()
     req_id = str(uuid.uuid4())
     request.state.request_id = req_id
     response = await call_next(request)
+    duration_ms = round((time.time() - start_time) * 1000, 2)
+    record_http_request_metric(response.status_code, duration_ms)
     response.headers["X-Request-ID"] = req_id
+    response.headers["X-Response-Time"] = f"{duration_ms}ms"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -201,6 +217,27 @@ class SignupRequest(BaseModel):
     business_unit: Optional[str] = "Global Technology"
     department: Optional[str] = "Software Engineering"
     designation: Optional[str] = "Senior Engineer"
+
+class DeleteAccountRequest(BaseModel):
+    password: str
+
+class AnalyticsEventSchema(BaseModel):
+    event_type: str = "action"
+    event_name: str
+    page_url: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
+    duration_ms: Optional[float] = None
+    session_id: Optional[str] = None
+
+class BatchAnalyticsRequest(BaseModel):
+    events: List[AnalyticsEventSchema]
+
+class CrashReportRequest(BaseModel):
+    error_name: str
+    error_message: str
+    stack_trace: Optional[str] = None
+    component_stack: Optional[str] = None
+    page_url: Optional[str] = None
 
 class AIQueryRequest(BaseModel):
     query: str
@@ -400,6 +437,136 @@ def get_current_user_profile(current_user: User = Depends(get_current_user)):
         "role": current_user.role,
         "employee_id": current_user.employee_id
     }
+
+@app.delete("/api/users/me")
+def delete_my_account(req: DeleteAccountRequest, current_user: User = Depends(get_current_user)):
+    """
+    Self-service account deletion. Anonymizes employee PII while upholding statutory
+    financial travel facts.
+    """
+    success, msg = delete_user_account(current_user.email, req.password)
+    if not success:
+        raise HTTPException(status_code=400, detail=msg)
+    return {"success": True, "message": msg}
+
+# --- ENTERPRISE APM, TELEMETRY, CRASH REPORTING & PRIVACY ---
+
+@app.post("/api/analytics/track")
+def track_analytics_event(req: AnalyticsEventSchema, request: Request, authorization: Optional[str] = Header(None)):
+    """
+    Tracks client-side user actions, navigation events, and web vitals.
+    """
+    u_id = None
+    u_role = None
+    if authorization:
+        try:
+            parts = authorization.split()
+            if len(parts) == 2 and parts[0].lower() == "bearer":
+                from services.auth import decode_access_token
+                payload = decode_access_token(parts[1])
+                u_id = payload.get("sub")
+                u_role = payload.get("role")
+        except Exception:
+            pass
+            
+    ua = request.headers.get("user-agent", "")
+    event_id = record_user_event(
+        event_type=req.event_type,
+        event_name=req.event_name,
+        user_id=u_id,
+        user_role=u_role,
+        page_url=req.page_url,
+        metadata=req.metadata,
+        duration_ms=req.duration_ms,
+        session_id=req.session_id,
+        user_agent=ua
+    )
+    return {"success": True, "event_id": event_id}
+
+@app.post("/api/analytics/batch")
+def track_batch_events(req: BatchAnalyticsRequest, request: Request, authorization: Optional[str] = Header(None)):
+    """
+    Batched analytics telemetry ingestion.
+    """
+    u_id = None
+    u_role = None
+    if authorization:
+        try:
+            parts = authorization.split()
+            if len(parts) == 2 and parts[0].lower() == "bearer":
+                from services.auth import decode_access_token
+                payload = decode_access_token(parts[1])
+                u_id = payload.get("sub")
+                u_role = payload.get("role")
+        except Exception:
+            pass
+            
+    events_data = [e.model_dump() for e in req.events]
+    count = record_events_batch(events_data, user_id=u_id, user_role=u_role)
+    return {"success": True, "ingested_count": count}
+
+@app.post("/api/analytics/crash-report")
+def report_client_crash(req: CrashReportRequest, request: Request):
+    """
+    Captures unhandled frontend crashes with stack trace and generates a unique crash reference ID.
+    """
+    ua = request.headers.get("user-agent", "")
+    crash_id = log_client_crash(
+        error_name=req.error_name,
+        error_message=req.error_message,
+        stack_trace=req.stack_trace,
+        component_stack=req.component_stack,
+        page_url=req.page_url,
+        user_agent=ua
+    )
+    return {"success": True, "crash_id": crash_id, "message": "Crash report logged successfully for diagnostic triage."}
+
+@app.get("/api/analytics/summary")
+def get_telemetry_summary(current_user: User = Depends(require_role(["manager", "admin"]))):
+    """
+    Provides aggregated analytics metrics on feature usage, user interaction, and client latency.
+    """
+    return get_analytics_summary()
+
+@app.get("/api/analytics/crashes")
+def get_crash_reports(current_user: User = Depends(require_role(["manager", "admin"]))):
+    """
+    Lists recent unhandled UI crash diagnostics.
+    """
+    session = SessionLocal()
+    try:
+        from database.models import AppCrashLog
+        from sqlalchemy import desc
+        crashes = session.query(AppCrashLog).order_by(desc(AppCrashLog.created_at)).limit(25).all()
+        return [
+            {
+                "crash_id": c.crash_id,
+                "error_name": c.error_name,
+                "error_message": c.error_message,
+                "stack_trace": c.stack_trace,
+                "component_stack": c.component_stack,
+                "page_url": c.page_url,
+                "status": c.status,
+                "created_at": c.created_at.isoformat() if c.created_at else None
+            }
+            for c in crashes
+        ]
+    finally:
+        session.close()
+
+@app.get("/api/legal/privacy-policy")
+def get_privacy_policy():
+    """
+    Corporate Travel Analytics Data Governance & Privacy Policy.
+    """
+    return get_privacy_policy_contract()
+
+@app.get("/api/metrics")
+def get_live_metrics():
+    """
+    APM monitoring metrics: request rates, status codes, p95 latencies, and uptime.
+    """
+    return get_system_health_metrics()
 
 # --- GOVERNED DASHBOARD ANALYTICS (DYNAMIC DATABASE AGGREGATION) ---
 

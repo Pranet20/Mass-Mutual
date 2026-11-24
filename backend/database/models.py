@@ -232,6 +232,36 @@ class Complaint(Base):
     status = Column(String(50), default="OPEN")
     created_at = Column(DateTime, default=get_utc_now)
 
+class UserAnalyticsEvent(Base):
+    __tablename__ = "user_analytics_events"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String(100), index=True, nullable=True)
+    user_role = Column(String(50), nullable=True)
+    event_type = Column(String(50), nullable=False, index=True) # page_view, action, performance, export
+    event_name = Column(String(100), nullable=False, index=True)
+    page_url = Column(String(255), nullable=True)
+    metadata_json = Column(Text, nullable=True)
+    duration_ms = Column(Float, nullable=True)
+    session_id = Column(String(100), nullable=True)
+    user_agent = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=get_utc_now, index=True)
+
+class AppCrashLog(Base):
+    __tablename__ = "app_crash_logs"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    crash_id = Column(String(100), unique=True, nullable=False, index=True)
+    user_id = Column(String(100), nullable=True)
+    error_name = Column(String(200), nullable=False)
+    error_message = Column(Text, nullable=False)
+    stack_trace = Column(Text, nullable=True)
+    component_stack = Column(Text, nullable=True)
+    page_url = Column(String(255), nullable=True)
+    user_agent = Column(String(255), nullable=True)
+    status = Column(String(50), default="UNRESOLVED")
+    created_at = Column(DateTime, default=get_utc_now, index=True)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
     

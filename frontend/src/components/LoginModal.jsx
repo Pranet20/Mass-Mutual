@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Lock, Mail, User, AlertCircle, ShieldCheck, UserCheck, UserPlus, Building2, Briefcase } from 'lucide-react';
 
-export const LoginModal = () => {
+export const LoginModal = ({ onOpenPrivacyPolicy }) => {
   const { login, signup, googleLogin } = useAuth();
   const [activeTab, setActiveTab] = useState('manager'); // 'manager', 'employee', or 'signup'
 
@@ -421,6 +421,18 @@ export const LoginModal = () => {
             </form>
           )}
         </div>
+
+        {onOpenPrivacyPolicy && (
+          <div className="py-3 px-6 bg-slate-950/40 border-t border-slate-800 text-center">
+            <button
+              type="button"
+              onClick={onOpenPrivacyPolicy}
+              className="text-[11px] text-slate-400 hover:text-indigo-400 transition-colors underline"
+            >
+              Corporate Travel Data Governance & Privacy Policy
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
