@@ -13,6 +13,9 @@ export const Pipeline = () => {
   const [quarantineRecords, setQuarantineRecords] = useState([]);
   const [resyncMsg, setResyncMsg] = useState('');
 
+  const [selectedDataset, setSelectedDataset] = useState('all');
+  const [resetFact, setResetFact] = useState(false);
+
   // Manager & Employee Linked Exemption Form State
   const [overrideTckId, setOverrideTckId] = useState('TCK-8012');
   const [overrideEmpId, setOverrideEmpId] = useState('EMP-1002');
@@ -100,15 +103,18 @@ export const Pipeline = () => {
     .catch(() => {});
   };
 
-  const triggerManualRun = () => {
+  const triggerDatasetRun = (datasetName = selectedDataset, isReset = resetFact) => {
     setRunning(true);
-    axios.post('/api/pipeline/run')
+    axios.post('/api/pipeline/run', { dataset: datasetName, reset_fact: isReset })
       .then(res => {
         setLogs(res.data);
         setRunning(false);
         fetchPipelineData();
       })
-      .catch(() => setRunning(false));
+      .catch((err) => {
+        console.error('Failed to trigger dataset pipeline:', err);
+        setRunning(false);
+      });
   };
 
   return (
@@ -125,12 +131,55 @@ export const Pipeline = () => {
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-3">
             <Database className="w-5 h-5 text-blue-600" />
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Continuous Ingestion & Governed Pipeline</h3>
+            <div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Continuous Ingestion & Governed Pipeline</h3>
+              <p className="text-[11px] text-slate-500">Select any batch dataset or upload new CSV to dynamically update the entire app & Power BI</p>
+            </div>
           </div>
 
-          <form onSubmit={handleFileUpload} className="space-y-3">
+          {/* Quick Dataset Selector */}
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 space-y-3">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              Select Operating Data File:
+            </label>
+            <select
+              value={selectedDataset}
+              onChange={(e) => setSelectedDataset(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="all">All Batches Combined (Full Year 2026 Portfolio)</option>
+              <option value="travel_raw_tickets.csv">Baseline Dataset (travel_raw_tickets.csv)</option>
+              <option value="Test_Dataset_Batch_1_Q3_2026.csv">Test Dataset Batch 1 — Q3 2026 Focus</option>
+              <option value="Test_Dataset_Batch_2_Q4_2026.csv">Test Dataset Batch 2 — Q4 2026 Year-End Focus</option>
+            </select>
+
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="resetFactCheck"
+                checked={resetFact}
+                onChange={(e) => setResetFact(e.target.checked)}
+                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <label htmlFor="resetFactCheck" className="text-[11px] text-slate-600 dark:text-slate-400 cursor-pointer font-medium">
+                Isolate to selected dataset only (Clear previous records)
+              </label>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => triggerDatasetRun(selectedDataset, resetFact)}
+              disabled={running}
+              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>{running ? 'Executing Governed Pipeline...' : 'Run Pipeline on Selected Dataset'}</span>
+            </button>
+          </div>
+
+          <form onSubmit={handleFileUpload} className="space-y-3 pt-1 border-t border-slate-100 dark:border-slate-700">
             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Upload New Vendor/Partner Ticketing CSV Dataset:
+              Or Upload Custom Vendor/Partner Ticketing CSV:
             </label>
             <input
               type="file"
@@ -144,12 +193,12 @@ export const Pipeline = () => {
               disabled={!uploadFile || running}
               className={`w-full py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 ${
                 uploadFile && !running
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                  ? 'bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer'
                   : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
               }`}
             >
               <Upload className="w-4 h-4" />
-              <span>{running ? 'Ingesting & Validating Dataset...' : 'Run Pipeline on Chosen File'}</span>
+              <span>{running ? 'Ingesting & Validating Dataset...' : 'Upload & Process Custom CSV'}</span>
             </button>
           </form>
 

@@ -390,7 +390,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Authoritative 37-Column Data Dictionary (vw_travel) | Page 6 of 7</div>
                     </div>
                     <div class="page-badge">
@@ -448,7 +448,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Pipeline Batch Processing Ledger & Corporate Attestation | Page 7 of 7</div>
                     </div>
                     <div class="page-badge">
@@ -707,8 +707,10 @@ def generate_executive_audit_package_html() -> str:
         
         table.gov-table {{
             width: 100%;
+            table-layout: fixed;
+            word-wrap: break-word;
             border-collapse: collapse;
-            font-size: 11.5px;
+            font-size: 11px;
             margin-bottom: 10px;
         }}
         table.gov-table th {{
@@ -716,16 +718,22 @@ def generate_executive_audit_package_html() -> str:
             color: #334155;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 10.5px;
+            font-size: 10px;
             padding: 6px 8px;
             border-top: 1px solid #cbd5e1;
             border-bottom: 2px solid #94a3b8;
             text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }}
         table.gov-table td {{
             padding: 5px 8px;
             border-bottom: 1px solid #e2e8f0;
             color: #334155;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
         }}
         table.gov-table tr:nth-child(even) {{
             background: #f8fafc;
@@ -772,7 +780,7 @@ def generate_executive_audit_package_html() -> str:
     <!-- Interactive On-Screen Header (Hidden when printing to PDF) -->
     <div class="no-print-toolbar">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="font-weight: 900; font-size: 16px; letter-spacing: -0.5px; color: #fbbf24;">CORPORATE TRAVEL INTELLIGENCE</div>
+            <div style="font-weight: 900; font-size: 16px; letter-spacing: -0.5px; color: #fbbf24;">MASSMUTUAL TRAVEL DESK TEAM</div>
             <span style="font-size: 12px; color: #94a3b8;">{toolbar_sub}</span>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -788,7 +796,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Executive Travel & Spend Intelligence Summary | Page 1 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -865,7 +873,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Departmental Budget & Employee Mobility Hub | Page 2 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -937,7 +945,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Policy Governance, Approvals & Compliance Audit | Page 3 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -1024,7 +1032,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Treasury FX Exposure & Multi-Currency Lineage | Page 4 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -1099,7 +1107,7 @@ def generate_executive_audit_package_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM</div>
                         <div class="brand-sub">Data Quality, ETL Lineage & Control Room Certification | Page 5 of {total_pages}</div>
                     </div>
                     <div class="page-badge">
@@ -1554,7 +1562,7 @@ def generate_csuite_briefing_html() -> str:
             <div>
                 <div class="page-header">
                     <div>
-                        <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
+                        <div class="brand-title">MASSMUTUAL TRAVEL DESK TEAM — CORPORATE TRAVEL INTELLIGENCE</div>
                         <div class="brand-sub">Enterprise Travel Intelligence & Treasury Governance</div>
                     </div>
                     <div class="page-badge">
@@ -1852,8 +1860,8 @@ def generate_executive_audit_package_pdf_bytes() -> bytes:
         elements = []
 
         # --- COVER / HEADER ---
-        elements.append(Paragraph("CORPORATE TRAVEL & EXPENSE AUDIT PACKAGE", title_style))
-        elements.append(Paragraph(f"Corporate Travel Analytics Governed Pipeline & Analytical Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
+        elements.append(Paragraph("MASSMUTUAL TRAVEL DESK TEAM — AUDIT PACKAGE", title_style))
+        elements.append(Paragraph(f"MassMutual Corporate Travel Analytics Governed Pipeline & Analytical Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
         elements.append(Spacer(1, 14))
 
         # --- EXECUTIVE KPI TABLE ---

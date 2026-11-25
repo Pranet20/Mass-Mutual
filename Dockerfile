@@ -25,6 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend codebase and CSV datasets
 COPY backend/ ./backend/
 COPY *.csv ./
+COPY powerbi/ ./powerbi/
 # Copy frontend production build to dist
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 

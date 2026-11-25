@@ -1229,10 +1229,50 @@ def get_quarantined_records(current_user: User = Depends(require_role(["manager"
     session.close()
     return result
 
+class PipelineTriggerRequest(BaseModel):
+    dataset: Optional[str] = "all"
+    reset_fact: Optional[bool] = False
+
+@app.get("/api/pipeline/datasets")
+def list_available_datasets():
+    return [
+        {"id": "all", "name": "All Batches Combined (Full Year 2026 Portfolio)", "filename": "all"},
+        {"id": "travel_raw_tickets.csv", "name": "Baseline Dataset (travel_raw_tickets.csv)", "filename": "travel_raw_tickets.csv"},
+        {"id": "Test_Dataset_Batch_1_Q3_2026.csv", "name": "Test Dataset Batch 1 — Q3 2026", "filename": "Test_Dataset_Batch_1_Q3_2026.csv"},
+        {"id": "Test_Dataset_Batch_2_Q4_2026.csv", "name": "Test Dataset Batch 2 — Q4 2026", "filename": "Test_Dataset_Batch_2_Q4_2026.csv"}
+    ]
+
 @app.post("/api/pipeline/run")
-def trigger_pipeline(current_user: User = Depends(require_role(["manager", "admin"]))):
-    result = run_end_to_end_pipeline()
-    return result
+def trigger_pipeline(req: Optional[PipelineTriggerRequest] = None, current_user: User = Depends(require_role(["manager", "admin"]))):
+    dataset_choice = (req.dataset if req else "all") or "all"
+    reset_fact = req.reset_fact if req else False
+
+    session = SessionLocal()
+    if reset_fact:
+        session.query(FactTravelTicket).delete()
+        session.commit()
+    session.close()
+
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    data_dir = os.path.join(os.path.dirname(__file__), "data")
+
+    if dataset_choice == "all":
+        base_path = os.path.join(data_dir, "travel_raw_tickets.csv")
+        res = run_end_to_end_pipeline(base_path, force_reprocess=True)
+        for b_name in ["Test_Dataset_Batch_1_Q3_2026.csv", "Test_Dataset_Batch_2_Q4_2026.csv"]:
+            candidate = os.path.join(root_dir, b_name)
+            if not os.path.exists(candidate):
+                candidate = os.path.join(data_dir, b_name)
+            if os.path.exists(candidate):
+                run_end_to_end_pipeline(candidate, force_reprocess=True)
+        return res
+    else:
+        target_path = os.path.join(data_dir, dataset_choice)
+        if not os.path.exists(target_path):
+            target_path = os.path.join(root_dir, dataset_choice)
+        if not os.path.exists(target_path):
+            raise HTTPException(status_code=404, detail=f"Dataset file '{dataset_choice}' not found on server.")
+        return run_end_to_end_pipeline(target_path, force_reprocess=True)
 
 @app.post("/api/pipeline/upload-csv")
 def upload_pipeline_csv(file: UploadFile = File(...), current_user: User = Depends(require_role(["manager", "admin"]))):
@@ -1300,18 +1340,22 @@ def forecasting_data(current_user: User = Depends(get_current_user)):
     return get_spend_forecasting()
 
 @app.get("/api/reports/briefing-html", response_class=HTMLResponse)
-def get_briefing_html():
-    return generate_csuite_briefing_html()
-
+@app.get("/api/reports/briefing")
 @app.get("/api/export/csuite-briefing", response_class=HTMLResponse)
 def get_csuite_briefing():
     return generate_csuite_briefing_html()
 
 @app.get("/api/reports/audit-package-html", response_class=HTMLResponse)
+@app.get("/api/reports/audit-package", response_class=HTMLResponse)
+@app.get("/api/reports/5-page-report-html", response_class=HTMLResponse)
 def get_audit_package_html():
     return generate_executive_audit_package_html()
 
+@app.get("/api/reports/executive-audit-package")
+@app.get("/api/reports/audit-package-pdf")
 @app.get("/api/export/audit-package-pdf")
+@app.get("/api/export/executive-audit-package")
+@app.get("/api/export/5-page-report-pdf")
 @app.get("/api/export/pdf")
 def get_audit_package_pdf(format: Optional[str] = Query(None, description="Format: 'pdf' or 'html'")):
     if format and format.lower() == "html":
@@ -1320,7 +1364,7 @@ def get_audit_package_pdf(format: Optional[str] = Query(None, description="Forma
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=Executive_Travel_Audit_Package.pdf"}
+        headers={"Content-Disposition": "attachment; filename=MassMutual_Executive_Audit_Package.pdf"}
     )
 
 @app.get("/api/powerbi/embed-config")
@@ -1393,9 +1437,23 @@ def download_pbit(current_user: User = Depends(get_current_user)):
 
 @app.get("/api/powerbi/pbix")
 def download_pbix(current_user: User = Depends(get_current_user)):
-    pbix_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "powerbi", "Corporate_Travel_Analytics.pbix"))
-    if not os.path.exists(pbix_path):
-        raise HTTPException(status_code=404, detail="Power BI report template not found")
+    candidates = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "powerbi", "Corporate_Travel_Analytics.pbix")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "powerbi", "Corporate_Travel_Analytics.pbix")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Corporate_Travel_Analytics.pbix")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "Corporate_Travel_Analytics.pbix")),
+        "/app/powerbi/Corporate_Travel_Analytics.pbix"
+    ]
+    pbix_path = None
+    for p in candidates:
+        if os.path.exists(p) and os.path.getsize(p) > 0:
+            pbix_path = p
+            break
+            
+    if not pbix_path:
+        # Fallback to dynamically generated PBIT/PBIX template
+        pbix_path = generate_pbit_template()
+        
     return FileResponse(
         pbix_path,
         media_type="application/octet-stream",

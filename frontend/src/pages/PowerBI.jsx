@@ -47,55 +47,21 @@ export const PowerBI = () => {
       .finally(() => setIsRefreshing(false));
   };
 
-  const handleDownloadPBIX = async () => {
-    try {
-      setDownloadingPBIX(true);
-      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get('/api/powerbi/pbix', { headers, responseType: 'blob' });
-      const blob = new Blob([res.data], { type: 'application/octet-stream' });
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = 'Corporate_Travel_Analytics.pbix';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      console.error('Failed to download PBIX report:', err);
-      alert('Unable to download Power BI file. Please verify authentication.');
-    } finally {
-      setDownloadingPBIX(false);
-    }
+  const handleDownloadPBIX = () => {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token') || '';
+    window.location.href = `/api/powerbi/pbix?token=${encodeURIComponent(token)}`;
   };
 
-  const handleDownloadCSuiteMemo = async () => {
-    try {
-      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get('/api/reports/briefing-html', { headers, responseType: 'blob' });
-      const blob = new Blob([res.data], { type: 'text/html' });
-      const blobUrl = window.URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-    } catch (err) {
-      console.error('Failed to generate C-Suite memo:', err);
-      alert('Unable to generate briefing document.');
-    }
+  const handleDownloadCSuiteMemo = () => {
+    window.open('/api/reports/briefing-html', '_blank');
   };
 
-  const handleDownloadAuditPackage = async () => {
-    try {
-      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get('/api/reports/executive-audit-package', { headers, responseType: 'blob' });
-      const blob = new Blob([res.data], { type: 'text/html' });
-      const blobUrl = window.URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-    } catch (err) {
-      console.error('Failed to generate executive audit package:', err);
-      alert('Unable to generate executive audit package.');
-    }
+  const handleDownloadAuditPackage = () => {
+    window.open('/api/export/audit-package-pdf', '_blank');
+  };
+
+  const handleDownload5PageReport = () => {
+    window.open('/api/reports/audit-package-html', '_blank');
   };
 
   // Reconciled 14 Production DAX Measures
@@ -220,13 +186,16 @@ export const PowerBI = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-black text-lg tracking-wide">Enterprise Corporate Travel Analytics</h3>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300">
+                MassMutual Travel Desk Team
+              </span>
+              <h3 className="font-black text-lg tracking-wide">Corporate Travel Analytics</h3>
               <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40">
                 Official Power BI Studio
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Authoritative Warehouse View <code className="text-amber-300 font-mono font-bold">public.vw_travel</code> • 37 Governed Columns • 5 Core Report Pages
+              Authoritative Warehouse View <code className="text-amber-300 font-mono font-bold">public.vw_travel</code> • Governed Columns • 5 Core Report Pages
             </p>
           </div>
         </div>
@@ -246,22 +215,32 @@ export const PowerBI = () => {
 
           <button
             type="button"
-            onClick={handleDownloadCSuiteMemo}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
-            title="Download 2-Page Executive C-Suite Strategic Memo"
+            onClick={handleDownloadAuditPackage}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            title="Download Certified Executive PDF Audit Package"
           >
-            <Download className="w-3.5 h-3.5 text-slate-300" />
-            <span>C-Suite Memo (PDF)</span>
+            <FileText className="w-3.5 h-3.5 text-emerald-200" />
+            <span>Audit Package (PDF)</span>
           </button>
 
           <button
             type="button"
-            onClick={handleDownloadAuditPackage}
-            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-            title="Download certified 7-Page Executive PDF Audit Package"
+            onClick={handleDownload5PageReport}
+            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            title="Open 5-Page Interactive Governed Report View"
           >
-            <FileText className="w-3.5 h-3.5 text-emerald-200" />
-            <span>Audit Package (PDF)</span>
+            <FileSpreadsheet className="w-3.5 h-3.5 text-blue-200" />
+            <span>5-Page Report (PDF)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadCSuiteMemo}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
+            title="Download Executive Strategic Memo"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-300" />
+            <span>C-Suite Memo</span>
           </button>
 
           <button

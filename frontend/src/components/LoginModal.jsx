@@ -101,10 +101,10 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
         {/* Brand Header */}
         <div className="p-6 bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-900 text-white text-center">
           <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-2xl mx-auto mb-2 border border-white/20 shadow-md">
-            C
+            M
           </div>
-          <h2 className="text-2xl font-black">Corporate Travel Analytics</h2>
-          <p className="text-blue-200 text-xs mt-0.5">Enterprise Travel Intelligence Platform</p>
+          <h2 className="text-2xl font-black">MassMutual Travel Analytics</h2>
+          <p className="text-blue-200 text-xs mt-0.5 font-semibold">MassMutual Travel Desk Team</p>
         </div>
 
         {/* 3 Dedicated Sign In & Sign Up Tabs */}
