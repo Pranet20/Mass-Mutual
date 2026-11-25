@@ -57,6 +57,7 @@ from services.test_runner import execute_automated_system_tests
 
 def ensure_database_populated(session):
     try:
+        session.commit()
         mgr_user = session.query(User).filter_by(email="manager@travelintelligence.com").first()
         if not mgr_user:
             from seed_data import generate_all_data
@@ -65,6 +66,9 @@ def ensure_database_populated(session):
         ticket_count = session.query(FactTravelTicket).count()
         if ticket_count == 0:
             raw_csv = os.path.join(os.path.dirname(__file__), "data", "travel_raw_tickets.csv")
+            if not os.path.exists(raw_csv) or os.path.getsize(raw_csv) < 100:
+                from seed_data import generate_all_data
+                generate_all_data()
             if os.path.exists(raw_csv):
                 run_end_to_end_pipeline(raw_csv, force_reprocess=True)
             root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -72,6 +76,7 @@ def ensure_database_populated(session):
                 batch_path = os.path.join(root_dir, batch_file)
                 if os.path.exists(batch_path):
                     run_end_to_end_pipeline(batch_path, force_reprocess=True)
+        session.commit()
     except Exception as e:
         print(f"[AUTO-POPULATE NOTICE] {e}")
 

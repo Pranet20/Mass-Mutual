@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DollarSign, Ticket, Plane, Clock, Check, XCircle, CheckCircle2, Filter, Layers, Globe, BarChart3, ExternalLink } from 'lucide-react';
 import { StatCardSkeleton, ChartSkeleton } from '../components/LoadingSkeleton';
 import { ErrorAlert } from '../components/ErrorAlert';
+import { PowerBIReportEmbed } from '../components/PowerBIReportEmbed';
 
 export const Dashboard = ({ onNavigateToPowerBI }) => {
   const { theme } = useTheme();
@@ -323,144 +323,38 @@ export const Dashboard = ({ onNavigateToPowerBI }) => {
         </div>
       )}
 
-      {/* BI Tile 1 & Tile 2 Dynamic Charts with Metric Dropdowns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* TILE 1 */}
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-base font-bold text-slate-900 dark:text-white">BI Tile 1: Travel Volume & Spend Timeline</h4>
-            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-600 text-xs">
-              <span className="text-slate-500 dark:text-slate-400 font-semibold">View Metric:</span>
-              <select
-                value={tile1Metric}
-                onChange={(e) => setTile1Metric(e.target.value)}
-                className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer"
+      {/* Executive Visual Analytics — 100% Governed Power BI Suite */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs shadow-md shadow-amber-500/20">
+              PBI
+            </div>
+            <div>
+              <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                Enterprise Analytics — Powered by Microsoft Power BI
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Governed View: <code className="text-amber-500 font-mono font-bold">vw_travel</code> • 37 Governed Columns • Single Source of Truth
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onNavigateToPowerBI && (
+              <button
+                onClick={onNavigateToPowerBI}
+                className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
               >
-                <option value="spend" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Spend Amount (INR ₹)</option>
-                <option value="count" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Booking Volume (Count)</option>
-              </select>
-            </div>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={filteredMonthlyTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                <XAxis dataKey="month" stroke={textColor} fontSize={12} />
-                <YAxis stroke={textColor} fontSize={12} tickFormatter={(v) => tile1Metric === 'spend' ? `₹${v/1000}k` : `${v} trips`} />
-                <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderColor: gridColor, borderRadius: '8px' }} />
-                <Area type="monotone" dataKey="metric_val" name={tile1Metric === 'spend' ? 'Spend (INR)' : 'Trips'} stroke="#2563eb" fill="#3b82f6" fillOpacity={0.2} />
-              </AreaChart>
-            </ResponsiveContainer>
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Open Dedicated Power BI Studio</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* TILE 2 */}
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-base font-bold text-slate-900 dark:text-white">BI Tile 2: Spend by Business Division</h4>
-            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-600 text-xs">
-              <span className="text-slate-500 dark:text-slate-400 font-semibold">View Metric:</span>
-              <select
-                value={tile2Metric}
-                onChange={(e) => setTile2Metric(e.target.value)}
-                className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer"
-              >
-                <option value="spend" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Total Spend (INR ₹)</option>
-                <option value="count" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Trip Count</option>
-              </select>
-            </div>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredByBU}>
-                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                <XAxis dataKey="business_unit" stroke={textColor} fontSize={10} />
-                <YAxis stroke={textColor} fontSize={12} tickFormatter={(v) => tile2Metric === 'spend' ? `₹${v/1000}k` : `${v}`} />
-                <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderColor: gridColor, borderRadius: '8px' }} />
-                <Bar dataKey="val" name={tile2Metric === 'spend' ? 'Spend (INR)' : 'Trips'} fill="#10b981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* BI Tile 3: Interactive Country/Route Filtered Un-congested Donut Chart */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-600" />
-              <span>BI Tile 3: Interactive Route & Country Travel Distribution</span>
-            </h4>
-            <p className="text-xs text-slate-500">Select a country or route to dynamically isolate and un-congest chart visuals</p>
-          </div>
-
-          {/* Tile 3 Route / Country Dropdown Filter */}
-          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-xs">
-            <span className="font-semibold text-slate-700 dark:text-slate-300">Filter Country / Route:</span>
-            <select
-              value={tile3Country}
-              onChange={(e) => setTile3Country(e.target.value)}
-              className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer"
-            >
-              <option value="ALL" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">All Countries / Routes</option>
-              <option value="Domestic" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Domestic India</option>
-              <option value="US" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">United States (IN to US)</option>
-              <option value="GB" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">United Kingdom (IN to GB)</option>
-              <option value="DE" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Germany (IN to DE)</option>
-              <option value="SG" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Singapore (IN to SG)</option>
-              <option value="AE" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">United Arab Emirates (IN to AE)</option>
-              <option value="CA" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Canada (IN to CA)</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Clean, Spacious Layout with Un-congested Donut Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-2">
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={tile3Data}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={105}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {tile3Data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderColor: gridColor, borderRadius: '8px' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="space-y-3">
-            <h5 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Filtered Route Breakdown</h5>
-            <div className="space-y-2.5">
-              {tile3Data.map((item, idx) => {
-                const pct = tile3Total > 0 ? Math.round((item.value / tile3Total) * 100) : 0;
-                return (
-                  <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }}></div>
-                      <span className="font-bold text-slate-900 dark:text-white">{item.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-slate-500 dark:text-slate-400 font-semibold">{pct}%</span>
-                      <span className="font-mono font-bold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/40">
-                        {item.value} Trips
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        {/* Embedded Power BI Workspace */}
+        <PowerBIReportEmbed onSwitchToFallback={onNavigateToPowerBI} />
       </div>
     </div>
   );

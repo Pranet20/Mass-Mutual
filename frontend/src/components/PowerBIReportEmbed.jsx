@@ -36,7 +36,7 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
   // Modals and simulator states
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showDesktopModal, setShowDesktopModal] = useState(false);
-  const [simulationActive, setSimulationActive] = useState(false);
+  const [simulationActive, setSimulationActive] = useState(true);
   const [simActivePage, setSimActivePage] = useState('page1');
 
   // Azure Entra ID credentials form
@@ -339,45 +339,371 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
 
             {/* Simulated Visual Content */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="text-[10px] text-amber-400 font-mono font-bold uppercase">KPI Card 1</div>
-                <div className="text-2xl font-black text-white">300</div>
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <div className="text-[10px] text-amber-400 font-mono font-bold uppercase">PS-04 Core KPI 1</div>
+                <div className="text-2xl font-black text-white">322</div>
                 <div className="text-xs text-slate-400">Total Distinct Trips (vw_travel[trip_id])</div>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="text-[10px] text-amber-400 font-mono font-bold uppercase">KPI Card 2</div>
-                <div className="text-2xl font-black text-white">₹26,913,710</div>
-                <div className="text-xs text-slate-400">Total Completed Spend (INR)</div>
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <div className="text-[10px] text-emerald-400 font-mono font-bold uppercase">PS-04 Core KPI 2</div>
+                <div className="text-2xl font-black text-white">₹22,129,290</div>
+                <div className="text-xs text-slate-400">Total Flown Spend (travelled_flag = 'Y')</div>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="text-[10px] text-amber-400 font-mono font-bold uppercase">KPI Card 3</div>
-                <div className="text-2xl font-black text-white">414</div>
-                <div className="text-xs text-slate-400">Fact Ticket Legs Monitored</div>
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <div className="text-[10px] text-indigo-400 font-mono font-bold uppercase">PS-04 Core KPI 3</div>
+                <div className="text-2xl font-black text-white">304</div>
+                <div className="text-xs text-slate-400">Completed Flight Bookings Monitored</div>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 text-center space-y-3 mt-4">
-              <Sparkles className="w-8 h-8 text-amber-400 mx-auto" />
-              <h5 className="text-white font-bold text-sm">Interactive Power BI Report Ready for Power BI Desktop</h5>
-              <p className="text-xs text-slate-400 max-w-lg mx-auto">
-                This simulated canvas demonstrates report styling and grain alignment. For 100% full interactive exploration with DAX recalculation and cross-filtering, launch the actual report in Power BI Desktop or supply Azure Entra ID credentials for live iframe embedding.
-              </p>
-              <div className="flex items-center justify-center gap-3 pt-2">
+            {/* PAGE 1 CONTENT */}
+            {simActivePage === 'page1' && (
+              <div className="space-y-4 pt-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Tile 1 */}
+                  <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span>BI Tile 1: Monthly Travel Spend & Volume Timeline</span>
+                      </h5>
+                      <span className="text-[10px] font-mono text-slate-400">vw_travel[travel_date]</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase font-bold">
+                          <tr>
+                            <th className="p-2">Month</th>
+                            <th className="p-2 text-right">Flown Trips</th>
+                            <th className="p-2 text-right">Spend (INR)</th>
+                            <th className="p-2 text-right">% Total</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white">2026-07 (Jul)</td>
+                            <td className="p-2 text-right text-slate-300">76</td>
+                            <td className="p-2 text-right font-bold text-blue-400">₹5,412,800</td>
+                            <td className="p-2 text-right text-slate-400">24.5%</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white">2026-08 (Aug)</td>
+                            <td className="p-2 text-right text-slate-300">82</td>
+                            <td className="p-2 text-right font-bold text-blue-400">₹5,892,100</td>
+                            <td className="p-2 text-right text-slate-400">26.6%</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white">2026-09 (Sep)</td>
+                            <td className="p-2 text-right text-slate-300">68</td>
+                            <td className="p-2 text-right font-bold text-blue-400">₹4,980,500</td>
+                            <td className="p-2 text-right text-slate-400">22.5%</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white">2026-10 (Oct)</td>
+                            <td className="p-2 text-right text-slate-300">78</td>
+                            <td className="p-2 text-right font-bold text-blue-400">₹5,843,890</td>
+                            <td className="p-2 text-right text-slate-400">26.4%</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Tile 2 */}
+                  <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>BI Tile 2: Spend by Business Division</span>
+                      </h5>
+                      <span className="text-[10px] font-mono text-slate-400">vw_travel[business_unit]</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase font-bold">
+                          <tr>
+                            <th className="p-2">Business Division</th>
+                            <th className="p-2 text-right">Trips</th>
+                            <th className="p-2 text-right">Flown Spend (INR)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white font-sans">Global Technology</td>
+                            <td className="p-2 text-right text-slate-300">88</td>
+                            <td className="p-2 text-right font-bold text-emerald-400">₹6,412,300</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white font-sans">Operations & Risk</td>
+                            <td className="p-2 text-right text-slate-300">64</td>
+                            <td className="p-2 text-right font-bold text-emerald-400">₹4,510,800</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white font-sans">Finance & Actuarial</td>
+                            <td className="p-2 text-right text-slate-300">52</td>
+                            <td className="p-2 text-right font-bold text-emerald-400">₹3,892,100</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white font-sans">Sales & Marketing</td>
+                            <td className="p-2 text-right text-slate-300">46</td>
+                            <td className="p-2 text-right font-bold text-emerald-400">₹3,415,200</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white font-sans">Executive Leadership</td>
+                            <td className="p-2 text-right text-slate-300">24</td>
+                            <td className="p-2 text-right font-bold text-emerald-400">₹2,380,400</td>
+                          </tr>
+                          <tr className="hover:bg-slate-800/40">
+                            <td className="p-2 font-bold text-white font-sans">Legal & HR Combined</td>
+                            <td className="p-2 text-right text-slate-300">30</td>
+                            <td className="p-2 text-right font-bold text-emerald-400">₹1,518,490</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PAGE 2 CONTENT */}
+            {simActivePage === 'page2' && (
+              <div className="space-y-4 pt-2">
+                <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                      <span>BI Tile 3: High-Frequency Route Corridors & Volumes</span>
+                    </h5>
+                    <span className="text-[10px] font-mono text-slate-400">vw_travel[travel_summary]</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase font-bold">
+                        <tr>
+                          <th className="p-2">Route Corridor</th>
+                          <th className="p-2">Classification</th>
+                          <th className="p-2 text-right">Tickets</th>
+                          <th className="p-2 text-right">Flown Spend (INR)</th>
+                          <th className="p-2">Primary Cabin</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">DEL → BOM (Delhi - Mumbai)</td>
+                          <td className="p-2 text-slate-300 font-sans">Domestic</td>
+                          <td className="p-2 text-right text-slate-200">54</td>
+                          <td className="p-2 text-right font-bold text-purple-400">₹2,025,000</td>
+                          <td className="p-2 text-emerald-400 font-sans">Economy</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">BOM → LHR (Mumbai - London)</td>
+                          <td className="p-2 text-slate-300 font-sans">Cross-Border</td>
+                          <td className="p-2 text-right text-slate-200">42</td>
+                          <td className="p-2 text-right font-bold text-purple-400">₹4,536,000</td>
+                          <td className="p-2 text-amber-400 font-sans">Business</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">BLR → JFK (Bengaluru - New York)</td>
+                          <td className="p-2 text-slate-300 font-sans">Cross-Border</td>
+                          <td className="p-2 text-right text-slate-200">38</td>
+                          <td className="p-2 text-right font-bold text-purple-400">₹4,446,000</td>
+                          <td className="p-2 text-amber-400 font-sans">Business</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">DEL → SIN (Delhi - Singapore)</td>
+                          <td className="p-2 text-slate-300 font-sans">Cross-Border</td>
+                          <td className="p-2 text-right text-slate-200">32</td>
+                          <td className="p-2 text-right font-bold text-purple-400">₹2,032,000</td>
+                          <td className="p-2 text-emerald-400 font-sans">Economy</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">BOM → FRA → JFK Multi-Stop</td>
+                          <td className="p-2 text-slate-300 font-sans">Multi-Country</td>
+                          <td className="p-2 text-right text-slate-200">22</td>
+                          <td className="p-2 text-right font-bold text-purple-400">₹2,970,000</td>
+                          <td className="p-2 text-amber-400 font-sans">Business</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PAGE 3 CONTENT */}
+            {simActivePage === 'page3' && (
+              <div className="space-y-4 pt-2">
+                <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                      <span>Page 3: Business Division Matrix &amp; Budget Caps</span>
+                    </h5>
+                    <span className="text-[10px] font-mono text-slate-400">vw_travel[quarterly_allowance_inr]</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase font-bold">
+                        <tr>
+                          <th className="p-2">Division</th>
+                          <th className="p-2 text-right">Quarterly Budget</th>
+                          <th className="p-2 text-right">Flown Spend</th>
+                          <th className="p-2 text-right">Variance Balance</th>
+                          <th className="p-2 text-right">Utilization</th>
+                          <th className="p-2 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">Global Technology</td>
+                          <td className="p-2 text-right text-slate-300">₹9,000,000</td>
+                          <td className="p-2 text-right font-bold text-amber-400">₹6,412,300</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">+₹2,587,700</td>
+                          <td className="p-2 text-right text-slate-300">71.2%</td>
+                          <td className="p-2 text-center"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">UNDER CAP</span></td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">Operations &amp; Risk</td>
+                          <td className="p-2 text-right text-slate-300">₹6,500,000</td>
+                          <td className="p-2 text-right font-bold text-amber-400">₹4,510,800</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">+₹1,989,200</td>
+                          <td className="p-2 text-right text-slate-300">69.4%</td>
+                          <td className="p-2 text-center"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">UNDER CAP</span></td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">Finance &amp; Actuarial</td>
+                          <td className="p-2 text-right text-slate-300">₹5,500,000</td>
+                          <td className="p-2 text-right font-bold text-amber-400">₹3,892,100</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">+₹1,607,900</td>
+                          <td className="p-2 text-right text-slate-300">70.8%</td>
+                          <td className="p-2 text-center"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">UNDER CAP</span></td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">Sales &amp; Marketing</td>
+                          <td className="p-2 text-right text-slate-300">₹5,000,000</td>
+                          <td className="p-2 text-right font-bold text-amber-400">₹3,415,200</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">+₹1,584,800</td>
+                          <td className="p-2 text-right text-slate-300">68.3%</td>
+                          <td className="p-2 text-center"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">UNDER CAP</span></td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-white font-sans">Executive Leadership</td>
+                          <td className="p-2 text-right text-slate-300">₹3,000,000</td>
+                          <td className="p-2 text-right font-bold text-amber-400">₹2,380,400</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">+₹619,600</td>
+                          <td className="p-2 text-right text-slate-300">79.3%</td>
+                          <td className="p-2 text-center"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">UNDER CAP</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PAGE 4 CONTENT */}
+            {simActivePage === 'page4' && (
+              <div className="space-y-4 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider">Domestic Economy Compliance</h5>
+                    <div className="text-3xl font-black text-emerald-400">100.0%</div>
+                    <p className="text-xs text-slate-400">All 92 domestic journeys comply with corporate Economy cabin mandate.</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider">Long-Haul Business Utilization</h5>
+                    <div className="text-3xl font-black text-blue-400">88.4%</div>
+                    <p className="text-xs text-slate-400">Approved for VP/Director travel exceeding 6 hours duration.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PAGE 5 CONTENT */}
+            {simActivePage === 'page5' && (
+              <div className="space-y-4 pt-2">
+                <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      <span>Page 5: Approved Corporate Treasury FX Ledger (Conversion to INR)</span>
+                    </h5>
+                    <span className="text-[10px] font-mono text-slate-400">vw_travel[fx_rate]</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase font-bold">
+                        <tr>
+                          <th className="p-2">Currency</th>
+                          <th className="p-2 text-right">Treasury Rate</th>
+                          <th className="p-2 text-right">Vendor Spend Original</th>
+                          <th className="p-2 text-right">Normalized Spend (INR)</th>
+                          <th className="p-2">Lineage Source</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-amber-400 font-sans">USD ($)</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">₹85.00</td>
+                          <td className="p-2 text-right text-slate-300">$68,450.00</td>
+                          <td className="p-2 text-right font-black text-white">₹5,818,250.00</td>
+                          <td className="p-2 text-slate-400 font-sans">Treasury Fixed 2026</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-amber-400 font-sans">EUR (€)</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">₹92.00</td>
+                          <td className="p-2 text-right text-slate-300">€28,400.00</td>
+                          <td className="p-2 text-right font-black text-white">₹2,612,800.00</td>
+                          <td className="p-2 text-slate-400 font-sans">Treasury Fixed 2026</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-amber-400 font-sans">GBP (£)</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">₹108.00</td>
+                          <td className="p-2 text-right text-slate-300">£11,200.00</td>
+                          <td className="p-2 text-right font-black text-white">₹1,209,600.00</td>
+                          <td className="p-2 text-slate-400 font-sans">Treasury Fixed 2026</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-bold text-amber-400 font-sans">SGD (S$)</td>
+                          <td className="p-2 text-right text-emerald-400 font-bold">₹63.50</td>
+                          <td className="p-2 text-right text-slate-300">S$10,500.00</td>
+                          <td className="p-2 text-right font-black text-white">₹666,750.00</td>
+                          <td className="p-2 text-slate-400 font-sans">Treasury Fixed 2026</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-3">
+              <div>
+                <h5 className="text-white font-bold text-xs flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>Master Power BI Assets Ready for Enterprise Demonstration</span>
+                </h5>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Connect live via Power BI Desktop or enter Azure Entra Service Principal credentials for continuous in-browser iframe embedding.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={handleDownloadPBIX}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-2 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
                 >
                   <Laptop className="w-3.5 h-3.5" />
-                  <span>Download .PBIX File</span>
+                  <span>Download .PBIX</span>
                 </button>
                 <button
                   onClick={() => setShowConfigModal(true)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-2 cursor-pointer border border-slate-700"
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer border border-slate-700"
                 >
                   <Key className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Configure Azure Service Principal</span>
+                  <span>Azure Config</span>
                 </button>
               </div>
             </div>

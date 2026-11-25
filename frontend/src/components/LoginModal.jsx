@@ -200,17 +200,6 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
               >
                 {loading ? 'Authenticating Manager...' : 'Sign In as Manager'}
               </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setManagerEmail('manager@travelintelligence.com');
-                  setManagerPassword('Manager123!');
-                }}
-                className="w-full py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <span>⚡ Auto-fill Demo Manager Credentials</span>
-              </button>
             </form>
           )}
 
@@ -255,17 +244,6 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
                 className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? 'Authenticating Employee...' : 'Sign In as Employee'}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEmployeeEmail('rajesh.sharma@travelintelligence.com');
-                  setEmployeePassword('Rajesh#2026!');
-                }}
-                className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <span>⚡ Auto-fill Demo Employee Credentials (Rajesh Sharma)</span>
               </button>
 
               {/* Or Divider */}
