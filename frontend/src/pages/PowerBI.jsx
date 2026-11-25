@@ -4,14 +4,16 @@ import {
   Download, BarChart3, Database, Filter, Layers, PieChart as PieIcon, 
   Table, FileText, Play, Sliders, CheckCircle2, Sparkles, RefreshCw, 
   ChevronRight, ExternalLink, ShieldCheck, TrendingUp, AlertTriangle, 
-  Compass, Code, Laptop, Globe, Coins, DollarSign
+  Compass, Code, Laptop, Globe, Coins, DollarSign, Monitor
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, LineChart, Line, PieChart, Pie, AreaChart, Area, Legend 
 } from 'recharts';
+import { PowerBIReportEmbed } from '../components/PowerBIReportEmbed';
 
 export const PowerBI = () => {
+  const [viewMode, setViewMode] = useState('suite'); // 'suite' | 'embed'
   const [activeReportPage, setActiveReportPage] = useState('executive'); // 'executive', 'divisional', 'routes', 'compliance', 'financial-audit'
   
   // Power BI Interactive Slicers State
@@ -526,17 +528,61 @@ export const PowerBI = () => {
         </div>
       </div>
 
-      {/* Analytics Data Unavailable Notice */}
-      {loadError && !liveAnalytics && (
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold text-center space-y-2">
-          <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto" />
-          <div className="text-base font-black">Analytics Data Unavailable</div>
-          <p className="text-xs text-slate-400">Unable to retrieve live telemetry from backend. Please verify that the API server and database are reachable.</p>
-        </div>
-      )}
+      {/* Primary Analytics View Mode Switcher */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-2 bg-slate-900/90 border border-slate-800 rounded-2xl">
+        <div className="flex items-center gap-2 p-1 bg-slate-950 rounded-xl w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setViewMode('suite')}
+            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              viewMode === 'suite'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Interactive Analytical Suite (Native)</span>
+          </button>
 
-      {/* Main Interactive Analytical Workspace */}
-      <div id="interactive-analytical-view" className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+          <button
+            type="button"
+            onClick={() => setViewMode('embed')}
+            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              viewMode === 'embed'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Monitor className="w-4 h-4" />
+            <span>Power BI Embedded Service (Cloud/Client)</span>
+          </button>
+        </div>
+
+        <div className="text-[11px] text-slate-400 font-medium px-3 text-right">
+          {viewMode === 'suite' ? (
+            <span>Direct PostgreSQL <code className="text-amber-300 font-mono">vw_travel</code> high-performance Recharts canvas</span>
+          ) : (
+            <span>Official Microsoft <code className="text-indigo-300 font-mono">powerbi-client-react</code> runtime container</span>
+          )}
+        </div>
+      </div>
+
+      {/* View Mode Branching */}
+      {viewMode === 'embed' ? (
+        <PowerBIReportEmbed onSwitchToFallback={() => setViewMode('suite')} />
+      ) : (
+        <>
+          {/* Analytics Data Unavailable Notice */}
+          {loadError && !liveAnalytics && (
+            <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold text-center space-y-2">
+              <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto" />
+              <div className="text-base font-black">Analytics Data Unavailable</div>
+              <p className="text-xs text-slate-400">Unable to retrieve live telemetry from backend. Please verify that the API server and database are reachable.</p>
+            </div>
+          )}
+
+          {/* Main Interactive Analytical Workspace */}
+          <div id="interactive-analytical-view" className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
         {/* Workspace Title Bar */}
         <div className="px-5 py-3.5 bg-slate-950/90 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2.5">
@@ -1367,6 +1413,8 @@ export const PowerBI = () => {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

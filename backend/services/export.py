@@ -385,13 +385,13 @@ def generate_executive_audit_package_html() -> str:
             full_quarantine_rows_html = "<tr><td colspan='5' style='text-align: center; color: #166534; padding: 10px; font-weight: 600;'>Zero quarantined records. All vendor input records cleanly processed into warehouse.</td></tr>"
 
         extra_pages_html = f"""
-        <!-- ================= PAGE 6: GOVERNED 36-COLUMN DATA DICTIONARY ================= -->
+        <!-- ================= PAGE 6: GOVERNED 37-COLUMN DATA DICTIONARY ================= -->
         <div class="report-page">
             <div>
                 <div class="page-header">
                     <div>
                         <div class="brand-title">CORPORATE TRAVEL INTELLIGENCE</div>
-                        <div class="brand-sub">Authoritative 36-Column Data Dictionary (vw_travel) | Page 6 of 7</div>
+                        <div class="brand-sub">Authoritative 37-Column Data Dictionary (vw_travel) | Page 6 of 7</div>
                     </div>
                     <div class="page-badge">
                         <div>STAR SCHEMA GOVERNANCE</div>
@@ -406,7 +406,7 @@ def generate_executive_audit_package_html() -> str:
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Total Governed Attributes</div>
-                        <div class="kpi-val" style="color: #059669;">36 Columns</div>
+                        <div class="kpi-val" style="color: #059669;">37 Columns</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Primary Natural Fact Key</div>
@@ -414,7 +414,7 @@ def generate_executive_audit_package_html() -> str:
                     </div>
                 </div>
 
-                <h4 class="section-title"><span>Authoritative 36-Column Schema Specification & Data Dictionary</span><span style="font-size: 11px; color: #64748b;">Single Source of Truth</span></h4>
+                <h4 class="section-title"><span>Authoritative 37-Column Schema Specification & Data Dictionary</span><span style="font-size: 11px; color: #64748b;">Single Source of Truth</span></h4>
                 <div style="overflow-x: auto;">
                     <table class="gov-table" style="font-size: 10px;">
                         <thead>
@@ -433,12 +433,12 @@ def generate_executive_audit_package_html() -> str:
                 </div>
 
                 <div class="callout-box" style="margin-top: 14px; font-size: 11px;">
-                    <strong>Enterprise Data Governance Rule:</strong> The 36-column analytical view <code>vw_travel</code> projects historical SCD Type-2 employee data joined at the point-in-time of travel, complete currency FX lineage, and automated classification rules.
+                    <strong>Enterprise Data Governance Rule:</strong> The 37-column analytical view <code>vw_travel</code> projects historical SCD Type-2 employee data joined at the point-in-time of travel, complete currency FX lineage, and automated classification rules.
                 </div>
             </div>
 
             <div class="page-footer">
-                <div>Single Source of Truth: PostgreSQL Governed View <code>vw_travel</code> • 36 Attributes</div>
+                <div>Single Source of Truth: PostgreSQL Governed View <code>vw_travel</code> • 37 Attributes</div>
                 <div>Executive Audit Package | Page 6 of 7</div>
             </div>
         </div>

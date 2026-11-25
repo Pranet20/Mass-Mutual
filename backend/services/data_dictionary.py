@@ -6,7 +6,7 @@ def get_governed_data_dictionary() -> dict:
     return {
         "view_name": "vw_travel",
         "description": "Enterprise governed analytical projection of the enriched fact table (FactTravelTicket).",
-        "total_columns": 36,
+        "total_columns": 37,
         "primary_database_key": "ticket_id (VARCHAR(50), Primary Fact Key)",
         "trip_grouping_key": "trip_id (VARCHAR(50), Itinerary Cluster)",
         "hash_algorithm": "SHA-256 Cryptographic Hash",
@@ -17,6 +17,7 @@ def get_governed_data_dictionary() -> dict:
             {"column_name": "employee_id", "data_type": "VARCHAR(50)", "description": "Corporate employee identifier (Dimension Key)."},
             {"column_name": "employee_name", "data_type": "VARCHAR(100)", "description": "Enriched employee full name from EmployeeMaster."},
             {"column_name": "business_unit", "data_type": "VARCHAR(100)", "description": "SCD Type-2 historical business unit at time of travel."},
+            {"column_name": "business_group", "data_type": "VARCHAR(100)", "description": "SCD Type-2 historical business group at time of travel."},
             {"column_name": "department", "data_type": "VARCHAR(100)", "description": "SCD Type-2 historical department at time of travel."},
             {"column_name": "issue_date", "data_type": "DATE (ISO YYYY-MM-DD)", "description": "Date ticket was booked/issued."},
             {"column_name": "travel_date", "data_type": "DATE (ISO YYYY-MM-DD)", "description": "Outbound departure date."},

@@ -155,5 +155,34 @@ Batch lifecycle and reconciliation ledger.
 
 ### 2.9 `users` & `complaints`
 Authentication, RBAC, and operational grievance tracking.
-- `users`: `id`, `email` (Unique), `password_hash` (PBKDF2), `name`, `role` (`manager`, `employee`, `admin`), `employee_id`
+- `users`: `id`, `email` (Unique), `password_hash` (PBKDF2), `name`, `role` (`manager`, `employee`, `admin`), `employee_id`, `created_at`, `updated_at`
 - `complaints`: `id`, `subject`, `details`, `submitted_by`, `status` (`OPEN`, `RESOLVED`), `created_at`
+
+### 2.10 `user_analytics_events`
+Telemetric capture of user behavior, navigational events, and operational UX performance.
+- `id` (INT, PK, Auto-increment)
+- `event_type` (VARCHAR(50), Indexed, Not Null) — `page_view`, `action`, `kpi_interaction`, `export`, `filter_change`
+- `event_name` (VARCHAR(100), Indexed, Not Null)
+- `user_id` (INT, Nullable, Foreign Key to `users.id`)
+- `user_email` (VARCHAR(100), Nullable)
+- `user_role` (VARCHAR(50), Nullable)
+- `page_url` (VARCHAR(255), Nullable)
+- `session_id` (VARCHAR(100), Indexed, Nullable)
+- `device_info` (VARCHAR(255), Nullable)
+- `properties_json` (TEXT, Nullable) — Metadata payload
+- `client_timestamp` (VARCHAR(50), Nullable)
+- `server_timestamp` (TIMESTAMP, Indexed, Default `utcnow`)
+
+### 2.11 `app_crash_logs`
+Automated client-side error boundary crash reporting and stack trace diagnostic capture.
+- `id` (INT, PK, Auto-increment)
+- `error_message` (TEXT, Not Null)
+- `error_stack` (TEXT, Nullable)
+- `component_stack` (TEXT, Nullable) — React component hierarchy
+- `url` (VARCHAR(255), Nullable)
+- `user_agent` (VARCHAR(255), Nullable)
+- `user_email` (VARCHAR(100), Nullable)
+- `app_version` (VARCHAR(50), Nullable)
+- `extra_context_json` (TEXT, Nullable)
+- `status` (VARCHAR(50), Default `'NEW'`) — `'NEW'`, `'TRIAGED'`, `'RESOLVED'`
+- `created_at` (TIMESTAMP, Indexed, Default `utcnow`)

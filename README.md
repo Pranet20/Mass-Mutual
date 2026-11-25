@@ -1,14 +1,29 @@
 # Corporate Travel & Expense Intelligence Platform (PS-04)
 
-[![CI Pipeline](https://github.com/Pranet20/Corporate-Travel-Analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Corporate-Travel-Analytics/actions/workflows/ci.yml)
-[![Tests: 50 Passed](https://img.shields.io/badge/Tests-50%20Passed-brightgreen)](TEST_CASES.md)
-[![Verification: 20/20 Checks](https://img.shields.io/badge/Verification-20%2F20%20Checks%20Passed-brightgreen)](scripts/verify_production_readiness.py)
-[![FastAPI](https://img.shields.io/badge/FastAPI-2.1.0-009688.svg)](https://fastapi.tiangolo.com)
+[![CI Pipeline](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml)
+[![Tests: 61 Passed](https://img.shields.io/badge/Tests-61%20Passed-brightgreen)](TESTING_REPORT.md)
+[![Verification: 20/20 Checks](https://img.shields.io/badge/Verification-20%2F20%20Checks%20Passed-brightgreen)](PRODUCTION_READINESS.md)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.x-61dafb.svg)](https://reactjs.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg)](https://www.postgresql.org)
-[![Power BI](https://img.shields.io/badge/Power_BI-Governed_vw__travel-F2C811.svg)](powerbi/)
+[![Power BI](https://img.shields.io/badge/Power_BI-Dual_Asset_vw__travel-F2C811.svg)](POWERBI_STATUS.md)
 
 An enterprise-grade multi-tier ETL, data warehousing, and business intelligence platform engineered to ingest multi-vendor corporate travel records, execute automated data cleansing, apply temporal Slowly Changing Dimension (SCD Type 2) enrichments, enforce business rules, support audited manual overrides, and expose an authoritative 37-column analytical view (`vw_travel`) to Power BI, executive React dashboards, and AI services.
+
+---
+
+## 📋 Comprehensive Engineering Audit Deliverables
+
+- 📄 **Executive Audit Report**: [`COMPLETE_AUDIT_REPORT.md`](./COMPLETE_AUDIT_REPORT.md)
+- 🐛 **Defect Register & Remediation**: [`DEFECT_REGISTER.md`](./DEFECT_REGISTER.md)
+- 🎯 **Requirements Traceability Matrix (54 Specs)**: [`REQUIREMENTS_TRACEABILITY.md`](./REQUIREMENTS_TRACEABILITY.md)
+- 💰 **KPI & Financial Reconciliation (₹0.00 Variance)**: [`KPI_RECONCILIATION.md`](./KPI_RECONCILIATION.md)
+- 📖 **Governed Data Dictionary (37 Columns)**: [`DATA_DICTIONARY.md`](./DATA_DICTIONARY.md)
+- 🧪 **Test Execution Report (61 Tests Passed)**: [`TESTING_REPORT.md`](./TESTING_REPORT.md)
+- 🛡️ **Application Security Review**: [`SECURITY_REVIEW.md`](./SECURITY_REVIEW.md)
+- 📊 **Power BI Dual-Asset Architecture**: [`POWERBI_STATUS.md`](./POWERBI_STATUS.md)
+- 🚀 **Production Readiness Scorecard (20/20 Checks)**: [`PRODUCTION_READINESS.md`](./PRODUCTION_READINESS.md)
+- 📝 **Changelog & Audit Fixes**: [`CHANGELOG_AUDIT_FIXES.md`](./CHANGELOG_AUDIT_FIXES.md)
 
 ---
 
@@ -108,11 +123,10 @@ docker-compose up --build -d
 Run all automated unit, integration, and security tests:
 
 ```bash
-pytest -q
+pytest
 ```
 ```text
-..................................................                       [100%]
-50 passed in 4.29s (100% Pass Rate)
+============================= 61 passed in 44.62s =============================
 ```
 
 Run the master 20-point production verification checklist:
