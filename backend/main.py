@@ -98,7 +98,13 @@ env = os.environ.get("ENV", os.environ.get("ENVIRONMENT", "development")).lower(
 allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
 if not allowed_origins_env:
     if env == "production":
-        allowed_origins = ["https://travelanalytics.travelanalytics.internal", "https://app.travelanalytics.internal"]
+        allowed_origins = [
+            "https://corporate-travel-analytics.onrender.com",
+            "https://travelanalytics.travelanalytics.internal", 
+            "https://app.travelanalytics.internal",
+            "http://localhost:3000",
+            "http://localhost:8000"
+        ]
     else:
         allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "*"]
 else:
@@ -106,7 +112,8 @@ else:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins if ("*" not in allowed_origins or env != "production") else ["https://travelanalytics.travelanalytics.internal"],
+    allow_origins=allowed_origins if ("*" not in allowed_origins or env != "production") else ["*"],
+    allow_origin_regex=r"https://.*\.onrender\.com" if env == "production" else None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
