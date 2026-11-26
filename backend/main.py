@@ -150,6 +150,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "success": False,
             "error_code": "HTTP_ERROR",
             "message": exc.detail,
+            "detail": exc.detail,
             "request_id": req_id
         }
     )
@@ -220,6 +221,7 @@ def readiness_check():
 class LoginRequest(BaseModel):
     email: str
     password: str
+    role: Optional[str] = None
 
 class SignupRequest(BaseModel):
     email: str
@@ -363,6 +365,19 @@ def login(req: LoginRequest, request: Request):
     user = authenticate_user(req.email, req.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    if req.role:
+        expected_role = req.role.strip().lower()
+        if expected_role == "manager" and user.role != "manager":
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied. This is an Employee account. Please sign in via the Employee Sign In tab."
+            )
+        elif expected_role == "employee" and user.role != "employee":
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied. Manager accounts cannot sign in as Employee. Please sign in via the Manager Sign In tab."
+            )
     
     token = create_access_token({"sub": user.email, "role": user.role, "employee_id": user.employee_id})
     return {

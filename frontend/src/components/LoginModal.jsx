@@ -52,9 +52,12 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
     setError('');
     setLoading(true);
     try {
-      await login(managerEmail, managerPassword);
+      const userData = await login(managerEmail, managerPassword, 'manager');
+      if (userData && userData.role !== 'manager') {
+        throw new Error('Access denied. This is an Employee account. Please sign in via the Employee Sign In tab.');
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Manager authentication failed. Please check credentials.');
+      setError(err.response?.data?.detail || err.response?.data?.message || err.message || 'Manager authentication failed. Please check credentials.');
     } finally {
       setLoading(false);
     }
@@ -65,9 +68,12 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
     setError('');
     setLoading(true);
     try {
-      await login(employeeEmail, employeePassword);
+      const userData = await login(employeeEmail, employeePassword, 'employee');
+      if (userData && userData.role !== 'employee') {
+        throw new Error('Access denied. Manager accounts cannot sign in as Employee. Please sign in via the Manager Sign In tab.');
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Employee authentication failed. Please check credentials.');
+      setError(err.response?.data?.detail || err.response?.data?.message || err.message || 'Employee authentication failed. Please check credentials.');
     } finally {
       setLoading(false);
     }
@@ -170,6 +176,7 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
                   <input
                     type="email"
                     required
+                    placeholder="manager@travelintelligence.com"
                     value={managerEmail}
                     onChange={(e) => setManagerEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium"
@@ -186,6 +193,7 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
                   <input
                     type="password"
                     required
+                    placeholder="••••••••"
                     value={managerPassword}
                     onChange={(e) => setManagerPassword(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium"
@@ -215,6 +223,7 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
                   <input
                     type="email"
                     required
+                    placeholder="employee@travelintelligence.com"
                     value={employeeEmail}
                     onChange={(e) => setEmployeeEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium"
@@ -231,6 +240,7 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
                   <input
                     type="password"
                     required
+                    placeholder="••••••••"
                     value={employeePassword}
                     onChange={(e) => setEmployeePassword(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium"

@@ -590,3 +590,72 @@ def test_43_powerbi_dax_and_data_model_artifacts():
         dm_text = f.read()
     assert "37 Governed Attributes" in dm_text
     assert "business_group" in dm_text
+
+
+def test_44_strict_role_based_login_and_auth_errors():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+
+    # 1. Manager authenticating on Manager tab -> 200 OK
+    res = client.post("/api/auth/login", json={
+        "email": "manager@travelintelligence.com",
+        "password": "Manager123!",
+        "role": "manager"
+    })
+    assert res.status_code == 200
+    assert res.json()["role"] == "manager"
+
+    # 2. Manager credentials on Employee tab -> 403 Forbidden
+    res = client.post("/api/auth/login", json={
+        "email": "manager@travelintelligence.com",
+        "password": "Manager123!",
+        "role": "employee"
+    })
+    assert res.status_code == 403
+    assert "Manager accounts cannot sign in as Employee" in res.json()["detail"]
+
+    # 3. Employee credentials on Employee tab -> 200 OK
+    res = client.post("/api/auth/login", json={
+        "email": "rajesh.sharma@travelintelligence.com",
+        "password": "Rajesh#2026!",
+        "role": "employee"
+    })
+    assert res.status_code == 200
+    assert res.json()["role"] == "employee"
+
+    # 4. Employee credentials on Manager tab -> 403 Forbidden
+    res = client.post("/api/auth/login", json={
+        "email": "rajesh.sharma@travelintelligence.com",
+        "password": "Rajesh#2026!",
+        "role": "manager"
+    })
+    assert res.status_code == 403
+    assert "This is an Employee account" in res.json()["detail"]
+
+    # 5. Invalid password -> 401 Unauthorized
+    res = client.post("/api/auth/login", json={
+        "email": "manager@travelintelligence.com",
+        "password": "WrongPassword999!",
+        "role": "manager"
+    })
+    assert res.status_code == 401
+    assert "Invalid email or password" in res.json()["detail"]
+
+    # 6. Invalid email -> 401 Unauthorized
+    res = client.post("/api/auth/login", json={
+        "email": "nonexistent.user@travelintelligence.com",
+        "password": "SomePassword123!",
+        "role": "manager"
+    })
+    assert res.status_code == 401
+    assert "Invalid email or password" in res.json()["detail"]
+
+    # 7. Backward compatibility: login without role
+    res = client.post("/api/auth/login", json={
+        "email": "manager@travelintelligence.com",
+        "password": "Manager123!"
+    })
+    assert res.status_code == 200
+    assert res.json()["role"] == "manager"
+
