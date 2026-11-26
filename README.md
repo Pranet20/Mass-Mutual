@@ -1,4 +1,4 @@
-# Corporate Travel & Expense Intelligence Platform (PS-04)
+# Airline Data Pipeline Build and Analytics Platform
 
 [![CI Pipeline](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranet20/Mass-Mutual/actions/workflows/ci.yml)
 [![Tests: 61 Passed](https://img.shields.io/badge/Tests-61%20Passed-brightgreen)](TESTING_REPORT.md)

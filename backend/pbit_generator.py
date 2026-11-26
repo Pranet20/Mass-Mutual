@@ -10,9 +10,9 @@ def generate_pbit_template():
     
     # Power BI schema metadata
     layout_json = {
-        "name": "Corporate Travel Analytics Travel Analytics Dashboard",
+        "name": "Airline Data Pipeline Build and Analytics Dashboard",
         "version": "1.0",
-        "description": "Governed Corporate Travel Analytics Template connected to SQLite / Postgres vw_travel SQL view.",
+        "description": "Governed Airline Data Pipeline Template connected to SQLite / Postgres vw_travel SQL view.",
         "tables": [
             {
                 "name": "vw_travel",
@@ -30,7 +30,7 @@ def generate_pbit_template():
     with zipfile.ZipFile(pbit_path, "w") as zf:
         zf.writestr("DataModelSchema", json.dumps(layout_json, indent=2))
         zf.writestr("Version", "1.13")
-        zf.writestr("README.txt", "Corporate Travel Analytics Power BI Template File (.pbit)\nImport into Power BI Desktop and configure connection string to travel_analytics.db.")
+        zf.writestr("README.txt", "Airline Data Pipeline Build and Analytics Power BI Template File (.pbit)\nImport into Power BI Desktop and configure connection string to travel_analytics.db.")
 
     print(f"Generated Power BI Template at: {pbit_path}")
     return pbit_path

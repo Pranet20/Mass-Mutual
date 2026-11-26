@@ -30,7 +30,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenPrivacyPolicy, onOpenAc
           </div>
           <div>
             <h1 className="font-bold text-slate-900 dark:text-white text-base leading-tight">Travel Desk Team</h1>
-            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Corporate Travel Analytics</p>
+            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Airline Data Pipeline</p>
           </div>
         </div>
 

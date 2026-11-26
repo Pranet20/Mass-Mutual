@@ -181,6 +181,9 @@ export const Dashboard = ({ onNavigateToPowerBI }) => {
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
               Travel Desk Team
             </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+              Airline Data Pipeline & Analytics
+            </span>
           </div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">Executive Command Center</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Filter time-series charts and metrics dynamically across Quarters & Business Divisions</p>

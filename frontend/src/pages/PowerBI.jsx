@@ -185,7 +185,7 @@ export const PowerBI = () => {
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300">
                 Travel Desk Team
               </span>
-              <h3 className="font-black text-lg tracking-wide">Corporate Travel Analytics</h3>
+              <h3 className="font-black text-lg tracking-wide">Airline Analytics Studio</h3>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
               Authoritative Warehouse View <code className="text-amber-300 font-mono font-bold">public.vw_travel</code> • Governed Columns • 5 Core Report Pages

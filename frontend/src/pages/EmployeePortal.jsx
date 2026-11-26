@@ -136,7 +136,7 @@ export const EmployeePortal = ({ onOpenPrivacyPolicy, onOpenAccountDeletion }) =
       const ticketId = res.data.complaint_id || 'CMP-101';
       setCompMsg(res.data.message || `Ticket registered successfully: ${ticketId}`);
       
-      const mailSubject = `[Corporate Travel Ticket ${ticketId}] ${compSubject.trim()}`;
+      const mailSubject = `[Airline Ticket ${ticketId}] ${compSubject.trim()}`;
       const mailBody = `From: ${fromEmail.trim() || empName}\nEmployee: ${empName} (${empId})\nDivision: ${data?.business_unit || 'Human Resources'}\nTicket Reference: ${ticketId}\n\nDetails:\n${compDetails.trim()}`;
       
       // Official Google Gmail Web Compose URL (guaranteed delivery via browser Gmail)
@@ -160,7 +160,7 @@ export const EmployeePortal = ({ onOpenPrivacyPolicy, onOpenAccountDeletion }) =
       fetchComplaints();
     })
     .catch(() => {
-      const mailSubject = `[Corporate Travel Query] ${compSubject.trim()}`;
+      const mailSubject = `[Airline Query] ${compSubject.trim()}`;
       const mailBody = `From: ${fromEmail.trim()}\nEmployee: ${empName} (${empId})\n\nDetails:\n${compDetails.trim()}`;
       const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
       const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;

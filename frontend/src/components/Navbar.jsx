@@ -15,7 +15,7 @@ export const Navbar = ({ activeTab }) => {
     reports: 'C-Suite Executive Briefing Generator',
     forecasting: 'Predictive Travel Spend Forecasting',
     powerbi: 'Power BI Governed Analytical View',
-    assistant: 'Corporate AI Travel Assistant'
+    assistant: 'Airline AI Travel Assistant'
   };
 
   const isManager = user?.role === 'manager';

@@ -92,7 +92,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="Corporate Travel & Expense Intelligence Platform",
+    title="Airline Data Pipeline Build and Analytics Platform",
     description="Governed multi-tier ETL analytics pipeline, SCD Type-2 lineage, and Executive BI.",
     version="2.1.0",
     lifespan=lifespan
@@ -175,7 +175,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
 def health_check():
     return {
         "status": "HEALTHY",
-        "service": "Corporate Travel Intelligence API",
+        "service": "Airline Data Pipeline & Analytics API",
         "version": "2.1.0",
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
@@ -584,7 +584,7 @@ def get_crash_reports(current_user: User = Depends(require_role(["manager", "adm
 @app.get("/api/legal/privacy-policy")
 def get_privacy_policy():
     """
-    Corporate Travel Analytics Data Governance & Privacy Policy.
+    Airline Data Pipeline Build & Analytics Data Governance & Privacy Policy.
     """
     return get_privacy_policy_contract()
 

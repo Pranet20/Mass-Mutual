@@ -240,7 +240,7 @@ def get_privacy_policy_contract() -> Dict[str, Any]:
     Returns legal & corporate travel privacy policy contract.
     """
     return {
-        "title": "Corporate Travel Analytics - Enterprise Privacy & Data Governance Policy",
+        "title": "Airline Data Pipeline Build and Analytics - Enterprise Privacy Policy",
         "last_updated": "2026-11-24",
         "compliance_standards": ["GDPR (EU 2016/679)", "ISO/IEC 27001", "Corporate Financial Audit Standards"],
         "data_collected": [

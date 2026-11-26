@@ -535,7 +535,7 @@ def generate_executive_audit_package_html() -> str:
 
     total_pages = 7 if include_audit_package else 5
     doc_label = "Executive Audit Package" if include_audit_package else "Executive Briefing"
-    doc_title = "Corporate Travel Analytics - Executive PDF Audit Package (7 Pages)" if include_audit_package else "Corporate Travel Analytics - Executive C-Suite 5-Page Briefing"
+    doc_title = "Airline Data Pipeline Build & Analytics - Executive PDF Audit Package (7 Pages)" if include_audit_package else "Airline Data Pipeline Build & Analytics - Executive C-Suite 5-Page Briefing"
     toolbar_sub = "| Certified 7-Page Executive PDF Audit Package & Governance Repository" if include_audit_package else "| Executive C-Suite 5-Page Governed Report"
 
     # --- ASSEMBLE HTML DOCUMENT ---
@@ -1290,7 +1290,7 @@ def generate_csuite_briefing_html() -> str:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Corporate Travel Analytics - C-Suite Strategic Memo (2 Pages)</title>
+    <title>Airline Data Pipeline Build & Analytics - C-Suite Strategic Memo (2 Pages)</title>
     <style>
         @page {{
             size: A4 portrait;
@@ -1745,7 +1745,7 @@ def generate_pbit_template() -> str:
     
     schema = {
         "name": "TravelAnalyticsDataModel",
-        "description": "Governed Corporate Travel Analytics Model connected to vw_travel view",
+        "description": "Governed Airline Data Pipeline Model connected to vw_travel view",
         "version": "2.1.0",
         "entities": [
             {
@@ -1861,7 +1861,7 @@ def generate_executive_audit_package_pdf_bytes() -> bytes:
 
         # --- COVER / HEADER ---
         elements.append(Paragraph("TRAVEL DESK TEAM — AUDIT PACKAGE", title_style))
-        elements.append(Paragraph(f"Corporate Travel Analytics Governed Pipeline & Analytical Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
+        elements.append(Paragraph(f"Airline Data Pipeline Build and Analytics Governed Lineage  •  Generated: {time_str}  •  Status: CERTIFIED", subtitle_style))
         elements.append(Spacer(1, 14))
 
         # --- EXECUTIVE KPI TABLE ---

@@ -3,7 +3,7 @@ def get_governed_data_dictionary() -> dict:
     Returns complete enterprise data dictionary metadata for all database tables and views.
     """
     return {
-        "title": "Corporate Travel Analytics - Governed Enterprise Data Dictionary",
+        "title": "Airline Data Pipeline Build and Analytics - Governed Enterprise Data Dictionary",
         "version": "2.0.0",
         "description": "Comprehensive schema documentation for raw staging, cleansed, dim, fact, and analytical views in SQLite warehouse.",
         "tables": [

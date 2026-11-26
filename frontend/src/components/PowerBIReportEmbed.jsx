@@ -181,7 +181,7 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
       <div className="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span className="text-white font-bold text-sm">Travel Desk Team — Power BI Analytics Studio (5 Governed Pages)</span>
+          <span className="text-white font-bold text-sm">Travel Desk Team — Airline Analytics Studio (5 Governed Pages)</span>
         </div>
 
         <div className="flex items-center gap-2">

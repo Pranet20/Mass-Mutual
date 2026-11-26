@@ -89,11 +89,11 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
     }
 
     if query_lower in ["hi", "hello", "hey", "greetings"]:
-        response["answer"] = f"Hello! I am your Corporate Travel Governance Desk connected to the live warehouse. We are currently tracking {total_tickets} tickets across {emp_count} active employees with ₹{total_spend:,.2f} INR in verified flown spend. How can I assist you with budgets, policies, spend optimizations, or approvals today?"
+        response["answer"] = f"Hello! I am your Airline Analytics Desk connected to the live warehouse. We are currently tracking {total_tickets} tickets across {emp_count} active employees with ₹{total_spend:,.2f} INR in verified flown spend. How can I assist you with budgets, policies, spend optimizations, or approvals today?"
         response["data_summary"] = {"Total Records": total_tickets, "Total Spend": f"₹{total_spend:,.2f}", "Active Employees": emp_count}
 
     elif "service" in query_lower or "feature" in query_lower or "capabilities" in query_lower or "what do you do" in query_lower:
-        response["answer"] = "The Corporate Travel Intelligence Platform provides 6 core enterprise services: 1. Executive Command Center with dynamic spend analytics, route filters, and BI visualizations. 2. Governed multi-tier ETL Ingestion Pipeline with quarantine isolation, FX normalization, and deduplication. 3. 100-Employee Corporate Directory with real-time quarterly allowance limit management. 4. Manager Approval Desk & Policy Exemption Overrides. 5. Predictive Time-Series Spend Forecasting with QoQ projections. 6. Power BI Analytics Canvas with 14 production-grade DAX measures."
+        response["answer"] = "The Airline Data Pipeline & Analytics Platform provides 6 core enterprise services: 1. Executive Command Center with dynamic spend analytics, route filters, and BI visualizations. 2. Governed multi-tier ETL Ingestion Pipeline with quarantine isolation, FX normalization, and deduplication. 3. 100-Employee Corporate Directory with real-time quarterly allowance limit management. 4. Manager Approval Desk & Policy Exemption Overrides. 5. Predictive Time-Series Spend Forecasting with QoQ projections. 6. Power BI Analytics Canvas with 14 production-grade DAX measures."
         response["data_summary"] = {"Core Services": "Executive BI, Governed Pipeline, Employee Directory, Approvals, Forecasting, Power BI"}
 
     elif "optimize" in query_lower or "saving" in query_lower or "reduction" in query_lower:
@@ -138,7 +138,7 @@ def process_ai_query(user_query: str, user_role: str = "manager", employee_id: s
         response["data_summary"] = {"Domestic Class": "Economy Only", "International Class": "Business (Lead+ / >6 hrs)", "Approval": "Manager Mandatory"}
 
     else:
-        response["answer"] = f"I analyzed our corporate travel analytics warehouse: We track {total_tickets} travel tickets across {emp_count} active employees with a verified spend of ₹{total_spend:,.2f} INR. Top spending division: {top_bu[0]} (₹{top_bu[1]:,.2f} INR). Highest spender: {top_emp_str}. How can I assist you further?"
+        response["answer"] = f"I analyzed our airline data pipeline analytics warehouse: We track {total_tickets} travel tickets across {emp_count} active employees with a verified spend of ₹{total_spend:,.2f} INR. Top spending division: {top_bu[0]} (₹{top_bu[1]:,.2f} INR). Highest spender: {top_emp_str}. How can I assist you further?"
         response["data_summary"] = {"Total Records": total_tickets, "Total Spend": f"₹{total_spend:,.2f}", "Top Division": top_bu[0]}
 
     session.close()
@@ -187,7 +187,7 @@ def submit_complaint(subject: str, details: str, submitted_by: str, from_email: 
     comp_id = f"CMP-{complaint_obj.id + 100}"
     session.close()
 
-    mail_subject = f"[Corporate Travel Query - {comp_id}] {subject}"
+    mail_subject = f"[Airline Query - {comp_id}] {subject}"
     mail_body = f"From: {from_email or submitted_by}\nEmployee: {submitted_by}\nTicket Reference: {comp_id}\n\nDetails:\n{details}"
     sent, smtp_msg = send_smtp_email(OFFICIAL_EMAIL, mail_subject, mail_body, from_email)
 

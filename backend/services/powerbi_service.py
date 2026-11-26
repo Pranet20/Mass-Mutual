@@ -317,7 +317,7 @@ def get_powerbi_embed_config() -> Dict[str, Any]:
     config_status = validate_powerbi_config()
 
     report_metadata = {
-        "report_name": "Enterprise Corporate Travel Analytics",
+        "report_name": "Airline Data Pipeline & Analytics",
         "governed_source": "public.vw_travel",
         "required_pages": [
             "Executive Spend Overview",

@@ -109,7 +109,7 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
           <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-2xl mx-auto mb-2 border border-white/20 shadow-md">
             T
           </div>
-          <h2 className="text-2xl font-black">Corporate Travel Analytics</h2>
+          <h2 className="text-2xl font-black">Airline Data Pipeline & Analytics</h2>
           <p className="text-blue-200 text-xs mt-0.5 font-semibold">Travel Desk Team</p>
         </div>
 
@@ -439,7 +439,7 @@ export const LoginModal = ({ onOpenPrivacyPolicy }) => {
               onClick={onOpenPrivacyPolicy}
               className="text-[11px] text-slate-400 hover:text-indigo-400 transition-colors underline"
             >
-              Corporate Travel Data Governance & Privacy Policy
+              Airline Data Governance & Privacy Policy
             </button>
           </div>
         )}

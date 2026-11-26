@@ -35,7 +35,7 @@ export const PrivacyPolicyModal = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h3 className="text-base font-bold text-white tracking-tight">Privacy & Data Governance Policy</h3>
-              <p className="text-xs text-slate-400">Enterprise Corporate Travel Analytics • GDPR & Compliance</p>
+              <p className="text-xs text-slate-400">Airline Data Pipeline Build & Analytics • GDPR & Compliance</p>
             </div>
           </div>
           <button
