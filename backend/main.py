@@ -1379,7 +1379,7 @@ def get_audit_package_pdf(format: Optional[str] = Query(None, description="Forma
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=MassMutual_Executive_Audit_Package.pdf"}
+        headers={"Content-Disposition": "attachment; filename=Corporate_Travel_Executive_Audit_Package.pdf"}
     )
 
 @app.get("/api/powerbi/embed-config")

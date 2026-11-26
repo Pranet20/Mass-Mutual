@@ -179,7 +179,7 @@ export const Dashboard = ({ onNavigateToPowerBI }) => {
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
-              MassMutual Travel Desk Team
+              Travel Desk Team
             </span>
           </div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">Executive Command Center</h3>

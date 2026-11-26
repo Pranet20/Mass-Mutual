@@ -26,11 +26,11 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenPrivacyPolicy, onOpenAc
         {/* Brand Header */}
         <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            M
+            T
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 dark:text-white text-base leading-tight">MassMutual</h1>
-            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Travel Desk Team</p>
+            <h1 className="font-bold text-slate-900 dark:text-white text-base leading-tight">Travel Desk Team</h1>
+            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Corporate Travel Analytics</p>
           </div>
         </div>
 
