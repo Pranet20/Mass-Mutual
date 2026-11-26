@@ -3,7 +3,7 @@ import axios from 'axios';
 import { 
   Download, BarChart3, Database, FileText, CheckCircle2, Sparkles, 
   RefreshCw, ChevronRight, ExternalLink, ShieldCheck, Laptop, 
-  Code, Layers, Info, Check, AlertTriangle
+  Code, Layers, Info, Check, AlertTriangle, FileSpreadsheet
 } from 'lucide-react';
 import { PowerBIReportEmbed } from '../components/PowerBIReportEmbed';
 
