@@ -56,10 +56,6 @@ export const PowerBI = () => {
     window.open('/api/reports/briefing-html', '_blank');
   };
 
-  const handleDownloadAuditPackage = () => {
-    window.open('/api/export/audit-package-pdf', '_blank');
-  };
-
   const handleDownload5PageReport = () => {
     window.open('/api/reports/audit-package-html', '_blank');
   };
@@ -187,12 +183,9 @@ export const PowerBI = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300">
-                MassMutual Travel Desk Team
+                Travel Desk Team
               </span>
               <h3 className="font-black text-lg tracking-wide">Corporate Travel Analytics</h3>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40">
-                Official Power BI Studio
-              </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
               Authoritative Warehouse View <code className="text-amber-300 font-mono font-bold">public.vw_travel</code> • Governed Columns • 5 Core Report Pages
@@ -211,16 +204,6 @@ export const PowerBI = () => {
           >
             <Laptop className="w-3.5 h-3.5 text-amber-300" />
             <span>{downloadingPBIX ? 'Downloading...' : 'Download .pbix File'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDownloadAuditPackage}
-            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-            title="Download Certified Executive PDF Audit Package"
-          >
-            <FileText className="w-3.5 h-3.5 text-emerald-200" />
-            <span>Audit Package (PDF)</span>
           </button>
 
           <button
@@ -343,32 +326,6 @@ export const PowerBI = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Prominent 1-Click PDF Audit Package Callout */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40 flex-shrink-0">
-            <FileText className="w-6 h-6" />
-          </div>
-          <div>
-            <h4 className="font-black text-base text-white">
-              1-Click Executive PDF Audit Package Download
-            </h4>
-            <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-              Instantly bundle all 5 analytical report pages, the full 37-column <code className="text-amber-400 bg-slate-900 px-1 py-0.5 rounded">vw_travel</code> governed data dictionary, and complete pipeline batch audit logs into an exportable corporate PDF governance package.
-            </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleDownloadAuditPackage}
-          className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer active:scale-95"
-        >
-          <Download className="w-4 h-4" />
-          <span>Download Executive PDF Package (7-Page)</span>
-        </button>
       </div>
     </div>
   );
