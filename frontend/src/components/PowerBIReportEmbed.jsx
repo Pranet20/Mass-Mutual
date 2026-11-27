@@ -107,9 +107,9 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
       });
   }, []);
 
-  const handleDownloadPBIX = () => {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('token') || '';
-    window.location.href = `/api/powerbi/pbix?token=${encodeURIComponent(token)}`;
+  const handleOpenPowerBIStudio = () => {
+    const url = embedConfig?.web_report_url || 'https://app.powerbi.com';
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const handleOpenWebReport = () => {
@@ -186,12 +186,13 @@ export const PowerBIReportEmbed = ({ onSwitchToFallback }) => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={handleDownloadPBIX}
-            className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-95"
-            title="Download Master Power BI (.pbix) Desktop File"
+            type="button"
+            onClick={handleOpenPowerBIStudio}
+            className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] flex items-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-95"
+            title="Open Power BI Studio Web Workspace"
           >
-            <Laptop className="w-3.5 h-3.5" />
-            <span>Download .PBIX File</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Open Power BI Studio</span>
           </button>
         </div>
       </div>
